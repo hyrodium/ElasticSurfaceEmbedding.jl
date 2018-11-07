@@ -251,10 +251,10 @@ function DrawConfig(config)
     global UNIT=config["UNIT"]
 end
 
-function ExportFig(ShapeName,𝒑₍₀₎,B2::Bs2mfd,index)
+function ExportFig(ShapeName,𝒑₍₀₎,B2::Bs2mfd,index;comment="")
     BsDraw(B2,filename=homedir()*"/I4SM-Result/"*ShapeName*"/svg/"*ShapeName*"-"*string(index)*".svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=UNIT)
     run(`convert $(homedir()*"/I4SM-Result/"*ShapeName*"/svg/"*ShapeName*"-"*string(index)*".svg") $(homedir()*"/I4SM-Result/"*ShapeName*"/slack/"*ShapeName*"-"*string(index)*".png")`)
-    SlackFile(homedir()*"/I4SM-Result/"*ShapeName*"/slack/"*ShapeName*"-"*string(index)*".png")
+    SlackFile(homedir()*"/I4SM-Result/"*ShapeName*"/slack/"*ShapeName*"-"*string(index)*".png",comment=comment)
 end
 
 function Init(ShapeName,𝒑₍₀₎,D;n₁=15,nip=25)
@@ -271,7 +271,7 @@ function Init(ShapeName,𝒑₍₀₎,D;n₁=15,nip=25)
     BsJLD["BsTree"]=BsTree
     save(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld",BsJLD)
     showtree(BsTree)
-    ExportFig(ShapeName,𝒑₍₀₎,B,index)
+    ExportFig(ShapeName,𝒑₍₀₎,B,index,comment="Initial Configuration")
     return nothing
 end
 function pRef(ShapeName,𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
@@ -281,14 +281,15 @@ function pRef(ShapeName,𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     B=BsJLD[string(parent)]
 
     B=pref(B,p₊,nip=nip)
-    addchild(BsTree,parent,"p-refinement with "*string(p₊))
+    comment="p-refinement with "*string(p₊)
+    addchild(BsTree,parent,comment)
 
     index=length(BsTree.nodes)
     BsJLD[string(index)]=B
     BsJLD["BsTree"]=BsTree
     save(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld",BsJLD)
     showtree(BsTree)
-    ExportFig(ShapeName,𝒑₍₀₎,B,index)
+    ExportFig(ShapeName,𝒑₍₀₎,B,index,comment=comment)
     return nothing
 end
 function hRef(ShapeName,𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=25)
@@ -298,14 +299,15 @@ function hRef(ShapeName,𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,n
     B=BsJLD[string(parent)]
 
     B=href(B,h₊,nip=nip)
-    addchild(BsTree,parent,"h-refinement with "*string(h₊))
+    comment="h-refinement with "*string(h₊)
+    addchild(BsTree,parent,comment)
 
     index=length(BsTree.nodes)
     BsJLD[string(index)]=B
     BsJLD["BsTree"]=BsTree
     save(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld",BsJLD)
     showtree(BsTree)
-    ExportFig(ShapeName,𝒑₍₀₎,B,index)
+    ExportFig(ShapeName,𝒑₍₀₎,B,index,comment=comment)
     return nothing
 end
 function Newt(ShapeName,𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=25)
@@ -315,14 +317,15 @@ function Newt(ShapeName,𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)
     B=BsJLD[string(parent)]
 
     B,F,Ǧ=NewtonIteration(𝒑₍₀₎,B,fixed,nip=nip)
-    addchild(BsTree,parent,"Newton Iteration - Residual norm: "*string(norm(F))*", Δa norm: "*string(norm(Ǧ)))
+    comment="Newton Iteration - Residual norm: "*string(norm(F))*", Δa norm: "*string(norm(Ǧ))
+    addchild(BsTree,parent,comment)
 
     index=length(BsTree.nodes)
     BsJLD[string(index)]=B
     BsJLD["BsTree"]=BsTree
     save(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld",BsJLD)
     showtree(BsTree)
-    ExportFig(ShapeName,𝒑₍₀₎,B,index)
+    ExportFig(ShapeName,𝒑₍₀₎,B,index,comment=comment)
     return nothing
 end
 
