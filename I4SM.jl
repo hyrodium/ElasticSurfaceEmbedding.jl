@@ -252,16 +252,16 @@ function DrawConfig(config)
 end
 
 function ExportFig(ShapeName,𝒑₍₀₎,B2::Bs2mfd,index)
-    BsDraw(B2,filename=ShapeName*"/svg/"*ShapeName*"-"*string(index)*".svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=UNIT)
-    run(`convert $(ShapeName*"/svg/"*ShapeName*"-"*string(index)*".svg") $(ShapeName*"/png/"*ShapeName*"-"*string(index)*".png")`)
-    SlackFile(ShapeName*"/png/"*ShapeName*"-"*string(index)*".png")
+    BsDraw(B2,filename=homedir()*"/I4SM-Result/"*ShapeName*"/svg/"*ShapeName*"-"*string(index)*".svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=UNIT)
+    run(`convert $(homedir()*"/I4SM-Result/"*ShapeName*"/svg/"*ShapeName*"-"*string(index)*".svg") $(homedir()*"/I4SM-Result/"*ShapeName*"/slack/"*ShapeName*"-"*string(index)*".png")`)
+    SlackFile(homedir()*"/I4SM-Result/"*ShapeName*"/slack/"*ShapeName*"-"*string(index)*".png")
 end
 
 function Init(ShapeName,𝒑₍₀₎,D;n₁=15,nip=25)
-    mkdir(ShapeName)
-    mkdir(ShapeName*"/svg")
-    mkdir(ShapeName*"/png")
-    mkdir(ShapeName*"/strain")
+    mkpath(homedir()*"/I4SM-Result/"*ShapeName)
+    mkpath(homedir()*"/I4SM-Result/"*ShapeName*"/svg")
+    mkpath(homedir()*"/I4SM-Result/"*ShapeName*"/slack")
+    mkpath(homedir()*"/I4SM-Result/"*ShapeName*"/strain")
     B=InitBs(𝒑₍₀₎,D,n₁,nip=25)
     BsTree=Tree()
     BsJLD=Dict{String,Any}()
@@ -269,13 +269,13 @@ function Init(ShapeName,𝒑₍₀₎,D;n₁=15,nip=25)
     index=1
     BsJLD[string(index)]=B
     BsJLD["BsTree"]=BsTree
-    save(ShapeName*"/"*ShapeName*".jld",BsJLD)
+    save(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld",BsJLD)
     showtree(BsTree)
     ExportFig(ShapeName,𝒑₍₀₎,B,index)
     return nothing
 end
 function pRef(ShapeName,𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
-    BsJLD=load(ShapeName*"/"*ShapeName*".jld")
+    BsJLD=load(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
     B=BsJLD[string(parent)]
@@ -286,13 +286,13 @@ function pRef(ShapeName,𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     index=length(BsTree.nodes)
     BsJLD[string(index)]=B
     BsJLD["BsTree"]=BsTree
-    save(ShapeName*"/"*ShapeName*".jld",BsJLD)
+    save(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld",BsJLD)
     showtree(BsTree)
     ExportFig(ShapeName,𝒑₍₀₎,B,index)
     return nothing
 end
 function hRef(ShapeName,𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=25)
-    BsJLD=load(ShapeName*"/"*ShapeName*".jld")
+    BsJLD=load(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
     B=BsJLD[string(parent)]
@@ -303,13 +303,13 @@ function hRef(ShapeName,𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,n
     index=length(BsTree.nodes)
     BsJLD[string(index)]=B
     BsJLD["BsTree"]=BsTree
-    save(ShapeName*"/"*ShapeName*".jld",BsJLD)
+    save(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld",BsJLD)
     showtree(BsTree)
     ExportFig(ShapeName,𝒑₍₀₎,B,index)
     return nothing
 end
 function Newt(ShapeName,𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=25)
-    BsJLD=load(ShapeName*"/"*ShapeName*".jld")
+    BsJLD=load(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
     B=BsJLD[string(parent)]
@@ -320,7 +320,7 @@ function Newt(ShapeName,𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)
     index=length(BsTree.nodes)
     BsJLD[string(index)]=B
     BsJLD["BsTree"]=BsTree
-    save(ShapeName*"/"*ShapeName*".jld",BsJLD)
+    save(homedir()*"/I4SM-Result/"*ShapeName*"/"*ShapeName*".jld",BsJLD)
     showtree(BsTree)
     ExportFig(ShapeName,𝒑₍₀₎,B,index)
     return nothing
