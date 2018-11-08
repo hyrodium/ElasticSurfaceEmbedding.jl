@@ -1,9 +1,10 @@
 module SvgDraw
 
 using IntervalSets
+using Colors
 using Luxor
 
-export SvgCurve
+export SvgCurve, ParametricColor
 
 function BézPts(𝒑,a,b) # Bézier曲線の制御点
     𝒑(a),
@@ -64,7 +65,6 @@ function SvgCurve(𝒑,I::ClosedInterval;name="BCA.svg",up=5,down=-5,right=5,lef
     return true
 end
 
-
 function SvgSurface(𝒑,k,n;name="BSA.svg",up=5,down=-5,right=5,left=-5,step=50)
     k₁,k₂=k
     n₁,n₂=n
@@ -93,6 +93,32 @@ function SvgSurface(𝒑,k,n;name="BSA.svg",up=5,down=-5,right=5,left=-5,step=50
     strokepath()
     finish()
     ChangeUnit!(name,"pt","mm")
+end
+
+function ParametricColor(𝒑,D;rgb=(u->[0.5,0.5,0.5]),filename="ParametricColor.png",up=5,down=-5,right=5,left=-5,mesh=(10,10),unit=100)
+    Drawing((right-left)*unit,(up-down)*unit,filename)
+    Luxor.origin(-left*unit,up*unit)
+
+    k₁=range(leftendpoint(D[1]),stop=rightendpoint(D[1]),length=mesh[1]+1)
+    k₂=range(leftendpoint(D[2]),stop=rightendpoint(D[2]),length=mesh[2]+1)
+
+    for I₁ in 1:mesh[1], I₂ in 1:mesh[2]
+        BézPth=BezierPath([
+                BezierPathSegment(map(p->LxrPt(p,unit),BézPts(t->𝒑([t,k₂[I₂]]),k₁[I₁],k₁[I₁+1]))...),
+                BezierPathSegment(map(p->LxrPt(p,unit),BézPts(t->𝒑([k₁[I₁+1],t]),k₂[I₂],k₂[I₂+1]))...),
+                BezierPathSegment(map(p->LxrPt(p,unit),BézPts(t->𝒑([t,k₂[I₂+1]]),k₁[I₁+1],k₁[I₁]))...),
+                BezierPathSegment(map(p->LxrPt(p,unit),BézPts(t->𝒑([k₁[I₁],t]),k₂[I₂+1],k₂[I₂]))...)])
+        mesh1 = Luxor.mesh(BézPth, [
+            Colors.RGB(rgb([k₁[I₁], k₂[I₂]])...), # (k₁[I₁], k₂[I₂])
+            Colors.RGB(rgb([k₁[I₁+1], k₂[I₂]])...), # (k₁[I₁+1], k₂[I₂])
+            Colors.RGB(rgb([k₁[I₁+1], k₂[I₂+1]])...), # (k₁[I₁+1], k₂[I₂+1])
+            Colors.RGB(rgb([k₁[I₁], k₂[I₂+1]])...)  # (k₁[I₁], k₂[I₂+1])
+            ])
+        setmesh(mesh1)
+        box(LxrPt([right+left,up+down]/2,unit), (right-left)*unit,(up-down)*unit,:fill)
+    end
+    finish()
+    return true
 end
 
 end

@@ -10,7 +10,7 @@ using JLD
 using Bspline
 using ElementaryCalculus
 using Slack
-# using SvgDraw
+using SvgDraw
 # using POV_Ray
 
 export Init, pRef, hRef, Newt, Config
@@ -241,7 +241,7 @@ function showtree(tree)
     shownode(tree,1,0)
 end
 
-function Config(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=(100,"pt"))
+function Config(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100)
     global NAME=name
     global DIR=homedir()*"/I4SM-Result/"*NAME
     global UP=up
@@ -249,13 +249,37 @@ function Config(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=(100,"pt"))
     global RIGHT=right
     global LEFT=left
     global MESH=mesh
-    global UNIT=unit
+    global UNIT=(unit,"pt")
 end
 
 function ExportFig(𝒑₍₀₎,B2::Bs2mfd,index;comment="")
-    BsDraw(B2,filename=DIR*"/svg/"*NAME*"-"*string(index)*".svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=UNIT)
-    run(`convert $(DIR*"/svg/"*NAME*"-"*string(index)*".svg") $(DIR*"/slack/"*NAME*"-"*string(index)*".png")`)
-    SlackFile(DIR*"/slack/"*NAME*"-"*string(index)*".png",comment=comment)
+    BsDraw(B2,filename=DIR*"/svg/"*NAME*"-"*string(index)*"-Bspline.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=UNIT)
+    k₁,k₂=B2.k
+    D=(k₁[1]..k₁[end],k₂[1]..k₂[end])
+
+    𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->𝒑₍₀₎([u₁,u[2]]),u[1])
+    𝒑₍ₜ₎(u)=BsMapping(B2,u)
+    function 𝒑₁₍ₜ₎(u)
+        p,k,a=B2.p,B2.k,B2.a
+        p₁,p₂=p
+        k₁,k₂=k
+        n=n₁,n₂=length.(k)-p.-1
+        return sum(Ḃs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])*a[I₁,I₂,:] for I₁ in 1:n₁, I₂ in 1:n₂)
+    end
+    g₍₀₎₁₁(u)=dot(𝒑₁₍₀₎(u),𝒑₁₍₀₎(u))
+    g₍ₜ₎₁₁(u)=dot(𝒑₁₍ₜ₎(u),𝒑₁₍ₜ₎(u))
+    E₁₁(u)=(g₍ₜ₎₁₁(u)-g₍₀₎₁₁(u))/2
+    E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
+    rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]*50 .+0.5
+
+    ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=DIR*"/strain/"*NAME*"-"*string(index)*"-strain.png",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=tuple(10*[MESH...]...),unit=5*UNIT[1])
+
+    run(`convert $(DIR*"/svg/"*NAME*"-"*string(index)*"-Bspline.svg") $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png")`)
+    run(`convert -resize 80% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png")`)
+    run(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(DIR*"/strain/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png")`)
+    run(`convert +append $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png")`)
+
+    SlackFile(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png",comment=comment)
 end
 
 function Init(𝒑₍₀₎,D;n₁=15,nip=25)
