@@ -45,7 +45,7 @@ function SvgCurve(𝒑,k::Array{T,1};name="BCA.svg",up=5,down=-5,right=5,left=-5
     return true
 end
 
-function SvgCurve(𝒑,I::ClosedInterval;name="BCA.svg",up=5,down=-5,right=5,left=-5,zoom=1,unitlength=(100,"pt")) where T<:Real
+function SvgCurve(𝒑,I::ClosedInterval;name="BCA.svg",up=5,down=-5,right=5,left=-5,zoom=1,unitlength=(100,"pt"))
     k=collect(range(endpoints(I)...,length=60))
     n=length(k)-1
     step, unit=(unitlength[1]*zoom,unitlength[2])
