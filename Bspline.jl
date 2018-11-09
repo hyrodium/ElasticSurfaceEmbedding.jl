@@ -18,7 +18,7 @@ mutable struct Bs1mfd
     function Bs1mfd(p,k,a)
         if (size(a)≠((length(k)-p-1),2))
             error("dim-error")
-        elseif (!*(issorted.(k)...))
+        elseif (!issorted(k))
             error("knots not sorted")
         else
             new(p,k,a)
