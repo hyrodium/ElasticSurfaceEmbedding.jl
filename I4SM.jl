@@ -241,7 +241,7 @@ function showtree(tree)
     shownode(tree,1,0)
 end
 
-function Config(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100)
+function Config(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true)
     global NAME=name
     global DIR=homedir()*"/I4SM-Result/"*NAME
     global UP=up
@@ -250,6 +250,7 @@ function Config(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100)
     global LEFT=left
     global MESH=mesh
     global UNIT=(unit,"pt")
+    global SLACK=slack
 end
 
 function ExportFig(𝒑₍₀₎,B2::Bs2mfd,index;comment="")
@@ -279,7 +280,9 @@ function ExportFig(𝒑₍₀₎,B2::Bs2mfd,index;comment="")
     run(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(DIR*"/strain/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png")`)
     run(`convert +append $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png")`)
 
-    SlackFile(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png",comment=comment)
+    if (slack)
+        SlackFile(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png",comment=comment)
+    end
 end
 
 function Init(𝒑₍₀₎,D;n₁=15,nip=25)
