@@ -3,8 +3,9 @@ module SvgDraw
 using IntervalSets
 using Colors
 using Luxor
+using Printf
 
-export SvgCurve, ParametricColor
+export SvgCurve, ParametricColor, ColorBar
 
 function BézPts(𝒑,a,b) # Bézier曲線の制御点
     𝒑(a),
@@ -117,6 +118,35 @@ function ParametricColor(𝒑,D;rgb=(u->[0.5,0.5,0.5]),filename="ParametricColor
         setmesh(mesh1)
         box(LxrPt([right+left,up+down]/2,unit), (right-left)*unit,(up-down)*unit,:fill)
     end
+    finish()
+    return true
+end
+
+function ColorBar(;max=1.234,filename="ColorBar.png",unit=100)
+    up=4
+    down=-4
+    right=4.6
+    left=-2
+    Length=3.5
+    FontSize=1
+    Thickness=10
+
+    Drawing((right-left)*unit,(up-down)*unit,filename)
+    Luxor.origin(-left*unit,up*unit)
+    setblend(blend(Point(0, -Length*unit), Point(0, Length*unit), "red", "cyan"))
+    box(LxrPt([-0.9,0],unit), 1.8*unit, 7*unit, :fill)
+    sethue("Black")
+    fontface("Cica")
+    fontsize(unit*FontSize)
+    setline(Thickness)
+    setlinecap("round")
+    text(" "*@sprintf("%.3f",max),LxrPt([1.5,Length-0.32*FontSize],unit))
+    text(" "*@sprintf("%.3f",0),LxrPt([1.5,-0.32*FontSize],unit))
+    text("-"*@sprintf("%.3f",max),LxrPt([1.5,-Length-0.32*FontSize],unit))
+    line(LxrPt([0.5,0],unit),LxrPt([1.2,0],unit),:stroke)
+    line(LxrPt([0.5,-Length],unit),LxrPt([1.2,-Length],unit),:stroke)
+    line(LxrPt([0.5,Length],unit),LxrPt([1.2,Length],unit),:stroke)
+
     finish()
     return true
 end

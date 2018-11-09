@@ -271,16 +271,19 @@ function ExportFig(𝒑₍₀₎,B2::Bs2mfd,index;comment="")
     g₍ₜ₎₁₁(u)=dot(𝒑₁₍ₜ₎(u),𝒑₁₍ₜ₎(u))
     E₁₁(u)=(g₍ₜ₎₁₁(u)-g₍₀₎₁₁(u))/2
     E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
-    rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]*50 .+0.5
 
+    maxstrain=0.005
+    rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*maxstrain) .+0.5
     ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=DIR*"/strain/"*NAME*"-"*string(index)*"-strain.png",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=tuple(10*[MESH...]...),unit=5*UNIT[1])
+    ColorBar(max=maxstrain,filename=DIR*"/colorbar/"*NAME*"-"*string(index)*"-colorbar.png",unit=UNIT[1])
 
     run(`convert $(DIR*"/svg/"*NAME*"-"*string(index)*"-Bspline.svg") $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png")`)
     run(`convert -resize 80% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png")`)
-    run(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(DIR*"/strain/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png")`)
+    run(`convert $(DIR*"/strain/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/colorbar/"*NAME*"-"*string(index)*"-colorbar.png") -gravity southeast -compose over -composite $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png")`)
+    run(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png")`)
     run(`convert +append $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png")`)
 
-    if (slack)
+    if (SLACK)
         SlackFile(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png",comment=comment)
     end
 end
@@ -288,72 +291,73 @@ end
 function Init(𝒑₍₀₎,D;n₁=15,nip=25)
     mkpath(DIR)
     mkpath(DIR*"/svg")
-    mkpath(DIR*"/slack")
     mkpath(DIR*"/strain")
-    B=InitBs(𝒑₍₀₎,D,n₁,nip=25)
+    mkpath(DIR*"/colorbar")
+    mkpath(DIR*"/slack")
+    B2=InitBs(𝒑₍₀₎,D,n₁,nip=25)
     BsTree=Tree()
     BsJLD=Dict{String,Any}()
 
     index=1
-    BsJLD[string(index)]=B
+    BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
     showtree(BsTree)
-    ExportFig(𝒑₍₀₎,B,index,comment="Initial Configuration")
+    ExportFig(𝒑₍₀₎,B2,index,comment="Initial Configuration")
     return nothing
 end
 function pRef(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
-    B=BsJLD[string(parent)]
+    B2=BsJLD[string(parent)]
 
-    B=pref(B,p₊,nip=nip)
+    B2=pref(B2,p₊,nip=nip)
     comment="p-refinement with "*string(p₊)
     addchild(BsTree,parent,comment)
 
     index=length(BsTree.nodes)
-    BsJLD[string(index)]=B
+    BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
     showtree(BsTree)
-    ExportFig(𝒑₍₀₎,B,index,comment=comment)
+    ExportFig(𝒑₍₀₎,B2,index,comment=comment)
     return nothing
 end
 function hRef(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
-    B=BsJLD[string(parent)]
+    B2=BsJLD[string(parent)]
 
-    B=href(B,h₊,nip=nip)
+    B2=href(B2,h₊,nip=nip)
     comment="h-refinement with "*string(h₊)
     addchild(BsTree,parent,comment)
 
     index=length(BsTree.nodes)
-    BsJLD[string(index)]=B
+    BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
     showtree(BsTree)
-    ExportFig(𝒑₍₀₎,B,index,comment=comment)
+    ExportFig(𝒑₍₀₎,B2,index,comment=comment)
     return nothing
 end
 function Newt(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
-    B=BsJLD[string(parent)]
+    B2=BsJLD[string(parent)]
 
-    B,F,Ǧ=NewtonIteration(𝒑₍₀₎,B,fixed,nip=nip)
+    B2,F,Ǧ=NewtonIteration(𝒑₍₀₎,B2,fixed,nip=nip)
     comment="Newton Iteration - Residual norm: "*string(norm(F))*", Δa norm: "*string(norm(Ǧ))
     addchild(BsTree,parent,comment)
 
     index=length(BsTree.nodes)
-    BsJLD[string(index)]=B
+    BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
     showtree(BsTree)
-    ExportFig(𝒑₍₀₎,B,index,comment=comment)
+    ExportFig(𝒑₍₀₎,B2,index,comment=comment)
     return nothing
 end
 
