@@ -28,9 +28,11 @@ end
 
 function Positioning(a::Array{Float64,3}) # 制御点の位置調整
     n₁,n₂=size(a)[1:2]
-    v=a[(n₁+1)÷2,(n₂-1)÷2,:]-a[(n₁+1)÷2,(n₂+1)÷2,:]
+    ind0=[(n₁+1)÷2,(n₂+1)÷2]
+    ind1=ind0-[0,1]
+    v=a[ind1...,:]-a[ind0...,:]
     R=-[v[2] -v[1];v[1] v[2]]/norm(v)
-    return a=aff(a,R,-R*a[(n₁+1)÷2,(n₂+1)÷2,:])
+    return a=aff(a,R,-R*a[ind0...,:])
 end
 
 function Positioning(B2::Bs2mfd) # 制御点の位置調整
@@ -347,6 +349,11 @@ function Newt(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
     B2=BsJLD[string(parent)]
+    n₁,n₂=length.(B2.k)-B2.p.-1
+    if (!isodd(n₁*n₂))
+        error("n₁ and n₂ should be odd numbers")
+    end
+    B2=Positioning(B2)
 
     B2,F,Ǧ=NewtonIteration(𝒑₍₀₎,B2,fixed,nip=nip)
     comment="Newton Iteration - Residual norm: "*string(norm(F))*", Δa norm: "*string(norm(Ǧ))
