@@ -9,7 +9,7 @@ import SvgDraw.BézPts
 import SvgDraw.LxrPt
 
 
-export Bs1mfd, Bs2mfd, Bs, Ḃs, Bsupp, BsCoef, BsMapping, href, pref, BsDraw, BsWrite, BsRead
+export Bs1mfd, Bs2mfd, Bs, Ḃs, Bsupp, BsCoef2, BsMapping, href, pref, BsDraw, BsWrite, BsRead
 
 mutable struct Bs1mfd
     p::Int64
@@ -63,24 +63,21 @@ function Bsupp(i,p,k)::ClosedInterval
     return k[i]..k[i+p+1]
 end
 
-function BsCoef(f,p::Int64,k::Array{Float64,1};nip=25)
+function BsCoef2(f,p::Int64,k::Array{Float64,1};nip=25)
     n=length(k)-p-1
     D=k[1]..k[end]
-    # return [INT(t->Bs(i,p,k,t)*Bs(j,p,k,t),D) for i ∈ 1:n, j ∈ 1:n]\[INT(t->Bs(i,p,k,t)*f(t),D) for i ∈ 1:n]
-    # return inv([INT(t->Bs(i,p,k,t)*Bs(j,p,k,t),D) for i ∈ 1:n, j ∈ 1:n])*[INT(t->Bs(i,p,k,t)*f(t),D) for i ∈ 1:n]
     A=inv([INT(t->Bs(i,p,k,t)*Bs(j,p,k,t),D,nip=nip) for i ∈ 1:n, j ∈ 1:n])*[INT(t->Bs(i,p,k,t)*f(t),D) for i ∈ 1:n]
     return reshape(hcat(reshape(vcat(A...),2,n)[1,:],reshape(vcat(A...),2,n)[2,:]),n,2)
 end
 
-function BsCoef(f,p::Array{Int64,1},k::Array{Array{Float64,1},1};nip=25)
+function BsCoef2(f,p::Array{Int64,1},k::Array{Array{Float64,1},1};nip=25)
     n₁,n₂=n=length.(k)-p.-1
     p₁,p₂=p
     k₁,k₂=k
-    D=(k₁[1]..k₁[end]),(k₂[1]..k₂[end])
-    # return reshape([INT2(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*Bs(j₁,p₁,k₁,u[1])*Bs(j₂,p₂,k₂,u[2]),D) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂, j₁ ∈ 1:n₁, j₂ ∈ 1:n₂],n₁*n₂,n₁*n₂) \ reshape([INT2(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*f(u),D) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂],n₁*n₂)
-    # return reshape(inv(reshape([INT2(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*Bs(j₁,p₁,k₁,u[1])*Bs(j₂,p₂,k₂,u[2]),D) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂, j₁ ∈ 1:n₁, j₂ ∈ 1:n₂],n₁*n₂,n₁*n₂))*reshape([INT2(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*f(u),D) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂],n₁*n₂),n₁,n₂)
-    A=reshape(inv(reshape([INT2(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*Bs(j₁,p₁,k₁,u[1])*Bs(j₂,p₂,k₂,u[2]),D,nip=nip) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂, j₁ ∈ 1:n₁, j₂ ∈ 1:n₂],n₁*n₂,n₁*n₂))*reshape([INT2(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*f(u),D) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂],n₁*n₂),n₁,n₂)
-    return reshape(hcat(reshape(vcat(A...),2,n₁,n₂)[1,:,:],reshape(vcat(A...),2,n₁,n₂)[2,:,:]),n₁,n₂,2)
+    A=reshape([INT2₊(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*Bs(j₁,p₁,k₁,u[1])*Bs(j₂,p₂,k₂,u[2]),(Bsupp(i₁,p₁,k₁)∩Bsupp(j₁,p₁,k₁),Bsupp(i₂,p₂,k₂)∩Bsupp(j₂,p₂,k₂)),nip=nip) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂, j₁ ∈ 1:n₁, j₂ ∈ 1:n₂],n₁*n₂,n₁*n₂)
+    B=reshape([INT2(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*f(u),(Bsupp(i₁,p₁,k₁),Bsupp(i₂,p₂,k₂))) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂],n₁*n₂)
+    C=reshape(inv(A)*B,n₁,n₂)
+    return [C[I₁,I₂][i] for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2]
 end
 
 # function BsCoef(f,p::Int64,k::Array{Float64,1})
@@ -161,7 +158,7 @@ function href(B2::Bs2mfd,k₊::Array{Array{Float64,1},1};nip=25)
     n=length.(k)-p.-1
     pᵣ=p
     kᵣ=[sort(convert(Array{Float64,1},vcat(k[l],k₊[l]))) for l ∈ 1:d]
-    aᵣ=BsCoef(u->BsMapping(B2,u),pᵣ,kᵣ,nip=nip)
+    aᵣ=BsCoef2(u->BsMapping(B2,u),pᵣ,kᵣ,nip=nip)
     return Bs2mfd(pᵣ,kᵣ,aᵣ)
 end
 
@@ -172,7 +169,7 @@ function pref(B2::Bs2mfd,p₊::Array{Int64,1};nip=25)
     pᵣ=p+p₊
     k₊=[repeat(DelDpl(k[l]),inner=p₊[l]) for l ∈ 1:d]
     kᵣ=[sort(convert(Array{Float64,1},vcat(k[l],k₊[l]))) for l ∈ 1:d]
-    aᵣ=BsCoef(u->BsMapping(B2,u),pᵣ,kᵣ,nip=nip)
+    aᵣ=BsCoef2(u->BsMapping(B2,u),pᵣ,kᵣ,nip=nip)
     return Bs2mfd(pᵣ,kᵣ,aᵣ)
 end
 
@@ -206,7 +203,7 @@ function BsDraw(B1::Bs1mfd;filename="BsplineCurve.svg",up=5,down=-5,right=5,left
 
     finish()
     ChangeUnit(filename,"pt",unit)
-    return true
+    return nothing
 end
 
 function BsDraw(B2::Bs2mfd;filename="BsplineSurface.svg",up=5,down=-5,right=5,left=-5,zoom=1,mesh=(10,10),unitlength=(100,"pt"),points=true)
@@ -262,12 +259,12 @@ function BsDraw(B2::Bs2mfd;filename="BsplineSurface.svg",up=5,down=-5,right=5,le
 
     finish()
     ChangeUnit(filename,"pt",unit)
-    return true
+    return nothing
 end
 
 function BsWrite(B2::Bs2mfd,i::Int64;filename="BsplineData.jld")
     save(filename,string(i),B2)
-    return true
+    return nothing
 end
 
 function BsRead(i::Int64;filename="BsplineData.jld")
@@ -283,7 +280,7 @@ end
 #     h5write(filename,"k₁-"*string(i),k₁)
 #     h5write(filename,"k₂-"*string(i),k₂)
 #     h5write(filename,"a-"*string(i),a)
-#     return true
+#     return nothing
 # end
 #
 # function BsRead(i::Int64;filename="BsplineData.h5")

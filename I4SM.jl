@@ -72,8 +72,8 @@ function InitBs(𝒑₍₀₎,D,n₁;nip=25)
 
     p₁=3
     k₁=sort(vcat(repeat(collect(extrema(D₁)),inner=p₁),collect(range(leftendpoint(D₁),stop=rightendpoint(D₁),length=n₁-2))))
-    m=BsCoef(𝒄,p₁,k₁,nip=nip)
-    m₂=BsCoef(𝒄₂,p₁,k₁,nip=nip)
+    m=BsCoef2(𝒄,p₁,k₁,nip=nip)
+    m₂=BsCoef2(𝒄₂,p₁,k₁,nip=nip)
     a1=m-width(D₂)*m₂/2
     a2=m+width(D₂)*m₂/2
     p₂=1
@@ -253,6 +253,7 @@ function Config(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=tru
     global MESH=mesh
     global UNIT=(unit,"pt")
     global SLACK=slack
+    return nothing
 end
 
 function ExportFig(𝒑₍₀₎,B2::Bs2mfd,index;comment="")

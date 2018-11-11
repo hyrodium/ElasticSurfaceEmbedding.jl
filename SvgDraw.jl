@@ -44,7 +44,7 @@ function SvgCurve(𝒑,k::Array{T,1};name="BCA.svg",up=5,down=-5,right=5,left=-5
     drawbezierpath(BézPth, :stroke)
     finish()
     ChangeUnit(name,"pt",unit)
-    return true
+    return nothing
 end
 
 function SvgCurve(𝒑,I::ClosedInterval;name="BCA.svg",up=5,down=-5,right=5,left=-5,zoom=1,unitlength=(100,"pt"))
@@ -63,7 +63,7 @@ function SvgCurve(𝒑,I::ClosedInterval;name="BCA.svg",up=5,down=-5,right=5,lef
     drawbezierpath(BézPth, :stroke)
     finish()
     ChangeUnit(name,"pt",unit)
-    return true
+    return nothing
 end
 
 function SvgSurface(𝒑,k,n;name="BSA.svg",up=5,down=-5,right=5,left=-5,step=50)
@@ -119,7 +119,7 @@ function ParametricColor(𝒑,D;rgb=(u->[0.5,0.5,0.5]),filename="ParametricColor
         box(LxrPt([right+left,up+down]/2,unit), (right-left)*unit,(up-down)*unit,:fill)
     end
     finish()
-    return true
+    return nothing
 end
 
 function ColorBar(;max=1.234,filename="ColorBar.png",unit=100)
@@ -148,7 +148,7 @@ function ColorBar(;max=1.234,filename="ColorBar.png",unit=100)
     line(LxrPt([0.5,Length],unit),LxrPt([1.2,Length],unit),:stroke)
 
     finish()
-    return true
+    return nothing
 end
 
 end

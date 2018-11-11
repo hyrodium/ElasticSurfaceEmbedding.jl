@@ -3,7 +3,7 @@ module ElementaryCalculus
 using IntervalSets
 using FastGaussQuadrature
 
-export INT, INT2, isnullset, DelDpl
+export INT, INT2, INT2₊, isnullset, DelDpl
 
 function INT(f,D::ClosedInterval;nip=25)
     nodes, weights = gausslegendre(nip)
@@ -22,6 +22,14 @@ function INT2(f,D;nip=25)
             x in (width(D[1])*nodes.+sum(extrema(D[1])))/2,
             y in (width(D[2])*nodes.+sum(extrema(D[2])))/2
     ])*prod(width.(D))/4
+end
+
+function INT2₊(f,D;nip=25)
+    if (*(((!).([isnullset.(D)...]))...))
+        return INT2(f,D,nip=nip)
+    else
+        return 0.0
+    end
 end
 
 function isnullset(I::ClosedInterval)::Bool
