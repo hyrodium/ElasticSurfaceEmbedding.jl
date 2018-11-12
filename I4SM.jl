@@ -13,7 +13,7 @@ using Slack
 using SvgDraw
 # using POV_Ray
 
-export Init, pRef, hRef, Newt, Config
+export InitialConfiguration, p_Refinement, h_Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, Settings
 
 const 𝝂=0.4 #Poisson比ν
 const d=2
@@ -234,16 +234,17 @@ children(tree, id) = tree.nodes[id].children
 parent(tree,id) = tree.nodes[id].parent
 comment(tree,id)=tree.nodes[id].comment
 function shownode(tree,id,depth)
-    println("  "^depth*string(id)*": "*comment(tree,id))
+    txt="  "^depth*string(id)*": "*comment(tree,id)*"\n"
     for node ∈ children(tree,id)
-        shownode(tree,node,depth+1)
+        txt=txt*shownode(tree,node,depth+1)
     end
+    return txt
 end
 function showtree(tree)
     shownode(tree,1,0)
 end
 
-function Config(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true)
+function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true,maximumstrain=0.01)
     global NAME=name
     global DIR=homedir()*"/I4SM-Result/"*NAME
     global UP=up
@@ -253,10 +254,11 @@ function Config(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=tru
     global MESH=mesh
     global UNIT=(unit,"pt")
     global SLACK=slack
+    global MAXIMUMSTRAIN=maximumstrain
     return nothing
 end
 
-function ExportFig(𝒑₍₀₎,B2::Bs2mfd,index;comment="")
+function ExportFig(𝒑₍₀₎,B2::Bs2mfd,BsTree,index;comment="",maximumstrain=MAXIMUMSTRAIN)
     BsDraw(B2,filename=DIR*"/svg/"*NAME*"-"*string(index)*"-Bspline.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=UNIT)
     k₁,k₂=B2.k
     D=(k₁[1]..k₁[end],k₂[1]..k₂[end])
@@ -275,10 +277,9 @@ function ExportFig(𝒑₍₀₎,B2::Bs2mfd,index;comment="")
     E₁₁(u)=(g₍ₜ₎₁₁(u)-g₍₀₎₁₁(u))/2
     E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
 
-    maxstrain=0.005
-    rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*maxstrain) .+0.5
+    rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*maximumstrain) .+0.5
     ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=DIR*"/strain/"*NAME*"-"*string(index)*"-strain.png",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=tuple(10*[MESH...]...),unit=5*UNIT[1])
-    ColorBar(max=maxstrain,filename=DIR*"/colorbar/"*NAME*"-"*string(index)*"-colorbar.png",unit=UNIT[1])
+    ColorBar(max=maximumstrain,filename=DIR*"/colorbar/"*NAME*"-"*string(index)*"-colorbar.png",unit=UNIT[1])
 
     run(`convert $(DIR*"/svg/"*NAME*"-"*string(index)*"-Bspline.svg") $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png")`)
     run(`convert -resize 80% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png")`)
@@ -287,11 +288,12 @@ function ExportFig(𝒑₍₀₎,B2::Bs2mfd,index;comment="")
     run(`convert +append $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png")`)
 
     if (SLACK)
-        SlackFile(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png",comment=comment)
+        SlackString(showtree(BsTree))
+        SlackFile(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png")
     end
 end
 
-function Init(𝒑₍₀₎,D;n₁=15,nip=25)
+function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=25)
     mkpath(DIR)
     mkpath(DIR*"/svg")
     mkpath(DIR*"/strain")
@@ -305,11 +307,11 @@ function Init(𝒑₍₀₎,D;n₁=15,nip=25)
     BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
-    showtree(BsTree)
-    ExportFig(𝒑₍₀₎,B2,index,comment="Initial Configuration")
+    println(showtree(BsTree))
+    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment="Initial Configuration")
     return nothing
 end
-function pRef(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
+function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -323,11 +325,11 @@ function pRef(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
-    showtree(BsTree)
-    ExportFig(𝒑₍₀₎,B2,index,comment=comment)
+    println(showtree(BsTree))
+    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
     return nothing
 end
-function hRef(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=25)
+function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -341,11 +343,11 @@ function hRef(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=25)
     BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
-    showtree(BsTree)
-    ExportFig(𝒑₍₀₎,B2,index,comment=comment)
+    println(showtree(BsTree))
+    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
     return nothing
 end
-function Newt(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=25)
+function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -364,9 +366,38 @@ function Newt(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n
     BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
-    showtree(BsTree)
-    ExportFig(𝒑₍₀₎,B2,index,comment=comment)
+    println(showtree(BsTree))
+    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
     return nothing
 end
+
+function FinalOutput(;index=0,unitlength=(10,"mm"))
+    BsJLD=load(DIR*"/"*NAME*".jld")
+    BsTree=BsJLD["BsTree"]
+    if (index==0) index=length(BsTree.nodes) end
+    B2=BsJLD[string(index)]
+    BsDraw(B2,filename=DIR*"/"*NAME*"-"*string(index)*"-final.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength,points=false)
+    if (SLACK)
+        SlackFile(DIR*"/"*NAME*"-"*string(index)*"-final.svg")
+    end
+    return nothing
+end
+
+function ShowKnots(;index=0)
+    BsJLD=load(DIR*"/"*NAME*".jld")
+    BsTree=BsJLD["BsTree"]
+    if (index==0) index=length(BsTree.nodes) end
+    B2=BsJLD[string(index)]
+    k₁,k₂=B2.k
+    println("k₁: ",k₁)
+    println("k₂: ",k₂)
+    println("Suggestion:")
+    k₁′=DelDpl(k₁)
+    k₂′=DelDpl(k₂)
+    println("k₁₊: ",[(k₁′[i]+k₁′[i+1])/2 for i in 1:(length(k₁′)-1)])
+    println("k₂₊: ",[(k₂′[i]+k₂′[i+1])/2 for i in 1:(length(k₂′)-1)])
+    return nothing
+end
+
 
 end

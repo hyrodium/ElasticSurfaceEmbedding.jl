@@ -1,7 +1,7 @@
 module Slack
-    export SlackSetting, SlackString, SlackDict, SlackFile
+    export SlackSettings, SlackString, SlackDict, SlackFile
 
-    function SlackSetting(;IncomingWebhookURL="", OAuthAccessToken="", ChannelID="")
+    function SlackSettings(;IncomingWebhookURL="", OAuthAccessToken="", ChannelID="")
         global IWhU = IncomingWebhookURL
         global OAAT = OAuthAccessToken
         global ChID = ChannelID
