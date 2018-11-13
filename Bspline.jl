@@ -2,12 +2,10 @@ module Bspline
 
 using IntervalSets
 using Luxor
-using JLD
 using ElementaryCalculus
 import SvgDraw.ChangeUnit
 import SvgDraw.BézPts
 import SvgDraw.LxrPt
-
 
 export Bs1mfd, Bs2mfd, Bs, Ḃs, Bsupp, BsCoef2, BsMapping, href, pref, BsDraw, BsWrite, BsRead
 
@@ -260,15 +258,6 @@ function BsDraw(B2::Bs2mfd;filename="BsplineSurface.svg",up=5,down=-5,right=5,le
     finish()
     ChangeUnit(filename,"pt",unit)
     return nothing
-end
-
-function BsWrite(B2::Bs2mfd,i::Int64;filename="BsplineData.jld")
-    save(filename,string(i),B2)
-    return nothing
-end
-
-function BsRead(i::Int64;filename="BsplineData.jld")
-    return load(filename)[string(i)]
 end
 
 # function BsWrite(B2::Bs2mfd,i::Int64;filename="BsplineData.h5")

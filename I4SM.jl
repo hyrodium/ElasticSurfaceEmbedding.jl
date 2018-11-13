@@ -153,24 +153,6 @@ function elm_F(g₍₀₎,B2::Bs2mfd,I₁,I₂,i;nip=25)
     )
 end
 
-function FFd(𝒑₍₀₎,B2::Bs2mfd;nip=25)
-    𝒑′₍₀₎(u)=ForwardDiff.jacobian(𝒑₍₀₎,u) # 接ベクトル
-    g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u)
-
-    n₁,n₂=n=length.(B2.k)-B2.p.-1
-
-    Ff=Array{Any}(undef,n₁,n₂,2)
-    for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d
-        Ff[I₁,I₂,i]=@spawn elm_F(g₍₀₎,B2,I₁,I₂,i,nip=nip)
-    end
-    @time F=fetch.(Ff)
-
-    return F
-
-    # F=[elm_F(g₍₀₎,B2,I₁,I₂,i,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:2]
-    # return F
-end
-
 function lineup(n,I₁,I₂,i)
     n₁,n₂=n
     return (i-1)*n₁*n₂+(I₂-1)*n₁+(I₁-1)+1
@@ -258,7 +240,11 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     return nothing
 end
 
-function ExportFig(𝒑₍₀₎,B2::Bs2mfd,BsTree,index;comment="",maximumstrain=MAXIMUMSTRAIN)
+function Export(𝒑₍₀₎,B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
+    index=length(BsTree.nodes)
+    BsJLD[string(index)]=B2
+    BsJLD["BsTree"]=BsTree
+    save(DIR*"/"*NAME*".jld",BsJLD)
     println(showtree(BsTree))
     BsDraw(B2,filename=DIR*"/svg/"*NAME*"-"*string(index)*"-Bspline.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=UNIT)
     k₁,k₂=B2.k
@@ -292,28 +278,23 @@ function ExportFig(𝒑₍₀₎,B2::Bs2mfd,BsTree,index;comment="",maximumstrai
         SlackString(showtree(BsTree))
         SlackFile(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png")
     end
+    return nothing
 end
 
 function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=25)
-    if (isfile(DIR*"/"*NAME*".jld"))
-        error("File already exists")
-    end
+    if (isfile(DIR*"/"*NAME*".jld")) error("File already exists") end
     mkpath(DIR)
     mkpath(DIR*"/svg")
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
     mkpath(DIR*"/slack")
+    BsJLD=Dict{String,Any}()
+
     B2=InitBs(𝒑₍₀₎,D,n₁,nip=25)
     comment="Initial Configuration"
     BsTree=Tree()
-    BsJLD=Dict{String,Any}()
 
-    index=1
-    BsJLD[string(index)]=B2
-    BsJLD["BsTree"]=BsTree
-    save(DIR*"/"*NAME*".jld",BsJLD)
-    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
-    return nothing
+    Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
 function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
@@ -325,12 +306,7 @@ function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     comment="p-refinement with "*string(p₊)
     addchild(BsTree,parent,comment)
 
-    index=length(BsTree.nodes)
-    BsJLD[string(index)]=B2
-    BsJLD["BsTree"]=BsTree
-    save(DIR*"/"*NAME*".jld",BsJLD)
-    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
-    return nothing
+    Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
 function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
@@ -342,34 +318,22 @@ function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip
     comment="h-refinement with "*string(h₊)
     addchild(BsTree,parent,comment)
 
-    index=length(BsTree.nodes)
-    BsJLD[string(index)]=B2
-    BsJLD["BsTree"]=BsTree
-    save(DIR*"/"*NAME*".jld",BsJLD)
-    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
-    return nothing
+    Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
 function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
     B2=BsJLD[string(parent)]
-    n₁,n₂=length.(B2.k)-B2.p.-1
-    if (!isodd(n₁*n₂))
-        error("n₁ and n₂ should be odd numbers")
-    end
-    B2=Positioning(B2)
 
+    n₁,n₂=length.(B2.k)-B2.p.-1
+    if (!isodd(n₁*n₂)) error("n₁ and n₂ should be odd numbers") end
+    B2=Positioning(B2)
     B2,F,Ǧ=NewtonIteration(𝒑₍₀₎,B2,fixed,nip=nip)
     comment="Newton Iteration - Residual norm: "*string(norm(F))*", Δa norm: "*string(norm(Ǧ))
     addchild(BsTree,parent,comment)
 
-    index=length(BsTree.nodes)
-    BsJLD[string(index)]=B2
-    BsJLD["BsTree"]=BsTree
-    save(DIR*"/"*NAME*".jld",BsJLD)
-    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
-    return nothing
+    Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
 
 function FinalOutput(;index=0,unitlength=(10,"mm"))
