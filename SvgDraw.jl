@@ -29,9 +29,9 @@ function ChangeUnit(name,before,after)
     return ss
 end
 
-function SvgCurve(𝒑,k::Array{T,1};name="BCA.svg",up=5,down=-5,right=5,left=-5,zoom=1,unitlength=(100,"pt")) where T<:Real
+function SvgCurve(𝒑,k::Array{T,1};name="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,unitlength=(100,"pt")) where T<:Real
     n=length(k)-1
-    step, unit=(unitlength[1]*zoom,unitlength[2])
+    step, unit=(unitlength[1],unitlength[2])
     Drawing((right-left)*step,(up-down)*step,name)
 
     Luxor.origin(-left*step,up*step)
@@ -39,7 +39,7 @@ function SvgCurve(𝒑,k::Array{T,1};name="BCA.svg",up=5,down=-5,right=5,left=-5
 
     BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i in 1:n])
 
-    setline(zoom)
+    setline(thickness)
     sethue("red")
     drawbezierpath(BézPth, :stroke)
     finish()
@@ -47,32 +47,55 @@ function SvgCurve(𝒑,k::Array{T,1};name="BCA.svg",up=5,down=-5,right=5,left=-5
     return nothing
 end
 
-function SvgCurve(𝒑,I::ClosedInterval;name="BCA.svg",up=5,down=-5,right=5,left=-5,zoom=1,unitlength=(100,"pt"))
-    k=collect(range(endpoints(I)...,length=60))
+function SvgCurve(𝒑,I::ClosedInterval;name="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,mesh=50,unitlength=(100,"pt"))
+    k=collect(range(endpoints(I)...,length=mesh))
     n=length(k)-1
-    step, unit=(unitlength[1]*zoom,unitlength[2])
+    step, unit=(unitlength[1],unitlength[2])
     Drawing((right-left)*step,(up-down)*step,name)
 
     Luxor.origin(-left*step,up*step)
     background("white")
 
-    BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i in 1:n])
-
-    setline(zoom)
+    setline(thickness)
     sethue("red")
+
+    BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i in 1:n])
     drawbezierpath(BézPth, :stroke)
+
     finish()
-    ChangeUnit(name,"pt",unit)
+    ChangeUnit(filename,"pt",unit)
     return nothing
 end
 
-function SvgSurface(𝒑,k,n;name="BSA.svg",up=5,down=-5,right=5,left=-5,step=50)
+function SvgCurve(𝒑s::Array{T,1},I::ClosedInterval;filename="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,mesh=50,unitlength=(100,"pt")) where T<:Any
+    k=collect(range(endpoints(I)...,length=mesh))
+    n=length(k)-1
+    step, unit=(unitlength[1],unitlength[2])
+    Drawing((right-left)*step,(up-down)*step,filename)
+
+    Luxor.origin(-left*step,up*step)
+    background("white")
+
+    setline(thickness)
+    sethue("cyan")
+
+    for 𝒑 in 𝒑s
+        BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i in 1:n])
+        drawbezierpath(BézPth, :stroke)
+    end
+
+    finish()
+    ChangeUnit(filename,"pt",unit)
+    return nothing
+end
+
+function SvgSurface(𝒑,k,n;filename="BSA.svg",up=5,down=-5,right=5,left=-5,step=50)
     k₁,k₂=k
     n₁,n₂=n
     K₁,K₂=range(minimum(k₁),maximum(k₁),length=n₁+1), range(minimum(k₂),maximum(k₂),length=n₂+1)
     N₁,N₂=length(k₁),length(k₂)
 
-    Drawing(step*(right-left),step*(up-down),name)
+    Drawing(step*(right-left),step*(up-down),filename)
     Luxor.origin(-step*left,step*up)
     background("white")
     sethue("blue")

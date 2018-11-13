@@ -195,7 +195,6 @@ function NewtonIteration(𝒑₍₀₎,B2::Bs2mfd,fixed;nip=25)
     return (Bs2mfd(B2.p,B2.k,a),F,Ǧ)
 end
 
-
 mutable struct TreeNode
     parent::Int
     children::Vector{Int}
@@ -257,7 +256,7 @@ function Export(𝒑₍₀₎,B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=M
         p₁,p₂=p
         k₁,k₂=k
         n=n₁,n₂=length.(k)-p.-1
-        return sum(Ḃs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])*a[I₁,I₂,:] for I₁ in 1:n₁, I₂ in 1:n₂)
+        return sum(Ḃs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])*a[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
     end
     g₍₀₎₁₁(u)=dot(𝒑₁₍₀₎(u),𝒑₁₍₀₎(u))
     g₍ₜ₎₁₁(u)=dot(𝒑₁₍ₜ₎(u),𝒑₁₍ₜ₎(u))
@@ -296,6 +295,7 @@ function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=25)
 
     Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
+
 function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
@@ -308,6 +308,7 @@ function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
 
     Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
+
 function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
@@ -320,6 +321,7 @@ function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip
 
     Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
+
 function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=25)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
@@ -336,15 +338,36 @@ function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(
     Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
 
-function FinalOutput(;index=0,unitlength=(10,"mm"))
+function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
+    # println(showtree(BsTree))
+
     if (index==0) index=length(BsTree.nodes) end
     B2=BsJLD[string(index)]
     BsDraw(B2,filename=DIR*"/"*NAME*"-"*string(index)*"-final.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength,points=false)
     if (SLACK)
         SlackFile(DIR*"/"*NAME*"-"*string(index)*"-final.svg")
     end
+
+    k₁,k₂=B2.k
+    D₁=ClosedInterval(k₁[1],k₁[end])
+    D₂=ClosedInterval(k₂[1],k₂[end])
+
+    𝒑₍ₜ₎(u)=BsMapping(B2,u)
+    function 𝒑₁₍ₜ₎(u)
+        p,k,a=B2.p,B2.k,B2.a
+        p₁,p₂=p
+        k₁,k₂=k
+        n=n₁,n₂=length.(k)-p.-1
+        return sum(Ḃs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])*a[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
+    end
+    𝒆⁽⁰⁾₁(u)=𝒑₁₍ₜ₎(u)
+    𝒆⁽⁰⁾₂(u)=[0.0 -1.0;1.0 0.0]*𝒆⁽⁰⁾₁(u)
+
+    𝒑a(i,t)=𝒑₍ₜ₎([t,leftendpoint(D₂)])+𝒆⁽⁰⁾₂([t,leftendpoint(D₂)])*i*cutout[1]/unitlength[1]
+    𝒑b(i,t)=𝒑₍ₜ₎([t,rightendpoint(D₂)])-𝒆⁽⁰⁾₂([t,rightendpoint(D₂)])*i*cutout[1]/unitlength[1]
+    SvgCurve([[t->𝒑a(i,t) for i in 0:cutout[2]]...,[t->𝒑b(i,t) for i in 0:cutout[2]]...],D₁,filename=DIR*"/"*NAME*"-"*string(index)*"-cutout.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,thickness=0.1,mesh=mesh,unitlength=unitlength)
     return nothing
 end
 
@@ -359,8 +382,8 @@ function ShowKnots(;index=0)
     println("Suggestion:")
     k₁′=DelDpl(k₁)
     k₂′=DelDpl(k₂)
-    println("k₁₊: ",[(k₁′[i]+k₁′[i+1])/2 for i in 1:(length(k₁′)-1)])
-    println("k₂₊: ",[(k₂′[i]+k₂′[i+1])/2 for i in 1:(length(k₂′)-1)])
+    println("k₁₊: ",[(k₁′[i]+k₁′[i+1])/2 for i ∈ 1:(length(k₁′)-1)])
+    println("k₂₊: ",[(k₂′[i]+k₂′[i+1])/2 for i ∈ 1:(length(k₂′)-1)])
     return nothing
 end
 
