@@ -259,6 +259,7 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
 end
 
 function ExportFig(𝒑₍₀₎,B2::Bs2mfd,BsTree,index;comment="",maximumstrain=MAXIMUMSTRAIN)
+    println(showtree(BsTree))
     BsDraw(B2,filename=DIR*"/svg/"*NAME*"-"*string(index)*"-Bspline.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=UNIT)
     k₁,k₂=B2.k
     D=(k₁[1]..k₁[end],k₂[1]..k₂[end])
@@ -294,12 +295,16 @@ function ExportFig(𝒑₍₀₎,B2::Bs2mfd,BsTree,index;comment="",maximumstrai
 end
 
 function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=25)
+    if (isfile(DIR*"/"*NAME*".jld"))
+        error("File already exists")
+    end
     mkpath(DIR)
     mkpath(DIR*"/svg")
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
     mkpath(DIR*"/slack")
     B2=InitBs(𝒑₍₀₎,D,n₁,nip=25)
+    comment="Initial Configuration"
     BsTree=Tree()
     BsJLD=Dict{String,Any}()
 
@@ -307,8 +312,7 @@ function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=25)
     BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
-    println(showtree(BsTree))
-    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment="Initial Configuration")
+    ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
     return nothing
 end
 function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
@@ -325,7 +329,6 @@ function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
-    println(showtree(BsTree))
     ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
     return nothing
 end
@@ -343,7 +346,6 @@ function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip
     BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
-    println(showtree(BsTree))
     ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
     return nothing
 end
@@ -366,7 +368,6 @@ function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(
     BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
-    println(showtree(BsTree))
     ExportFig(𝒑₍₀₎,B2,BsTree,index,comment=comment)
     return nothing
 end
