@@ -63,7 +63,7 @@ end
 
 function BsCoef2(f,p::Int64,k::Array{Float64,1};nip=25)
     n=length(k)-p-1
-    A=[INT(t->Bs(i,p,k,t)*Bs(j,p,k,t),Bsupp(i,p,k)∩Bsupp(j,p,k),nip=nip) for i ∈ 1:n, j ∈ 1:n]
+    A=[INT₊(t->Bs(i,p,k,t)*Bs(j,p,k,t),Bsupp(i,p,k)∩Bsupp(j,p,k),nip=nip) for i ∈ 1:n, j ∈ 1:n]
     B=[INT(t->Bs(i,p,k,t)*f(t),Bsupp(i,p,k)) for i ∈ 1:n]
     C=inv(A)*B
     return [C[I][i] for I ∈ 1:n, i ∈ 1:2]
