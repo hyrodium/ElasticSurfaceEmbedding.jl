@@ -3,28 +3,38 @@ module ElementaryCalculus
 using IntervalSets
 using FastGaussQuadrature
 
-export INT, INT2, INT2₊, isnullset, DelDpl
+export INT, INT₊, INT2, INT2₊, isnullset, DelDpl
 
-function INT(f,D::ClosedInterval;nip=25)
+const NIP=25
+
+function INT(f,D::ClosedInterval;nip=NIP)
     nodes, weights = gausslegendre(nip)
     return sum(
     weights.*
     [f(x) for
-            x in (width(D)*nodes.+sum(extrema(D)))/2
+            x ∈ (width(D)*nodes.+sum(extrema(D)))/2
     ])*width(D)/2
 end
 
-function INT2(f,D;nip=25)
+function INT₊(f,D;nip=NIP)
+    if !isnullset(D)
+        return INT(f,D,nip=nip)
+    else
+        return 0.0
+    end
+end
+
+function INT2(f,D;nip=NIP)
     nodes, weights = gausslegendre(nip)
     return sum(
     (weights*weights').*
     [f([x,y]) for
-            x in (width(D[1])*nodes.+sum(extrema(D[1])))/2,
-            y in (width(D[2])*nodes.+sum(extrema(D[2])))/2
+            x ∈ (width(D[1])*nodes.+sum(extrema(D[1])))/2,
+            y ∈ (width(D[2])*nodes.+sum(extrema(D[2])))/2
     ])*prod(width.(D))/4
 end
 
-function INT2₊(f,D;nip=25)
+function INT2₊(f,D;nip=NIP)
     if (*(((!).([isnullset.(D)...]))...))
         return INT2(f,D,nip=nip)
     else
@@ -39,7 +49,7 @@ end
 function DelDpl(v::Array{T,1})::Array{Float64,1} where T<:Real
     w=Array{eltype(v),1}()
     if (length(v)>0)
-        for e in v
+        for e ∈ v
             if e ∉ w
                 push!(w,e)
             end

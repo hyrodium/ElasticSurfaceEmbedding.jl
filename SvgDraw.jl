@@ -37,7 +37,7 @@ function SvgCurve(𝒑,k::Array{T,1};name="BCA.svg",up=5,down=-5,right=5,left=-5
     Luxor.origin(-left*step,up*step)
     background("white")
 
-    BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i in 1:n])
+    BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i ∈ 1:n])
 
     setline(thickness)
     sethue("red")
@@ -59,7 +59,7 @@ function SvgCurve(𝒑,I::ClosedInterval;name="BCA.svg",up=5,down=-5,right=5,lef
     setline(thickness)
     sethue("red")
 
-    BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i in 1:n])
+    BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i ∈ 1:n])
     drawbezierpath(BézPth, :stroke)
 
     finish()
@@ -79,8 +79,8 @@ function SvgCurve(𝒑s::Array{T,1},I::ClosedInterval;filename="BCA.svg",up=5,do
     setline(thickness)
     sethue("cyan")
 
-    for 𝒑 in 𝒑s
-        BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i in 1:n])
+    for 𝒑 ∈ 𝒑s
+        BézPth=BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(𝒑,k[i],k[i+1]))...) for i ∈ 1:n])
         drawbezierpath(BézPth, :stroke)
     end
 
@@ -100,16 +100,16 @@ function SvgSurface(𝒑,k,n;filename="BSA.svg",up=5,down=-5,right=5,left=-5,ste
     background("white")
     sethue("blue")
 
-    for j in 1:(n₂+1)
+    for j ∈ 1:(n₂+1)
         move(step*Point([1,-1].*𝒑([k₁[1],K₂[j]])...))
-        for i in 1:(N₁-1)
+        for i ∈ 1:(N₁-1)
             a₁,a₂,a₃,a₄=BézPts(t->𝒑([t,K₂[j]]),k₁[i],k₁[i+1])
             curve(step*Point([1,-1].*a₂...),step*Point([1,-1].*a₃...),step*Point([1,-1].*a₄...))
         end
     end
-    for j in 1:(n₁+1)
+    for j ∈ 1:(n₁+1)
         move(step*Point([1,-1].*𝒑([K₁[j],k₂[1]])...))
-        for i in 1:(N₂-1)
+        for i ∈ 1:(N₂-1)
             a₁,a₂,a₃,a₄=BézPts(t->𝒑([K₁[j],t]),k₂[i],k₂[i+1])
             curve(step*Point([1,-1].*a₂...),step*Point([1,-1].*a₃...),step*Point([1,-1].*a₄...))
         end
@@ -126,7 +126,7 @@ function ParametricColor(𝒑,D;rgb=(u->[0.5,0.5,0.5]),filename="ParametricColor
     k₁=range(leftendpoint(D[1]),stop=rightendpoint(D[1]),length=mesh[1]+1)
     k₂=range(leftendpoint(D[2]),stop=rightendpoint(D[2]),length=mesh[2]+1)
 
-    for I₁ in 1:mesh[1], I₂ in 1:mesh[2]
+    for I₁ ∈ 1:mesh[1], I₂ ∈ 1:mesh[2]
         BézPth=BezierPath([
                 BezierPathSegment(map(p->LxrPt(p,unit),BézPts(t->𝒑([t,k₂[I₂]]),k₁[I₁],k₁[I₁+1]))...),
                 BezierPathSegment(map(p->LxrPt(p,unit),BézPts(t->𝒑([k₁[I₁+1],t]),k₂[I₂],k₂[I₂+1]))...),

@@ -346,9 +346,6 @@ function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
     if (index==0) index=length(BsTree.nodes) end
     B2=BsJLD[string(index)]
     BsDraw(B2,filename=DIR*"/"*NAME*"-"*string(index)*"-final.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength,points=false)
-    if (SLACK)
-        SlackFile(DIR*"/"*NAME*"-"*string(index)*"-final.svg")
-    end
 
     k₁,k₂=B2.k
     D₁=ClosedInterval(k₁[1],k₁[end])
@@ -364,10 +361,15 @@ function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
     end
     𝒆⁽⁰⁾₁(u)=𝒑₁₍ₜ₎(u)
     𝒆⁽⁰⁾₂(u)=[0.0 -1.0;1.0 0.0]*𝒆⁽⁰⁾₁(u)
-
     𝒑a(i,t)=𝒑₍ₜ₎([t,leftendpoint(D₂)])+𝒆⁽⁰⁾₂([t,leftendpoint(D₂)])*i*cutout[1]/unitlength[1]
     𝒑b(i,t)=𝒑₍ₜ₎([t,rightendpoint(D₂)])-𝒆⁽⁰⁾₂([t,rightendpoint(D₂)])*i*cutout[1]/unitlength[1]
-    SvgCurve([[t->𝒑a(i,t) for i in 0:cutout[2]]...,[t->𝒑b(i,t) for i in 0:cutout[2]]...],D₁,filename=DIR*"/"*NAME*"-"*string(index)*"-cutout.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,thickness=0.1,mesh=mesh,unitlength=unitlength)
+    SvgCurve([[t->𝒑a(i,t) for i ∈ 0:cutout[2]]...,[t->𝒑b(i,t) for i ∈ 0:cutout[2]]...],D₁,filename=DIR*"/"*NAME*"-"*string(index)*"-cutout.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,thickness=0.1,mesh=mesh,unitlength=unitlength)
+
+    if (SLACK)
+        SlackFile(DIR*"/"*NAME*"-"*string(index)*"-final.svg")
+        SlackFile(DIR*"/"*NAME*"-"*string(index)*"-cutout.svg")
+    end
+
     return nothing
 end
 

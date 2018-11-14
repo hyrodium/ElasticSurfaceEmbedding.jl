@@ -15,7 +15,7 @@ module Slack
 
     function SlackDict(dic::Dict)
         DIC=""
-        for key in sort(collect(keys(dic)))
+        for key ∈ sort(collect(keys(dic)))
             DIC=DIC*key*" : "*string(dic[key])*"\n"
         end
         DIC="{\"text\":\""*DIC*"\"}"

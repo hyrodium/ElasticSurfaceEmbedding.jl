@@ -63,9 +63,10 @@ end
 
 function BsCoef2(f,p::Int64,k::Array{Float64,1};nip=25)
     n=length(k)-p-1
-    D=k[1]..k[end]
-    A=inv([INT(t->Bs(i,p,k,t)*Bs(j,p,k,t),D,nip=nip) for i ∈ 1:n, j ∈ 1:n])*[INT(t->Bs(i,p,k,t)*f(t),D) for i ∈ 1:n]
-    return reshape(hcat(reshape(vcat(A...),2,n)[1,:],reshape(vcat(A...),2,n)[2,:]),n,2)
+    A=[INT(t->Bs(i,p,k,t)*Bs(j,p,k,t),Bsupp(i,p,k)∩Bsupp(j,p,k),nip=nip) for i ∈ 1:n, j ∈ 1:n]
+    B=[INT(t->Bs(i,p,k,t)*f(t),Bsupp(i,p,k)) for i ∈ 1:n]
+    C=inv(A)*B
+    return [C[I][i] for I ∈ 1:n, i ∈ 1:2]
 end
 
 function BsCoef2(f,p::Array{Int64,1},k::Array{Array{Float64,1},1};nip=25)
@@ -75,7 +76,7 @@ function BsCoef2(f,p::Array{Int64,1},k::Array{Array{Float64,1},1};nip=25)
     A=reshape([INT2₊(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*Bs(j₁,p₁,k₁,u[1])*Bs(j₂,p₂,k₂,u[2]),(Bsupp(i₁,p₁,k₁)∩Bsupp(j₁,p₁,k₁),Bsupp(i₂,p₂,k₂)∩Bsupp(j₂,p₂,k₂)),nip=nip) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂, j₁ ∈ 1:n₁, j₂ ∈ 1:n₂],n₁*n₂,n₁*n₂)
     B=reshape([INT2(u->Bs(i₁,p₁,k₁,u[1])*Bs(i₂,p₂,k₂,u[2])*f(u),(Bsupp(i₁,p₁,k₁),Bsupp(i₂,p₂,k₂))) for i₁ ∈ 1:n₁, i₂ ∈ 1:n₂],n₁*n₂)
     C=reshape(inv(A)*B,n₁,n₂)
-    return [C[I₁,I₂][i] for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2]
+    return [C[I₁,I₂][i] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:2]
 end
 
 # function BsCoef(f,p::Int64,k::Array{Float64,1})
@@ -87,22 +88,22 @@ end
 # function BsCoef(f,p::Array{Int64,1},k::Array{Array{Float64,1},1})
 #     n=length.(k).-p-1
 #     d=length(p)
-#     κ=[[((n[j]+1-i)*k[j][i]+i*k[j][i+p[j]+1])/(n[j]+1) for i ∈ 1:n[j]] for j in 1:d]
-#     N=vcat([1],[prod(n[1:i]) for i in 1:d])
+#     κ=[[((n[j]+1-i)*k[j][i]+i*k[j][i+p[j]+1])/(n[j]+1) for i ∈ 1:n[j]] for j ∈ 1:d]
+#     N=vcat([1],[prod(n[1:i]) for i ∈ 1:d])
 #     K=Array{Array{Float64,1},1}()
 #     I=Array{Array{Int64,1},1}()
-#     for i in 0:(N[end]-1)
+#     for i ∈ 0:(N[end]-1)
 #         ind=Array{Int64,1}()
 #         k=0
-#         for j in 1:d
+#         for j ∈ 1:d
 #             k=mod((i-k)÷N[j],n[j])
 #             push!(ind,k+1)
 #         end
-#         push!(K,[κ[i][ind[i]] for i in 1:d])
-#         push!(I,[ind[i] for i in 1:d])
+#         push!(K,[κ[i][ind[i]] for i ∈ 1:d])
+#         push!(I,[ind[i] for i ∈ 1:d])
 #     end
 #
-#     [prod(Bs(I[j][l],p[l],k[l],K[i]) for l in 1:d) for i ∈ 1:N[end], j ∈ 1:N[end]]\map(f,K)
+#     [prod(Bs(I[j][l],p[l],k[l],K[i]) for l ∈ 1:d) for i ∈ 1:N[end], j ∈ 1:N[end]]\map(f,K)
 # end
 
 function BsMapping(B1::Bs1mfd,t)
