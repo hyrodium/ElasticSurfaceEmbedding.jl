@@ -245,38 +245,54 @@ function Export(𝒑₍₀₎,B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=M
     BsJLD["BsTree"]=BsTree
     save(DIR*"/"*NAME*".jld",BsJLD)
     println(showtree(BsTree))
-    BsDraw(B2,filename=DIR*"/svg/"*NAME*"-"*string(index)*"-Bspline.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=UNIT)
-    k₁,k₂=B2.k
-    D=(k₁[1]..k₁[end],k₂[1]..k₂[end])
 
-    𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->𝒑₍₀₎([u₁,u[2]]),u[1])
-    𝒑₍ₜ₎(u)=BsMapping(B2,u)
-    function 𝒑₁₍ₜ₎(u)
-        p,k,a=B2.p,B2.k,B2.a
-        p₁,p₂=p
-        k₁,k₂=k
-        n=n₁,n₂=length.(k)-p.-1
-        return sum(Ḃs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])*a[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
+    Name=NAME
+    Dir=DIR
+    Up=UP
+    Down=DOWN
+    Right=RIGHT
+    Left=LEFT
+    Mesh=MESH
+    Unit=UNIT
+    Slack=SLACK
+    Maximumstrain=MAXIMUMSTRAIN
+
+    @spawn begin
+        BsDraw(B2,filename=Dir*"/svg/"*Name*"-"*string(index)*"-Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
+        k₁,k₂=B2.k
+        D=(k₁[1]..k₁[end],k₂[1]..k₂[end])
+
+        𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->𝒑₍₀₎([u₁,u[2]]),u[1])
+        𝒑₍ₜ₎(u)=BsMapping(B2,u)
+        function 𝒑₁₍ₜ₎(u)
+            p,k,a=B2.p,B2.k,B2.a
+            p₁,p₂=p
+            k₁,k₂=k
+            n=n₁,n₂=length.(k)-p.-1
+            return sum(Ḃs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])*a[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
+        end
+        g₍₀₎₁₁(u)=dot(𝒑₁₍₀₎(u),𝒑₁₍₀₎(u))
+        g₍ₜ₎₁₁(u)=dot(𝒑₁₍ₜ₎(u),𝒑₁₍ₜ₎(u))
+        E₁₁(u)=(g₍ₜ₎₁₁(u)-g₍₀₎₁₁(u))/2
+        E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
+
+        rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*maximumstrain) .+0.5
+        ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=Dir*"/strain/"*Name*"-"*string(index)*"-strain.png",up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=5*Unit[1])
+        ColorBar(max=maximumstrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"-colorbar.png",unit=Unit[1])
+
+        run(`convert $(Dir*"/svg/"*Name*"-"*string(index)*"-Bspline.svg") $(Dir*"/slack/"*Name*"-"*string(index)*"-Bspline.png")`)
+        run(`convert -resize 80% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/slack/"*Name*"-"*string(index)*"-Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-Bspline.png")`)
+        run(`convert $(Dir*"/strain/"*Name*"-"*string(index)*"-strain.png") $(Dir*"/colorbar/"*Name*"-"*string(index)*"-colorbar.png") -gravity southeast -compose over -composite $(Dir*"/slack/"*Name*"-"*string(index)*"-strain.png")`)
+        run(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/slack/"*Name*"-"*string(index)*"-strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-strain.png")`)
+        run(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"-Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-append.png")`)
+
+        if (Slack)
+            println("foo")
+            SlackString(showtree(BsTree))
+            SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"-append.png")
+        end
     end
-    g₍₀₎₁₁(u)=dot(𝒑₁₍₀₎(u),𝒑₁₍₀₎(u))
-    g₍ₜ₎₁₁(u)=dot(𝒑₁₍ₜ₎(u),𝒑₁₍ₜ₎(u))
-    E₁₁(u)=(g₍ₜ₎₁₁(u)-g₍₀₎₁₁(u))/2
-    E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
 
-    rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*maximumstrain) .+0.5
-    ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=DIR*"/strain/"*NAME*"-"*string(index)*"-strain.png",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=tuple(10*[MESH...]...),unit=5*UNIT[1])
-    ColorBar(max=maximumstrain,filename=DIR*"/colorbar/"*NAME*"-"*string(index)*"-colorbar.png",unit=UNIT[1])
-
-    run(`convert $(DIR*"/svg/"*NAME*"-"*string(index)*"-Bspline.svg") $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png")`)
-    run(`convert -resize 80% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png")`)
-    run(`convert $(DIR*"/strain/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/colorbar/"*NAME*"-"*string(index)*"-colorbar.png") -gravity southeast -compose over -composite $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png")`)
-    run(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png")`)
-    run(`convert +append $(DIR*"/slack/"*NAME*"-"*string(index)*"-Bspline.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-strain.png") $(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png")`)
-
-    if (SLACK)
-        SlackString(showtree(BsTree))
-        SlackFile(DIR*"/slack/"*NAME*"-"*string(index)*"-append.png")
-    end
     return nothing
 end
 
