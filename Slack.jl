@@ -1,19 +1,23 @@
 module Slack
-    export SlackSettings, SlackString, SlackDict, SlackFile
+    export SlackString, SlackDict, SlackFile
 
-    function SlackSettings(;IncomingWebhookURL="", OAuthAccessToken="", ChannelID="")
-        global IWhU = IncomingWebhookURL
-        global OAAT = OAuthAccessToken
-        global ChID = ChannelID
-        return nothing
+    function loadconfig()
+        open("slack.txt") do file
+            IWhU = readline(file)
+            OAAT = readline(file)
+            ChID = readline(file)
+            return IWhU, OAAT, ChID
+        end
     end
 
     function SlackString(str::String)
+        IWhU, OAAT, ChID=loadconfig()
         str2="{\"text\":\""*str*"\"}"
         run(`curl -X POST -H 'Content-type: application/json' --data $str2 $IWhU`)
     end
 
     function SlackDict(dic::Dict)
+        IWhU, OAAT, ChID=loadconfig()
         DIC=""
         for key ∈ sort(collect(keys(dic)))
             DIC=DIC*key*" : "*string(dic[key])*"\n"
@@ -23,6 +27,7 @@ module Slack
     end
 
     function SlackFile(filename;comment="")
+        IWhU, OAAT, ChID=loadconfig()
         run(`curl -F file=@$filename -F "initial_comment=$comment" -F channels=$ChID -H "Authorization: Bearer $OAAT" https://slack.com/api/files.upload`)
     end
 end
