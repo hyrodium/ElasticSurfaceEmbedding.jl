@@ -58,21 +58,21 @@ function DelDpl(v::Array{T,1})::Array{Float64,1} where T<:Real
     return w
 end
 
-function CompareArray(A,B)
-    dim=size(A)
-    if(dim≠size(B))
-        DimensionMismatch("dimensions must match")
-    end
-    dict=Dict{String,Any}()
-    dict["Difference"]=A-B
-    #dict["EuclidDistance"]=norm(reshape(A-B,prod(dim)))
-    #dict["ChebyshevDistance"]=maximum(abs.(A-B))
-    dict["NormalizedEuclidDistance"]=norm(reshape(A-B,prod(dim)))/norm(reshape(A,prod(dim)))
-    dict["NormalizedChebyshevDistance"]=maximum(abs.(A-B))/norm(reshape(A,prod(dim)))
-    ind=findall(elm->elm==maximum(abs.(A-B)),A-B)∪findall(elm->elm==maximum(abs.(B-A)),B-A)
-    #println(ind)
-    dict["ChebyshevDistance"]=(maximum(abs.(A-B)),(A[ind],B[ind]))
-    return dict
-end
+# function CompareArray(A,B)
+#     dim=size(A)
+#     if(dim≠size(B))
+#         DimensionMismatch("dimensions must match")
+#     end
+#     dict=Dict{String,Any}()
+#     dict["Difference"]=A-B
+#     #dict["EuclidDistance"]=norm(reshape(A-B,prod(dim)))
+#     #dict["ChebyshevDistance"]=maximum(abs.(A-B))
+#     dict["NormalizedEuclidDistance"]=norm(reshape(A-B,prod(dim)))/norm(reshape(A,prod(dim)))
+#     dict["NormalizedChebyshevDistance"]=maximum(abs.(A-B))/norm(reshape(A,prod(dim)))
+#     ind=findall(elm->elm==maximum(abs.(A-B)),A-B)∪findall(elm->elm==maximum(abs.(B-A)),B-A)
+#     #println(ind)
+#     dict["ChebyshevDistance"]=(maximum(abs.(A-B)),(A[ind],B[ind]))
+#     return dict
+# end
 
 end
