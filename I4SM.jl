@@ -16,18 +16,19 @@ using SvgDraw
 export InitialConfiguration, p_Refinement, h_Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, Settings
 
 const 𝝂=0.4 #Poisson比ν
-const d=2
+const d=2 #Dimension
 const 𝝀=𝝂/((1+𝝂)*(1-(d-1)*𝝂)) #Lamé定数λ
 const 𝝁=1/(2+2𝝂) #Lamé定数μ
+const NIP=25 # Number of Integration Points
 
 function aff(a::Array{Float64,3},A::Array{Float64,2},b::Array{Float64,1})
     #x'=Ax+b
-    n₁,n₂=size(a)[1:2]
-    return [sum(A[i,j]*a[I₁,I₂,j] for j ∈ 1:2)+b[i] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:2]
+    n₁,n₂=size(a)[1:d]
+    return [sum(A[i,j]*a[I₁,I₂,j] for j ∈ 1:d)+b[i] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
 end
 
 function Positioning(a::Array{Float64,3}) # 制御点の位置調整
-    n₁,n₂=size(a)[1:2]
+    n₁,n₂=size(a)[1:d]
     ind0=[(n₁+1)÷2,(n₂+1)÷2]
     ind1=ind0-[0,1]
     v=a[ind1...,:]-a[ind0...,:]
@@ -37,12 +38,12 @@ end
 
 function Positioning(B2::Bs2mfd) # 制御点の位置調整
     p,k,a=B2.p,B2.k,B2.a
-    n₁,n₂=size(a)[1:2]
+    n₁,n₂=size(a)[1:d]
     aa=Positioning(a)
     return Bs2mfd(p,k,aa)
 end
 
-function InitBs(𝒑₍₀₎,D,n₁;nip=25)
+function InitBs(𝒑₍₀₎,D,n₁;nip=NIP)
     D₁,D₂=D
     𝒑′₍₀₎(u)=ForwardDiff.jacobian(𝒑₍₀₎,u) # 接ベクトル
     𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->𝒑₍₀₎([u₁,u[2]]),u[1])
@@ -51,7 +52,7 @@ function InitBs(𝒑₍₀₎,D,n₁;nip=25)
     𝝊₍₀₎(u)=norm(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u))) # 体積要素υ
     g⁻₍₀₎(u)=inv(g₍₀₎(u)) # 第一基本量の逆
 
-    g′₍₀₎(u)=reshape(ForwardDiff.jacobian(g₍₀₎,u),2,2,2) # 第一基本量の微分
+    g′₍₀₎(u)=reshape(ForwardDiff.jacobian(g₍₀₎,u),d,d,d) # 第一基本量の微分
     c(t)=[t,sum(extrema(D[2]))/2] #中心線に沿った座標
     ṡ₍₀₎(t)=sqrt(g₍₀₎(c(t))[1,1])
     s̈₍₀₎(t)=ForwardDiff.derivative(ṡ₍₀₎,t)
@@ -66,8 +67,8 @@ function InitBs(𝒑₍₀₎,D,n₁;nip=25)
     end
     𝒄𝒄̇₀=vcat([0.0,0.0],[1.,0.]*ṡ₍₀₎(minimum(D₁)))
     sol=solve(ODEProblem(ode,𝒄𝒄̇₀,extrema(D₁)))
-    𝒄(t)=sol(t)[1:2] # 解となる中心曲線
-    𝒄₁(t)=sol(t)[3:4] # その導関数
+    𝒄(t)=sol(t)[1:d] # 解となる中心曲線
+    𝒄₁(t)=sol(t)[(d+1):(2d)] # その導関数
     𝒄₂(t)=[g₍₀₎(c(t))[1,2] -𝝊₍₀₎(c(t));𝝊₍₀₎(c(t)) g₍₀₎(c(t))[1,2]]*𝒄₁(t)/g₍₀₎(c(t))[1,1] # 中心曲線上の幅方向のベクトル場
 
     p₁=3
@@ -81,7 +82,7 @@ function InitBs(𝒑₍₀₎,D,n₁;nip=25)
     n₂=length(k₂)-p₂-1
     p=[p₁,p₂]
     k=[k₁,k₂]
-    a=[[a1[I₁,i],a2[I₁,i]][I₂] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:2]
+    a=[[a1[I₁,i],a2[I₁,i]][I₂] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
 
     return Positioning(pref(Bs2mfd(p,k,a),[0,1]))
 end
@@ -101,7 +102,7 @@ function C(i,j,k,l,g⁻)
     return 𝝀*g⁻[i,j]*g⁻[k,l]+𝝁*(g⁻[i,k]*g⁻[j,l]+g⁻[i,l]*g⁻[j,k])
 end
 
-function elm_H(g₍₀₎,B2::Bs2mfd,I₁,I₂,i,R₁,R₂,r;nip=25)
+function elm_H(g₍₀₎,B2::Bs2mfd,I₁,I₂,i,R₁,R₂,r;nip=NIP)
     p,k,a=B2.p,B2.k,B2.a
     p₁,p₂=p
     k₁,k₂=k
@@ -118,16 +119,16 @@ function elm_H(g₍₀₎,B2::Bs2mfd,I₁,I₂,i,R₁,R₂,r;nip=25)
                 g⁻=inv(g);
                 𝝊=sqrt(det(g));
                 𝑁=[N′(B2,I₁,I₂,i,u) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d];
-                an=[sum(a[I₁,I₂,i]*𝑁[I₁,I₂,j] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:2, j ∈ 1:2];
+                an=[sum(a[I₁,I₂,i]*𝑁[I₁,I₂,j] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:d, j ∈ 1:d];
                 sum(
-                    C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*(𝜹[i,r]*𝑁[R₁,R₂,q]*(sum(an[o,m]*an[o,n] for o ∈ 1:2)-g[m,n])+2*𝑁[R₁,R₂,n]*an[i,q]*an[r,m])
-                for p ∈ 1:2, q ∈ 1:2, m ∈ 1:2, n ∈ 1:2)
+                    C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*(𝜹[i,r]*𝑁[R₁,R₂,q]*(sum(an[o,m]*an[o,n] for o ∈ 1:d)-g[m,n])+2*𝑁[R₁,R₂,n]*an[i,q]*an[r,m])
+                for p ∈ 1:d, q ∈ 1:d, m ∈ 1:d, n ∈ 1:d)
             )*𝝊,(D̂₁,D̂₂),nip=nip
         )
     end
 end
 
-function elm_F(g₍₀₎,B2::Bs2mfd,I₁,I₂,i;nip=25)
+function elm_F(g₍₀₎,B2::Bs2mfd,I₁,I₂,i;nip=NIP)
     p,k,a=B2.p,B2.k,B2.a
     p₁,p₂=p
     k₁,k₂=k
@@ -139,16 +140,16 @@ function elm_F(g₍₀₎,B2::Bs2mfd,I₁,I₂,i;nip=25)
             g=g₍₀₎(u);
             g⁻=inv(g);
             𝝊=sqrt(det(g));
-            𝑁=[N′(B2,I₁,I₂,i,u) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:2];
-            an=[sum(a[I₁,I₂,i]*𝑁[I₁,I₂,j] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:2, j ∈ 1:2];
+            𝑁=[N′(B2,I₁,I₂,i,u) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d];
+            an=[sum(a[I₁,I₂,i]*𝑁[I₁,I₂,j] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:d, j ∈ 1:d];
             sum(
                 sum(
                     C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*an[i,q]
-                    for p ∈ 1:2, q ∈ 1:2
+                    for p ∈ 1:d, q ∈ 1:d
                 )*(sum(
                     an[o,m]*an[o,n]
                 for o ∈ 1:d)-g[m,n])
-            for m ∈ 1:2, n ∈ 1:2)
+            for m ∈ 1:d, n ∈ 1:d)
         )*𝝊,(D̂₁,D̂₂),nip=nip
     )
 end
@@ -158,23 +159,23 @@ function lineup(n,I₁,I₂,i)
     return (i-1)*n₁*n₂+(I₂-1)*n₁+(I₁-1)+1
 end
 
-function NewtonIteration(𝒑₍₀₎,B2::Bs2mfd,fixed;nip=25)
+function NewtonIteration(𝒑₍₀₎,B2::Bs2mfd,fixed;nip=NIP)
     𝒑′₍₀₎(u)=ForwardDiff.jacobian(𝒑₍₀₎,u) # 接ベクトル
     g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u)
     n₁,n₂=n=length.(B2.k)-B2.p.-1
 
-    Ff=Array{Any}(undef,n₁,n₂,2)
+    Ff=Array{Any}(undef,n₁,n₂,d)
     for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d
         Ff[I₁,I₂,i]=@spawn elm_F(g₍₀₎,B2,I₁,I₂,i,nip=nip)
     end
     F=fetch.(Ff)
-    Hf=Array{Any}(undef,n₁,n₂,2,n₁,n₂,2)
+    Hf=Array{Any}(undef,n₁,n₂,d,n₁,n₂,d)
     for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d
         Hf[I₁,I₂,i,R₁,R₂,r]=@spawn elm_H(g₍₀₎,B2,I₁,I₂,i,R₁,R₂,r,nip=nip)
     end
     H=fetch.(Hf)
-    # H=[elm_H(g₍₀₎,B2,I₁,I₂,i,R₁,R₂,r,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:2, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:2]
-    # F=[elm_F(g₍₀₎,B2,I₁,I₂,i,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:2]
+    # H=[elm_H(g₍₀₎,B2,I₁,I₂,i,R₁,R₂,r,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d]
+    # F=[elm_F(g₍₀₎,B2,I₁,I₂,i,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
 
     𝕟=2n₁*n₂
     Fixed=sort(collect((i->lineup(n,i...)).(fixed(n₁,n₂))))
@@ -191,7 +192,7 @@ function NewtonIteration(𝒑₍₀₎,B2::Bs2mfd,fixed;nip=25)
     for i ∈ Fixed
         insert!(ǎ,i,aₒ[i])
     end
-    a=reshape(ǎ,n₁,n₂,2)
+    a=reshape(ǎ,n₁,n₂,d)
     return (Bs2mfd(B2.p,B2.k,a),F,Ǧ)
 end
 
@@ -296,7 +297,7 @@ function Export(𝒑₍₀₎,B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=M
     return nothing
 end
 
-function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=25)
+function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=NIP)
     if (isfile(DIR*"/"*NAME*".jld")) error("File already exists") end
     mkpath(DIR)
     mkpath(DIR*"/svg")
@@ -305,14 +306,14 @@ function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=25)
     mkpath(DIR*"/slack")
     BsJLD=Dict{String,Any}()
 
-    B2=InitBs(𝒑₍₀₎,D,n₁,nip=25)
+    B2=InitBs(𝒑₍₀₎,D,n₁,nip=nip)
     comment="Initial Configuration"
     BsTree=Tree()
 
     Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
 
-function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
+function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=NIP)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -325,7 +326,7 @@ function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=25)
     Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
 
-function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=25)
+function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=NIP)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -338,7 +339,7 @@ function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip
     Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
 
-function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=25)
+function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=NIP)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -353,6 +354,11 @@ function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(
 
     Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
 end
+
+function Restoration(name::String)
+    #TBW
+end
+
 
 function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
     BsJLD=load(DIR*"/"*NAME*".jld")

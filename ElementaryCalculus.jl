@@ -5,7 +5,7 @@ using FastGaussQuadrature
 
 export INT, INT₊, INT2, INT2₊, isnullset, DelDpl
 
-const NIP=25
+const NIP=25 # Number of Integration Points
 
 function INT(f,D::ClosedInterval;nip=NIP)
     nodes, weights = gausslegendre(nip)
