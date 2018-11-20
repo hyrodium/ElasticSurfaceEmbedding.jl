@@ -180,8 +180,8 @@ function NewtonIteration(𝒑₍₀₎,B2::Bs2mfd,fixed;nip=25)
     Fixed=sort(collect((i->lineup(n,i...)).(fixed(n₁,n₂))))
     Unfixed=deleteat!(collect(1:𝕟),Fixed)
 
-    H=reshape(H,𝕟,𝕟)
     F=reshape(F,𝕟)
+    H=reshape(H,𝕟,𝕟)
     a=aₒ=reshape(B2.a,𝕟)
     Ȟ=H[Unfixed,Unfixed]
     ǎ=a[Unfixed]

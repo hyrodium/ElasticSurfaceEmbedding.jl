@@ -225,10 +225,6 @@ function BsDraw(B2::Bs2mfd;filename="BsplineSurface.svg",up=5,down=-5,right=5,le
 
     sethue(1,.5,.5)
     drawbezierpath(BezierPath(vcat(
-        # [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u₁->𝒑([u₁,K₂[1]]),K₁[i],K₁[i+1]))...) for i ∈ 1:N₁],
-        # [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u₂->𝒑([K₁[end],u₂]),K₂[i],K₂[i+1]))...) for i ∈ 1:N₂],
-        # [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u₁->𝒑([K₁[1]+K₁[end]-u₁,K₂[end]]),K₁[i],K₁[i+1]))...) for i ∈ 1:N₁],
-        # [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u₂->𝒑([K₁[1],K₂[1]+K₂[end]-u₂]),K₂[i],K₂[i+1]))...) for i ∈ 1:N₂]
         [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u₁->𝒑([u₁,K₂[1]]),K₁[i],K₁[i+1]))...) for i ∈ 1:N₁],
         [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u₂->𝒑([K₁[end],u₂]),K₂[i],K₂[i+1]))...) for i ∈ 1:N₂],
         [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u₁->𝒑([u₁,K₂[end]]),K₁[end-i+1],K₁[end-i]))...) for i ∈ 1:N₁],
