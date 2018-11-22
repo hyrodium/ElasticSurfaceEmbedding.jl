@@ -43,11 +43,11 @@ function Positioning(B2::Bs2mfd) # 制御点の位置調整
     return Bs2mfd(p,k,aa)
 end
 
-function InitBs(𝒑₍₀₎,D,n₁;nip=NIP)
+function InitBs(D,n₁;nip=NIP)
     D₁,D₂=D
-    𝒑′₍₀₎(u)=ForwardDiff.jacobian(𝒑₍₀₎,u) # 接ベクトル
-    𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->𝒑₍₀₎([u₁,u[2]]),u[1])
-    𝒑₂₍₀₎(u)=ForwardDiff.derivative(u₂->𝒑₍₀₎([u[1],u₂]),u[2])
+    𝒑′₍₀₎(u)=ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # 接ベクトル
+    𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
+    𝒑₂₍₀₎(u)=ForwardDiff.derivative(u₂->Main.𝒑₍₀₎([u[1],u₂]),u[2])
     g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u) # 第一基本量
     𝝊₍₀₎(u)=norm(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u))) # 体積要素υ
     g⁻₍₀₎(u)=inv(g₍₀₎(u)) # 第一基本量の逆
@@ -159,11 +159,12 @@ function lineup(n,I₁,I₂,i)
     return (i-1)*n₁*n₂+(I₂-1)*n₁+(I₁-1)+1
 end
 
-function NewtonIteration(𝒑₍₀₎,B2::Bs2mfd,fixed;nip=NIP)
-    𝒑′₍₀₎(u)=ForwardDiff.jacobian(𝒑₍₀₎,u) # 接ベクトル
+function NewtonIteration(B2::Bs2mfd,fixed;nip=NIP)
+    𝒑′₍₀₎(u)=ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # 接ベクトル
     g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u)
     n₁,n₂=n=length.(B2.k)-B2.p.-1
 
+    t₀=time()
     Ff=Array{Any}(undef,n₁,n₂,d)
     for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d
         Ff[I₁,I₂,i]=@spawn elm_F(g₍₀₎,B2,I₁,I₂,i,nip=nip)
@@ -174,6 +175,9 @@ function NewtonIteration(𝒑₍₀₎,B2::Bs2mfd,fixed;nip=NIP)
         Hf[I₁,I₂,i,R₁,R₂,r]=@spawn elm_H(g₍₀₎,B2,I₁,I₂,i,R₁,R₂,r,nip=nip)
     end
     H=fetch.(Hf)
+    t₁=time()
+    println(t₁-t₀," sec")
+
     # H=[elm_H(g₍₀₎,B2,I₁,I₂,i,R₁,R₂,r,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d]
     # F=[elm_F(g₍₀₎,B2,I₁,I₂,i,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
 
@@ -240,7 +244,7 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     return nothing
 end
 
-function Export(𝒑₍₀₎,B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
+function Export(B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
     index=length(BsTree.nodes)
     BsJLD[string(index)]=B2
     BsJLD["BsTree"]=BsTree
@@ -258,12 +262,12 @@ function Export(𝒑₍₀₎,B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=M
     Slack=SLACK
     Maximumstrain=MAXIMUMSTRAIN
 
-    @spawn begin
+    @spawnat 1 begin
         BsDraw(B2,filename=Dir*"/svg/"*Name*"-"*string(index)*"-Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
         k₁,k₂=B2.k
         D=(k₁[1]..k₁[end],k₂[1]..k₂[end])
 
-        𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->𝒑₍₀₎([u₁,u[2]]),u[1])
+        𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
         𝒑₍ₜ₎(u)=BsMapping(B2,u)
         function 𝒑₁₍ₜ₎(u)
             p,k,a=B2.p,B2.k,B2.a
@@ -288,7 +292,6 @@ function Export(𝒑₍₀₎,B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=M
         run(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"-Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-append.png")`)
 
         if (Slack)
-            println("foo")
             SlackString(showtree(BsTree))
             SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"-append.png")
         end
@@ -297,7 +300,7 @@ function Export(𝒑₍₀₎,B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=M
     return nothing
 end
 
-function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=NIP)
+function InitialConfiguration(D;n₁=15,nip=NIP)
     if (isfile(DIR*"/"*NAME*".jld")) error("File already exists") end
     mkpath(DIR)
     mkpath(DIR*"/svg")
@@ -306,14 +309,14 @@ function InitialConfiguration(𝒑₍₀₎,D;n₁=15,nip=NIP)
     mkpath(DIR*"/slack")
     BsJLD=Dict{String,Any}()
 
-    B2=InitBs(𝒑₍₀₎,D,n₁,nip=nip)
+    B2=InitBs(D,n₁,nip=nip)
     comment="Initial Configuration"
     BsTree=Tree()
 
-    Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
+    Export(B2,BsTree,BsJLD,comment=comment)
 end
 
-function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=NIP)
+function p_Refinement(p₊::Array{Int64,1};parent=0,nip=NIP)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -323,10 +326,10 @@ function p_Refinement(𝒑₍₀₎,p₊::Array{Int64,1};parent=0,nip=NIP)
     comment="p-refinement with "*string(p₊)
     addchild(BsTree,parent,comment)
 
-    Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
+    Export(B2,BsTree,BsJLD,comment=comment)
 end
 
-function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip=NIP)
+function h_Refinement(h₊::Array{Array{Float64,1},1};parent=0,nip=NIP)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -336,10 +339,10 @@ function h_Refinement(𝒑₍₀₎,h₊::Array{Array{Float64,1},1};parent=0,nip
     comment="h-refinement with "*string(h₊)
     addchild(BsTree,parent,comment)
 
-    Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
+    Export(B2,BsTree,BsJLD,comment=comment)
 end
 
-function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=NIP)
+function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=NIP)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -348,11 +351,11 @@ function NewtonMethodIteration(𝒑₍₀₎;fixed=((n₁,n₂)->([(n₁+1)÷2,(
     n₁,n₂=length.(B2.k)-B2.p.-1
     if (!isodd(n₁*n₂)) error("n₁ and n₂ should be odd numbers") end
     B2=Positioning(B2)
-    B2,F,Ǧ=NewtonIteration(𝒑₍₀₎,B2,fixed,nip=nip)
+    B2,F,Ǧ=NewtonIteration(B2,fixed,nip=nip)
     comment="Newton Iteration - Residual norm: "*string(norm(F))*", Δa norm: "*string(norm(Ǧ))
     addchild(BsTree,parent,comment)
 
-    Export(𝒑₍₀₎,B2,BsTree,BsJLD,comment=comment)
+    Export(B2,BsTree,BsJLD,comment=comment)
 end
 
 function Restoration(name::String)
