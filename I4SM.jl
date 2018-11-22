@@ -13,13 +13,18 @@ using Slack
 using SvgDraw
 # using POV_Ray
 
-export InitialConfiguration, p_Refinement, h_Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, Settings
+export @DefineShape, InitialConfiguration, p_Refinement, h_Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, Settings, Restoration
 
 const 𝝂=0.4 #Poisson比ν
 const d=2 #Dimension
 const 𝝀=𝝂/((1+𝝂)*(1-(d-1)*𝝂)) #Lamé定数λ
 const 𝝁=1/(2+2𝝂) #Lamé定数μ
 const NIP=25 # Number of Integration Points
+
+macro DefineShape(ex)
+    global EXPR=ex
+    return :(@everywhere $ex)
+end
 
 function aff(a::Array{Float64,3},A::Array{Float64,2},b::Array{Float64,1})
     #x'=Ax+b
@@ -307,7 +312,7 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
     mkpath(DIR*"/slack")
-    BsJLD=Dict{String,Any}()
+    BsJLD=Dict{String,Any}("Expr"=>EXPR)
 
     B2=InitBs(D,n₁,nip=nip)
     comment="Initial Configuration"
@@ -358,8 +363,11 @@ function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1]
     Export(B2,BsTree,BsJLD,comment=comment)
 end
 
-function Restoration(name::String)
-    #TBW
+function Restoration()
+    if (!isfile(DIR*"/"*NAME*".jld")) error("File doen't exists") end
+    global ex=load(DIR*"/"*NAME*".jld","Expr")
+    eval(:(@everywhere $ex))
+    return nothing
 end
 
 
