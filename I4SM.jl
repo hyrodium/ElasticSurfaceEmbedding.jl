@@ -365,11 +365,12 @@ end
 
 function Restoration()
     if (!isfile(DIR*"/"*NAME*".jld")) error("File doen't exists") end
-    global ex=load(DIR*"/"*NAME*".jld","Expr")
-    eval(:(@everywhere $ex))
+    BsJLD=load(DIR*"/"*NAME*".jld")
+    println(showtree(BsJLD["BsTree"]))
+    global EXPR=BsJLD["Expr"]
+    eval(:(@everywhere $EXPR))
     return nothing
 end
-
 
 function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
     BsJLD=load(DIR*"/"*NAME*".jld")
@@ -392,7 +393,7 @@ function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
         n=n₁,n₂=length.(k)-p.-1
         return sum(Ḃs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])*a[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
     end
-    𝒆⁽⁰⁾₁(u)=𝒑₁₍ₜ₎(u)
+    𝒆⁽⁰⁾₁(u)=normalize(𝒑₁₍ₜ₎(u))
     𝒆⁽⁰⁾₂(u)=[0.0 -1.0;1.0 0.0]*𝒆⁽⁰⁾₁(u)
     𝒑a(i,t)=𝒑₍ₜ₎([t,leftendpoint(D₂)])+𝒆⁽⁰⁾₂([t,leftendpoint(D₂)])*i*cutout[1]/unitlength[1]
     𝒑b(i,t)=𝒑₍ₜ₎([t,rightendpoint(D₂)])-𝒆⁽⁰⁾₂([t,rightendpoint(D₂)])*i*cutout[1]/unitlength[1]
