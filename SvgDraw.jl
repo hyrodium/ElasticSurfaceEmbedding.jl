@@ -18,21 +18,21 @@ function LxrPt(p::Array{T,1},step) where T<:Real
     Point(step*[1,-1].*p...)
 end
 
-function ChangeUnit(name,before,after)
-    ss=open(name) do file
+function ChangeUnit(filename,before,after)
+    ss=open(filename) do file
         strn=read(file, String)
         replace(strn,Regex("(\\d+)"*before)=>SubstitutionString("\\1"*after))
     end
-    open(name,"w") do file
+    open(filename,"w") do file
         write(file,ss)
     end
     return ss
 end
 
-function SvgCurve(𝒑,k::Array{T,1};name="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,unitlength=(100,"pt")) where T<:Real
+function SvgCurve(𝒑,k::Array{T,1};filename="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,unitlength=(100,"pt")) where T<:Real
     n=length(k)-1
     step, unit=(unitlength[1],unitlength[2])
-    Drawing((right-left)*step,(up-down)*step,name)
+    Drawing((right-left)*step,(up-down)*step,filename)
 
     Luxor.origin(-left*step,up*step)
     background("white")
@@ -43,15 +43,15 @@ function SvgCurve(𝒑,k::Array{T,1};name="BCA.svg",up=5,down=-5,right=5,left=-5
     sethue("red")
     drawbezierpath(BézPth, :stroke)
     finish()
-    ChangeUnit(name,"pt",unit)
+    ChangeUnit(filename,"pt",unit)
     return nothing
 end
 
-function SvgCurve(𝒑,I::ClosedInterval;name="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,mesh=50,unitlength=(100,"pt"))
+function SvgCurve(𝒑,I::ClosedInterval;filename="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,mesh=50,unitlength=(100,"pt"))
     k=collect(range(endpoints(I)...,length=mesh))
     n=length(k)-1
     step, unit=(unitlength[1],unitlength[2])
-    Drawing((right-left)*step,(up-down)*step,name)
+    Drawing((right-left)*step,(up-down)*step,filename)
 
     Luxor.origin(-left*step,up*step)
     background("white")
@@ -116,7 +116,7 @@ function SvgSurface(𝒑,k,n;filename="BSA.svg",up=5,down=-5,right=5,left=-5,ste
     end
     strokepath()
     finish()
-    ChangeUnit!(name,"pt","mm")
+    ChangeUnit!(filename,"pt","mm")
 end
 
 function ParametricColor(𝒑,D;rgb=(u->[0.5,0.5,0.5]),filename="ParametricColor.png",up=5,down=-5,right=5,left=-5,mesh=(10,10),unit=100)
