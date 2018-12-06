@@ -1,4 +1,4 @@
-module SvgDraw
+module ParametricDraw
 
 using IntervalSets
 using Colors

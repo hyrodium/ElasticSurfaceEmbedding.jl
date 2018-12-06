@@ -3,9 +3,9 @@ module Bspline
 using IntervalSets
 using Luxor
 using ElementaryCalculus
-import SvgDraw.ChangeUnit
-import SvgDraw.BézPts
-import SvgDraw.LxrPt
+import ParametricDraw.ChangeUnit
+import ParametricDraw.BézPts
+import ParametricDraw.LxrPt
 
 export Bs1mfd, Bs2mfd, Bs, Ḃs, Bsupp, BsCoef2, BsMapping, href, pref, BsDraw, BsWrite, BsRead
 

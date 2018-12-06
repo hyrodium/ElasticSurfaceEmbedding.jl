@@ -10,7 +10,7 @@ using JLD
 using Bspline
 using ElementaryCalculus
 using Slack
-using SvgDraw
+using ParametricDraw
 # using POV_Ray
 
 export @DefineShape, InitialConfiguration, p_Refinement, h_Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, Settings, Restoration
