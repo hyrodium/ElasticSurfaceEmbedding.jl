@@ -145,16 +145,17 @@ function ParametricColor(𝒑,D;rgb=(u->[0.5,0.5,0.5]),filename="ParametricColor
     return nothing
 end
 
-function ColorBar(;max=1.234,filename="ColorBar.png",unit=100)
+function ColorBar(;max=1.234,filename="ColorBar.png",width=100)
     up=4
     down=-4
     right=4.6
     left=-2
     Length=3.5
     FontSize=1
-    Thickness=10
+    unit=width/(right-left)
+    Thickness=unit/10
 
-    Drawing((right-left)*unit,(up-down)*unit,filename)
+    Drawing(round(width),round((up-down)*unit),filename)
     Luxor.origin(-left*unit,up*unit)
     setblend(blend(Point(0, -Length*unit), Point(0, Length*unit), "red", "cyan"))
     box(LxrPt([-0.9,0],unit), 1.8*unit, 7*unit, :fill)

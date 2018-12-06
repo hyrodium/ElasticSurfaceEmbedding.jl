@@ -288,7 +288,7 @@ function Export(B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
 
         rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*maximumstrain) .+0.5
         ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=Dir*"/strain/"*Name*"-"*string(index)*"_strain.png",up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=5*Unit[1])
-        ColorBar(max=maximumstrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png",unit=Unit[1])
+        ColorBar(max=maximumstrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png",width=(Right-Left)*Unit[1])
 
         # svg to png
         run(pipeline(`convert $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg") $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
