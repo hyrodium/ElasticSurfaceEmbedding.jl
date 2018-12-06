@@ -268,7 +268,7 @@ function Export(B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
     Maximumstrain=MAXIMUMSTRAIN
 
     @spawnat 1 begin
-        BsDraw(B2,filename=Dir*"/svg/"*Name*"-"*string(index)*"-Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
+        BsDraw(B2,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
         k₁,k₂=B2.k
         D=(k₁[1]..k₁[end],k₂[1]..k₂[end])
 
@@ -287,18 +287,22 @@ function Export(B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
         E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
 
         rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*maximumstrain) .+0.5
-        ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=Dir*"/strain/"*Name*"-"*string(index)*"-strain.png",up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=5*Unit[1])
-        ColorBar(max=maximumstrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"-colorbar.png",unit=Unit[1])
+        ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=Dir*"/strain/"*Name*"-"*string(index)*"_strain.png",up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=5*Unit[1])
+        ColorBar(max=maximumstrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png",unit=Unit[1])
 
-        run(`convert $(Dir*"/svg/"*Name*"-"*string(index)*"-Bspline.svg") $(Dir*"/slack/"*Name*"-"*string(index)*"-Bspline.png")`)
-        run(`convert -resize 80% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/slack/"*Name*"-"*string(index)*"-Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-Bspline.png")`)
-        run(`convert $(Dir*"/strain/"*Name*"-"*string(index)*"-strain.png") $(Dir*"/colorbar/"*Name*"-"*string(index)*"-colorbar.png") -gravity southeast -compose over -composite $(Dir*"/slack/"*Name*"-"*string(index)*"-strain.png")`)
-        run(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/slack/"*Name*"-"*string(index)*"-strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-strain.png")`)
-        run(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"-Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"-append.png")`)
+        # svg to png
+        run(pipeline(`convert $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg") $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
+        # add colorbar to strain distribution figure
+        run(pipeline(`convert $(Dir*"/strain/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png") -gravity southeast -compose over -composite $(Dir*"/strain/"*Name*"-"*string(index)*"_swc.png")`, stdout=devnull, stderr=devnull))
+        # resize png
+        run(pipeline(`convert -resize 80% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
+        run(pipeline(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/strain/"*Name*"-"*string(index)*"_swc.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png")`, stdout=devnull, stderr=devnull))
+        # line up png
+        run(pipeline(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")`, stdout=devnull, stderr=devnull))
 
         if (Slack)
             SlackString(showtree(BsTree))
-            SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"-append.png")
+            SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")
         end
     end
 
@@ -308,7 +312,7 @@ end
 function InitialConfiguration(D;n₁=15,nip=NIP)
     if (isfile(DIR*"/"*NAME*".jld")) error("File already exists") end
     mkpath(DIR)
-    mkpath(DIR*"/svg")
+    mkpath(DIR*"/nurbs")
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
     mkpath(DIR*"/slack")
