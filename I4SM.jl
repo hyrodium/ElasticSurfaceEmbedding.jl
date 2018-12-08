@@ -26,6 +26,13 @@ macro DefineShape(ex)
     return :(@everywhere $ex)
 end
 
+𝒑′₍₀₎(u)=ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # 接ベクトル
+𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
+𝒑₂₍₀₎(u)=ForwardDiff.derivative(u₂->Main.𝒑₍₀₎([u[1],u₂]),u[2])
+g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u) # 第一基本量
+𝝊₍₀₎(u)=norm(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u))) # 体積要素υ
+g⁻₍₀₎(u)=inv(g₍₀₎(u)) # 第一基本量の逆
+
 function aff(a::Array{Float64,3},A::Array{Float64,2},b::Array{Float64,1})
     #x'=Ax+b
     n₁,n₂=size(a)[1:d]
@@ -50,12 +57,6 @@ end
 
 function InitBs(D,n₁;nip=NIP)
     D₁,D₂=D
-    𝒑′₍₀₎(u)=ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # 接ベクトル
-    𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
-    𝒑₂₍₀₎(u)=ForwardDiff.derivative(u₂->Main.𝒑₍₀₎([u[1],u₂]),u[2])
-    g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u) # 第一基本量
-    𝝊₍₀₎(u)=norm(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u))) # 体積要素υ
-    g⁻₍₀₎(u)=inv(g₍₀₎(u)) # 第一基本量の逆
 
     g′₍₀₎(u)=reshape(ForwardDiff.jacobian(g₍₀₎,u),d,d,d) # 第一基本量の微分
     c(t)=[t,sum(extrema(D[2]))/2] #中心線に沿った座標
@@ -165,8 +166,6 @@ function lineup(n,I₁,I₂,i)
 end
 
 function NewtonIteration(B2::Bs2mfd,fixed;nip=NIP)
-    𝒑′₍₀₎(u)=ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # 接ベクトル
-    g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u)
     n₁,n₂=n=length.(B2.k)-B2.p.-1
 
     t₀=time()
@@ -272,7 +271,6 @@ function Export(B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
         k₁,k₂=B2.k
         D=(k₁[1]..k₁[end],k₂[1]..k₂[end])
 
-        𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
         𝒑₍ₜ₎(u)=BsMapping(B2,u)
         function 𝒑₁₍ₜ₎(u)
             p,k,a=B2.p,B2.k,B2.a
