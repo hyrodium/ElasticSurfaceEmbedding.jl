@@ -180,7 +180,6 @@ function NewtonIteration(B2::Bs2mfd,fixed;nip=NIP)
     end
     H=fetch.(Hf)
     t₁=time()
-    println(t₁-t₀," sec")
 
     # H=[elm_H(g₍₀₎,B2,I₁,I₂,i,R₁,R₂,r,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d]
     # F=[elm_F(g₍₀₎,B2,I₁,I₂,i,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
@@ -201,7 +200,7 @@ function NewtonIteration(B2::Bs2mfd,fixed;nip=NIP)
         insert!(ǎ,i,aₒ[i])
     end
     a=reshape(ǎ,n₁,n₂,d)
-    return (Bs2mfd(B2.p,B2.k,a),F,Ǧ)
+    return (Bs2mfd(B2.p,B2.k,a),F,Ǧ,t₁-t₀)
 end
 
 mutable struct TreeNode
@@ -358,8 +357,8 @@ function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1]
     n₁,n₂=length.(B2.k)-B2.p.-1
     if (!isodd(n₁*n₂)) error("n₁ and n₂ should be odd numbers") end
     B2=Positioning(B2)
-    B2,F,Ǧ=NewtonIteration(B2,fixed,nip=nip)
-    comment="Newton Iteration - Residual norm: "*string(norm(F))*", Δa norm: "*string(norm(Ǧ))
+    B2,F,Ǧ,Δt=NewtonIteration(B2,fixed,nip=nip)
+    comment="Newton Iteration - Residual norm: "*string(norm(F))*", Δa norm: "*string(norm(Ǧ))*", computation time: "*string(Δt)*" sec"
     addchild(BsTree,parent,comment)
 
     Export(B2,BsTree,BsJLD,comment=comment)
