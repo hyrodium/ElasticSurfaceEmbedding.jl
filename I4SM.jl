@@ -125,9 +125,9 @@ function elm_H(g₍₀₎,B2::Bs2mfd,I₁,I₂,i,R₁,R₂,r;nip=NIP)
                 g⁻=inv(g);
                 𝝊=sqrt(det(g));
                 𝑁=[N′(B2,I₁,I₂,i,u) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d];
-                an=[sum(a[I₁,I₂,i]*𝑁[I₁,I₂,j] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:d, j ∈ 1:d];
+                Q=[sum(a[I₁,I₂,i]*𝑁[I₁,I₂,j] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:d, j ∈ 1:d];
                 sum(
-                    C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*(𝜹[i,r]*𝑁[R₁,R₂,q]*(sum(an[o,m]*an[o,n] for o ∈ 1:d)-g[m,n])+2*𝑁[R₁,R₂,n]*an[i,q]*an[r,m])
+                    C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*(𝜹[i,r]*𝑁[R₁,R₂,q]*(sum(Q[o,m]*Q[o,n] for o ∈ 1:d)-g[m,n])+2*𝑁[R₁,R₂,n]*Q[i,q]*Q[r,m])
                 for p ∈ 1:d, q ∈ 1:d, m ∈ 1:d, n ∈ 1:d)
             )*𝝊,(D̂₁,D̂₂),nip=nip
         )
@@ -147,13 +147,13 @@ function elm_F(g₍₀₎,B2::Bs2mfd,I₁,I₂,i;nip=NIP)
             g⁻=inv(g);
             𝝊=sqrt(det(g));
             𝑁=[N′(B2,I₁,I₂,i,u) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d];
-            an=[sum(a[I₁,I₂,i]*𝑁[I₁,I₂,j] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:d, j ∈ 1:d];
+            Q=[sum(a[I₁,I₂,i]*𝑁[I₁,I₂,j] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:d, j ∈ 1:d];
             sum(
                 sum(
-                    C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*an[i,q]
+                    C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*Q[i,q]
                     for p ∈ 1:d, q ∈ 1:d
                 )*(sum(
-                    an[o,m]*an[o,n]
+                    Q[o,m]*Q[o,n]
                 for o ∈ 1:d)-g[m,n])
             for m ∈ 1:d, n ∈ 1:d)
         )*𝝊,(D̂₁,D̂₂),nip=nip
@@ -328,7 +328,8 @@ function p_Refinement(p₊::Array{Int64,1};parent=0,nip=NIP)
     if (parent==0) parent=length(BsTree.nodes) end
     B2=BsJLD[string(parent)]
 
-    B2=pref(B2,p₊,nip=nip)
+    B2=pref(B2,p₊)
+    # B2=pref(B2,p₊,nip=nip)
     comment="p-refinement with "*string(p₊)
     addchild(BsTree,parent,comment)
 
@@ -341,7 +342,8 @@ function h_Refinement(h₊::Array{Array{Float64,1},1};parent=0,nip=NIP)
     if (parent==0) parent=length(BsTree.nodes) end
     B2=BsJLD[string(parent)]
 
-    B2=href(B2,h₊,nip=nip)
+    B2=href(B2,h₊)
+    # B2=href(B2,h₊,nip=nip)
     comment="h-refinement with "*string(h₊)
     addchild(BsTree,parent,comment)
 

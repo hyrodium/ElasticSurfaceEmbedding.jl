@@ -79,6 +79,12 @@ function BsCoef2(f,p::Array{Int64,1},k::Array{Array{Float64,1},1};nip=25)
     return [C[I₁,I₂][i] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:2]
 end
 
+function BsCoef(f,p::Int64,k::Array{Float64,1})
+    n=length(k)-p-1
+    κ=[((n+1-i)*k[i]+i*k[i+p+1])/(n+1) for i ∈ 1:n]
+    [Bs(j,p,k,κ[i]) for i ∈ 1:n, j ∈ 1:n]\f.(κ)
+end
+
 # function BsCoef(f,p::Int64,k::Array{Float64,1})
 #     n=length(k)-p-1
 #     κ=[((n+1-i)*k[i]+i*k[i+p+1])/(n+1) for i ∈ 1:n]
@@ -122,54 +128,56 @@ function BsMapping(B2::Bs2mfd,u)
     return sum(Bs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])*a[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
 end
 
-# function href(B2::Bs2mfd,k₊::Array{Array{Float64,1},1})
+# function href(B2::Bs2mfd,k₊::Array{Array{Float64,1},1};nip=25)
 #     p,k,a = B2.p,B2.k,B2.a
 #     d=2
 #     n=length.(k)-p.-1
 #     pᵣ=p
 #     kᵣ=[sort(convert(Array{Float64,1},vcat(k[l],k₊[l]))) for l ∈ 1:d]
-#     nᵣ=length.(kᵣ)-pᵣ.-1
-#     κ=[[((nᵣ[l]+1-i)/(nᵣ[l]+1))*kᵣ[l][i]+((i)/(nᵣ[l]+1))*kᵣ[l][i+pᵣ[l]+1] for i ∈ 1:nᵣ[l]] for l ∈ 1:d]
-#     C=[[Bs(i,pᵣ[l],kᵣ[l],κ[l][j]) for j ∈ 1:nᵣ[l], i ∈ 1:nᵣ[l]] for l ∈ 1:d]
-#     D=[C[l]\[Bs(j,p[l],k[l],κ[l][i]) for i ∈ 1:nᵣ[l], j ∈ 1:n[l]] for l ∈ 1:d]
-#     aᵣ=[sum(D[1][l₁,i₁]*D[2][l₂,i₂]*a[i₁,i₂,j] for i₁ ∈ 1:n[1], i₂ ∈ 1:n[2]) for l₁ ∈ 1:nᵣ[1], l₂ ∈ 1:nᵣ[2], j ∈ 1:d]
+#     aᵣ=BsCoef2(u->BsMapping(B2,u),pᵣ,kᵣ,nip=nip)
 #     return Bs2mfd(pᵣ,kᵣ,aᵣ)
 # end
 #
-# function pref(B2::Bs2mfd,p₊::Array{Int64,1})
+# function pref(B2::Bs2mfd,p₊::Array{Int64,1};nip=25)
 #     p,k,a=B2.p,B2.k,B2.a
 #     d=2
 #     n=length.(k)-p.-1
 #     pᵣ=p+p₊
 #     k₊=[repeat(DelDpl(k[l]),inner=p₊[l]) for l ∈ 1:d]
 #     kᵣ=[sort(convert(Array{Float64,1},vcat(k[l],k₊[l]))) for l ∈ 1:d]
-#     nᵣ=length.(kᵣ)-pᵣ.-1
-#     κ=[[((nᵣ[l]+1-i)/(nᵣ[l]+1))*kᵣ[l][i]+((i)/(nᵣ[l]+1))*kᵣ[l][i+pᵣ[l]+1] for i ∈ 1:nᵣ[l]] for l ∈ 1:d]
-#     C=[[Bs(i,pᵣ[l],kᵣ[l],κ[l][j]) for j ∈ 1:nᵣ[l], i ∈ 1:nᵣ[l]] for l ∈ 1:d]
-#     D=[C[l]\[Bs(j,p[l],k[l],κ[l][i]) for i ∈ 1:nᵣ[l], j ∈ 1:n[l]] for l ∈ 1:d]
-#     aᵣ=[sum(D[1][l₁,i₁]*D[2][l₂,i₂]*a[i₁,i₂,j] for i₁ ∈ 1:n[1], i₂ ∈ 1:n[2]) for l₁ ∈ 1:nᵣ[1], l₂ ∈ 1:nᵣ[2], j ∈ 1:d]
+#     aᵣ=BsCoef2(u->BsMapping(B2,u),pᵣ,kᵣ,nip=nip)
 #     return Bs2mfd(pᵣ,kᵣ,aᵣ)
 # end
 
-function href(B2::Bs2mfd,k₊::Array{Array{Float64,1},1};nip=25)
+function pref(B2::Bs2mfd,p₊::Array{Int64,1})
     p,k,a = B2.p,B2.k,B2.a
-    d=2
-    n=length.(k)-p.-1
-    pᵣ=p
-    kᵣ=[sort(convert(Array{Float64,1},vcat(k[l],k₊[l]))) for l ∈ 1:d]
-    aᵣ=BsCoef2(u->BsMapping(B2,u),pᵣ,kᵣ,nip=nip)
-    return Bs2mfd(pᵣ,kᵣ,aᵣ)
+    p₁,p₂=p
+    k₁,k₂=k
+    p₁′,p₂′=p′=p+p₊
+    k₊=[repeat(DelDpl(k[l]),inner=p₊[l]) for l ∈ 1:2]
+    k₁′,k₂′=k′=[sort(convert(Array{Float64,1},vcat(k[l],k₊[l]))) for l ∈ 1:2]
+
+    n₁,n₂=n=length.(k)-p.-1
+    n₁′,n₂′=n′=length.(k′)-p′.-1
+    A₁=hcat([BsCoef(t->Bs(i,p₁,k₁,t),p₁′,k₁′) for i in 1:n₁]...)
+    A₂=hcat([BsCoef(t->Bs(i,p₂,k₂,t),p₂′,k₂′) for i in 1:n₂]...)
+    a′=[sum(a[I₁,I₂,j]*A₁[J₁,I₁]*A₂[J₂,I₂] for I₁ in 1:n₁, I₂ in 1:n₂) for J₁ in 1:n₁′, J₂ in 1:n₂′, j in 1:2]
+    return Bs2mfd(p′,k′,a′)
 end
 
-function pref(B2::Bs2mfd,p₊::Array{Int64,1};nip=25)
-    p,k,a=B2.p,B2.k,B2.a
-    d=2
-    n=length.(k)-p.-1
-    pᵣ=p+p₊
-    k₊=[repeat(DelDpl(k[l]),inner=p₊[l]) for l ∈ 1:d]
-    kᵣ=[sort(convert(Array{Float64,1},vcat(k[l],k₊[l]))) for l ∈ 1:d]
-    aᵣ=BsCoef2(u->BsMapping(B2,u),pᵣ,kᵣ,nip=nip)
-    return Bs2mfd(pᵣ,kᵣ,aᵣ)
+function href(B2::Bs2mfd,k₊::Array{Array{Float64,1},1})
+    p,k,a = B2.p,B2.k,B2.a
+    p₁,p₂=p
+    k₁,k₂=k
+    p₁′,p₂′=p′=p
+    k₁′,k₂′=k′=[sort(vcat(k[l],k₊[l])) for l ∈ 1:2]
+
+    n₁,n₂=n=length.(k)-p.-1
+    n₁′,n₂′=n′=length.(k′)-p′.-1
+    A₁=hcat([BsCoef(t->Bs(i,p₁,k₁,t),p₁′,k₁′) for i in 1:n₁]...)
+    A₂=hcat([BsCoef(t->Bs(i,p₂,k₂,t),p₂′,k₂′) for i in 1:n₂]...)
+    a′=[sum(a[I₁,I₂,j]*A₁[J₁,I₁]*A₂[J₂,I₂] for I₁ in 1:n₁, I₂ in 1:n₂) for J₁ in 1:n₁′, J₂ in 1:n₂′, j in 1:2]
+    return Bs2mfd(p′,k′,a′)
 end
 
 function BsDraw(B1::Bs1mfd;filename="BsplineCurve.svg",up=5,down=-5,right=5,left=-5,zoom=1,unitlength=(100,"pt"),points=true)
