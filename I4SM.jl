@@ -426,5 +426,36 @@ function ShowKnots(;index=0)
     return nothing
 end
 
+function ShowMaximumStrain(;index=0)
+    BsJLD=load(DIR*"/"*NAME*".jld")
+    BsTree=BsJLD["BsTree"]
+    if (index==0) index=length(BsTree.nodes) end
+    B2=BsJLD[string(index)]
+    k₁,k₂=B2.k
+    println("k₁: ",k₁)
+    println("k₂: ",k₂)
+
+    𝒑₍ₜ₎(u)=BsMapping(B2,u)
+    function 𝒑₁₍ₜ₎(u)
+        p,k,a=B2.p,B2.k,B2.a
+        p₁,p₂=p
+        k₁,k₂=k
+        n=n₁,n₂=length.(k)-p.-1
+        return sum(Ḃs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])*a[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
+    end
+    g₍₀₎₁₁(u)=dot(𝒑₁₍₀₎(u),𝒑₁₍₀₎(u))
+    g₍ₜ₎₁₁(u)=dot(𝒑₁₍ₜ₎(u),𝒑₁₍ₜ₎(u))
+    E₁₁(u)=(g₍ₜ₎₁₁(u)-g₍₀₎₁₁(u))/2
+    E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
+
+    κ₁=DelDpl(k₁)
+    κ₂=DelDpl(k₂)
+
+    E=[E⁽⁰⁾₁₁([u₁,u₂]) for u₁ ∈ κ₁, u₂ ∈ κ₂]
+    println("min",minimum(E),", max",maximum(E))
+
+    return nothing
+end
+
 
 end
