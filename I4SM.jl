@@ -457,5 +457,9 @@ function ShowMaximumStrain(;index=0)
     return nothing
 end
 
+function ReDraw()
+    return nothing
+end
+
 
 end
