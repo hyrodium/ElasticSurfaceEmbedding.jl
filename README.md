@@ -6,6 +6,7 @@ Julia code for IGA for Surface Embedding.
     * IJulia
     * IntervalSets
     * Luxor
+    * Colors
     * JLD
     * ForwardDiff
     * DifferentialEquations
