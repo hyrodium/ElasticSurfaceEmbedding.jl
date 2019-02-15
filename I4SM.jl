@@ -15,10 +15,11 @@ using ParametricDraw
 
 export @DefineShape, InitialConfiguration, p_Refinement, h_Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, Settings, Restoration
 
-const 𝝂=0.4 #Poisson比ν
 const d=2 #Dimension
-const 𝝀=𝝂/((1+𝝂)*(1-(d-1)*𝝂)) #Lamé定数λ
-const 𝝁=1/(2+2𝝂) #Lamé定数μ
+const 𝝂=0.25 #Poisson比ν
+const Y=1.0 #Young率Y
+const 𝝀=𝝂*Y/((1+𝝂)*(1-(d-1)*𝝂)) #Lamé定数λ
+const 𝝁=1/2(1+𝝂) #Lamé定数μ
 const NIP=25 # Number of Integration Points
 
 macro DefineShape(ex)
@@ -284,15 +285,19 @@ function Export(B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
         E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
 
         rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*maximumstrain) .+0.5
+        # draw strain distribution (6000x6000)
         ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=Dir*"/strain/"*Name*"-"*string(index)*"_strain.png",up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=5*Unit[1])
         ColorBar(max=maximumstrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png",width=(Right-Left)*Unit[1])
 
-        # svg to png
+        # 1200x1200
+        # svg to png (1600x1600)
         run(pipeline(`convert $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg") $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
-        # add colorbar to strain distribution figure
+        # add colorbar to strain distribution figure (6000x6000)
         run(pipeline(`convert $(Dir*"/strain/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png") -gravity southeast -compose over -composite $(Dir*"/strain/"*Name*"-"*string(index)*"_swc.png")`, stdout=devnull, stderr=devnull))
         # resize png
-        run(pipeline(`convert -resize 80% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
+        # (1200x1200)
+        run(pipeline(`convert -resize 75% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
+        # (1200x1200)
         run(pipeline(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/strain/"*Name*"-"*string(index)*"_swc.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png")`, stdout=devnull, stderr=devnull))
         # line up png
         run(pipeline(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")`, stdout=devnull, stderr=devnull))
