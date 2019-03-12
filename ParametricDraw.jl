@@ -48,7 +48,7 @@ function SvgCurve(𝒑,k::Array{T,1};filename="BCA.svg",up=5,down=-5,right=5,lef
 end
 
 function SvgCurve(𝒑,I::ClosedInterval;filename="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,mesh=50,unitlength=(100,"pt"))
-    k=collect(range(endpoints(I)...,length=mesh))
+    k=collect(range(endpoints(I)...,length=mesh+1))
     n=length(k)-1
     step, unit=(unitlength[1],unitlength[2])
     Drawing((right-left)*step,(up-down)*step,filename)
@@ -68,7 +68,7 @@ function SvgCurve(𝒑,I::ClosedInterval;filename="BCA.svg",up=5,down=-5,right=5
 end
 
 function SvgCurve(𝒑s::Array{T,1},I::ClosedInterval;filename="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,mesh=50,unitlength=(100,"pt")) where T<:Any
-    k=collect(range(endpoints(I)...,length=mesh))
+    k=collect(range(endpoints(I)...,length=mesh+1))
     n=length(k)-1
     step, unit=(unitlength[1],unitlength[2])
     Drawing((right-left)*step,(up-down)*step,filename)
