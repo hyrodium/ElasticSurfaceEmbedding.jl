@@ -328,31 +328,36 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
     Export(B2,BsTree,BsJLD,comment=comment)
 end
 
-function p_Refinement(p₊::Array{Int64,1};parent=0,nip=NIP)
+function p_Refinement(p₊::Array{Int64,1};parent=0)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
     B2=BsJLD[string(parent)]
 
     B2=pref(B2,p₊)
-    # B2=pref(B2,p₊,nip=nip)
     comment="p-refinement with "*string(p₊)
     addchild(BsTree,parent,comment)
 
     Export(B2,BsTree,BsJLD,comment=comment)
 end
 
-function h_Refinement(h₊::Array{Array{Float64,1},1};parent=0,nip=NIP)
+function h_Refinement(k₊::Array{Array{Float64,1},1};parent=0)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
     B2=BsJLD[string(parent)]
 
-    B2=href(B2,h₊)
-    # B2=href(B2,h₊,nip=nip)
-    comment="h-refinement with "*string(h₊)
-    addchild(BsTree,parent,comment)
+    k₁₊,k₂₊=k₊
+    k̄₁,k̄₂=[min(B2.k[i]...)..max(B2.k[i]...) for i in 1:2]
 
+    if (*(Bool[kᵢ ∈ k̄₁ for kᵢ in k₁₊]...,Bool[kᵢ ∈ k̄₂ for kᵢ in k₂₊]...))
+        B2=href(B2,k₊)
+        comment="h-refinement with "*string(k₊)
+        addchild(BsTree,parent,comment)
+    else
+        comment="error: can't compute h-refinement with "*string(k₊)
+        addchild(BsTree,parent,comment)
+    end
     Export(B2,BsTree,BsJLD,comment=comment)
 end
 
