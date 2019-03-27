@@ -15,7 +15,7 @@ using Slack
 using ParametricDraw
 # using POV_Ray
 
-export @DefineShape, InitialConfiguration, p_Refinement, h_Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, Settings, Restoration
+export @DefineShape, InitialConfiguration, p_Refinement, h_Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, ShowMaximumStrain, Settings, Restoration
 
 const d=2 #Dimension
 const 𝝂=0.25 #Poisson比ν
@@ -236,7 +236,7 @@ function showtree(tree)
     shownode(tree,1,0)
 end
 
-function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true,maximumstrain=0.01)
+function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true,maximumstrain=0.0)
     global NAME=name
     global DIR=homedir()*"/I4SM-Result/"*NAME
     global UP=up
@@ -266,7 +266,12 @@ function Export(B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
     Mesh=MESH
     Unit=UNIT
     Slack=SLACK
-    Maximumstrain=MAXIMUMSTRAIN
+    if (maximumstrain==0.0)
+        MS=ComputeMaximumStrain(index=index)
+        MaximumStrain=max(-MS[1],MS[2])
+    else
+        MaximumStrain=maximumstrain
+    end
 
     @spawnat 1 begin
         BsDraw(B2,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
@@ -286,10 +291,10 @@ function Export(B2::Bs2mfd,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
         E₁₁(u)=(g₍ₜ₎₁₁(u)-g₍₀₎₁₁(u))/2
         E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
 
-        rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*maximumstrain) .+0.5
+        rgb(u)=E⁽⁰⁾₁₁(u)*[1,-1,-1]/(2*MaximumStrain) .+0.5
         # draw strain distribution (6000x6000)
         ParametricColor(𝒑₍ₜ₎,D,rgb=rgb,filename=Dir*"/strain/"*Name*"-"*string(index)*"_strain.png",up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=5*Unit[1])
-        ColorBar(max=maximumstrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png",width=(Right-Left)*Unit[1])
+        ColorBar(max=MaximumStrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png",width=(Right-Left)*Unit[1])
 
         # 1200x1200
         # svg to png (1600x1600)
@@ -439,14 +444,13 @@ function ShowKnots(;index=0)
     return nothing
 end
 
-function ShowMaximumStrain(;index=0)
+function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (index==0) index=length(BsTree.nodes) end
     B2=BsJLD[string(index)]
     k₁,k₂=B2.k
-    println("k₁: ",k₁)
-    println("k₂: ",k₂)
+    D=(k₁[1]..k₁[end],k₂[1]..k₂[end])
 
     𝒑₍ₜ₎(u)=BsMapping(B2,u)
     function 𝒑₁₍ₜ₎(u)
@@ -461,14 +465,22 @@ function ShowMaximumStrain(;index=0)
     E₁₁(u)=(g₍ₜ₎₁₁(u)-g₍₀₎₁₁(u))/2
     E⁽⁰⁾₁₁(u)=E₁₁(u)/g₍₀₎₁₁(u)
 
-    κ₁=DelDpl(k₁)
-    κ₂=DelDpl(k₂)
+    κ₁=range(leftendpoint(D[1]),stop=rightendpoint(D[1]),length=mesh[1]+1)
+    κ₂=range(leftendpoint(D[2]),stop=rightendpoint(D[2]),length=mesh[2]+1)
 
     E=[E⁽⁰⁾₁₁([u₁,u₂]) for u₁ ∈ κ₁, u₂ ∈ κ₂]
-    println("min",minimum(E),", max",maximum(E))
+
+    return (minimum(E),maximum(E))
+end
+
+function ShowMaximumStrain(;index=0,mesh=5)
+    minE,maxE=ComputeMaximumStrain(index=index,mesh=mesh)
+    println("min",minE,", max",maxE)
 
     return nothing
 end
+
+
 
 function ReDraw()
     return nothing

@@ -149,6 +149,7 @@ function ColorBar(;max=1.234,filename="ColorBar.png",width=100)
     up=4
     down=-4
     right=4.6
+    right=6.2
     left=-2
     Length=3.5
     FontSize=1
@@ -164,9 +165,9 @@ function ColorBar(;max=1.234,filename="ColorBar.png",width=100)
     fontsize(unit*FontSize)
     setline(Thickness)
     setlinecap("round")
-    text(" "*@sprintf("%.3f",max),LxrPt([1.5,Length-0.32*FontSize],unit))
-    text(" "*@sprintf("%.3f",0),LxrPt([1.5,-0.32*FontSize],unit))
-    text("-"*@sprintf("%.3f",max),LxrPt([1.5,-Length-0.32*FontSize],unit))
+    text(" "*@sprintf("%.6f",max),LxrPt([1.5,Length-0.32*FontSize],unit))
+    text(" "*@sprintf("%.6f",0),LxrPt([1.5,-0.32*FontSize],unit))
+    text("-"*@sprintf("%.6f",max),LxrPt([1.5,-Length-0.32*FontSize],unit))
     line(LxrPt([0.5,0],unit),LxrPt([1.2,0],unit),:stroke)
     line(LxrPt([0.5,-Length],unit),LxrPt([1.2,-Length],unit),:stroke)
     line(LxrPt([0.5,Length],unit),LxrPt([1.2,Length],unit),:stroke)
