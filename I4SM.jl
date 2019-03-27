@@ -5,6 +5,7 @@ using Printf
 using Distributed
 using IntervalSets
 using ForwardDiff
+using Dates
 using DifferentialEquations
 using JLD
 
@@ -371,7 +372,8 @@ function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1]
     if (!isodd(n₁*n₂)) error("n₁ and n₂ should be odd numbers") end
     B2=Positioning(B2)
     B2,F,Ǧ,Δt=NewtonIteration(B2,fixed,nip=nip)
-    comment="Newton Iteration - Residual norm: "*(@sprintf("%.5e",norm(F)))*", Δa norm: "*(@sprintf("%.5e",norm(Ǧ)))*", computation time: "*(@sprintf("%.5e",Δt))*" sec"
+    # comment="Newton Iteration - residual norm: "*(@sprintf("%.5e",norm(F)))*", Δa norm: "*(@sprintf("%.5e",norm(Ǧ)))*", computation time: "*(@sprintf("%.5e",Δt))*" sec"
+    comment="Newton Iteration - residual norm: "*(@sprintf("%.5e",norm(F)))*", Δa norm: "*(@sprintf("%.5e",norm(Ǧ)))*", computation time: "*string(Dates.canonicalize(Dates.CompoundPeriod(Dates.Millisecond(1000Δt÷1))))
     addchild(BsTree,parent,comment)
 
     Export(B2,BsTree,BsJLD,comment=comment)
