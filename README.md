@@ -2,7 +2,7 @@
 Julia code for IGA for Surface Embedding.
 
 ## Prerequisite
-* Julia(v1.0) package
+* Julia(v1.1) and packages
     * IJulia
     * IntervalSets
     * Luxor
@@ -37,5 +37,3 @@ Julia code for IGA for Surface Embedding.
 * Numerical analysis
     * NURBS
     * Galerkin method
-
-
