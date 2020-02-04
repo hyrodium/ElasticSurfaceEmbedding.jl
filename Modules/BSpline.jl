@@ -1,4 +1,4 @@
-# module Bspline
+# module BSpline
 #
 # using IntervalSets
 # using Luxor
