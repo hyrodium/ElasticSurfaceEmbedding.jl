@@ -9,7 +9,7 @@ using I4SM
 
 @DefineShape 𝒑₍₀₎(u)=[u...,u'*(u.*[-1.0,1.0])]
 D=((-1.0)..1.0,0.0..0.1)
-Settings("Paraboloid-1c",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
+Settings("Paraboloid-1d",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
 
 InitialConfiguration(D)
 
@@ -30,8 +30,7 @@ pnt=0
 
 BsJLD=load(I4SM.DIR*"/"*I4SM.NAME*".jld")
 BsTree=BsJLD["BsTree"]
-if (pnt==0) pnt=length(BsTree.nodes) end
-B2=BsJLD[string(pnt)]
+B2=BsJLD["1"]
 
 
 
@@ -41,12 +40,6 @@ B2=I4SM.Positioning(B2)
 fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1]))
 B2,F,Ǧ,Δt=I4SM.NewtonIteration(B2,fixed,nip=25)
 
-d=2 #Dimension
-const 𝝂=0.25 #Poisson比ν
-const Y=1.0 #Young率Y
-const 𝝀=𝝂*Y/((1+𝝂)*(1-(d-1)*𝝂)) #Lamé定数λ
-const 𝝁=1/2(1+𝝂) #Lamé定数μ
-const NIP=25 # Number of Integration Points
 
 Hf=Array{Any}(undef,n₁,n₂,d,n₁,n₂,d)
 for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d
