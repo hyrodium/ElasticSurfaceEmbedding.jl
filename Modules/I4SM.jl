@@ -100,7 +100,7 @@ function N′(B2::Bs2mfd,I₁,I₂,i,u)
     p,k,a=B2.p,B2.k,B2.a
     p₁,p₂=p
     k₁,k₂=k
-    if(i==1)
+    if (i==1)
         return Ḃs(I₁,p₁,k₁,u[1])*Bs(I₂,p₂,k₂,u[2])
     else
         return Bs(I₁,p₁,k₁,u[1])*Ḃs(I₂,p₂,k₂,u[2])
@@ -119,7 +119,7 @@ function elm_H(g₍₀₎,B2::Bs2mfd,I₁,I₂,i,R₁,R₂,r;nip=NIP)
     D̂₁=Bsupp(I₁,p₁,k₁)∩Bsupp(R₁,p₁,k₁)
     D̂₂=Bsupp(I₂,p₂,k₂)∩Bsupp(R₂,p₂,k₂)
     𝜹=[1.0 0.0;0.0 1.0]
-    if(isnullset(D̂₁)||isnullset(D̂₂))
+    if (isnullset(D̂₁)||isnullset(D̂₂))
         return 0.0
     else
         return INT2(
