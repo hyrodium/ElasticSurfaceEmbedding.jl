@@ -17,7 +17,7 @@ fixed(n₁,n₂)=[[1,(n₂+1)÷2,1],[1,(n₂+1)÷2,2],[n₁,(n₂+1)÷2,1],[n₁
 NewtonMethodIteration(nip=25,fixed=fixed)
 NewtonMethodIteration(nip=45)
 p_Refinement([0,1])
-h_Refinement([Float64[],[0.05]])
+h_Refinement([Float64[],[(i-1/2)/n]])
 NewtonMethodIteration(nip=45)
 NewtonMethodIteration(nip=45)
 NewtonMethodIteration(nip=45)
