@@ -21,3 +21,7 @@ h_Refinement([Float64[],[(i-1/2)/n]])
 NewtonMethodIteration(nip=45)
 NewtonMethodIteration(nip=45)
 NewtonMethodIteration(nip=45)
+
+Settings("Paraboloid-10b",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
+Restoration()
+FinalOutput(unitlength=(50,"mm"),cutout=(0.2,5))
