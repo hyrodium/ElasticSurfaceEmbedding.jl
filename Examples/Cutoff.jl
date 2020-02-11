@@ -29,4 +29,6 @@ NewtonMethodIteration(nip=45)
 NewtonMethodIteration(nip=45)
 NewtonMethodIteration(nip=45)
 
+ShowKnots()
+
 FinalOutput(unitlength=(10,"mm"),cutout=(0.2,5))
