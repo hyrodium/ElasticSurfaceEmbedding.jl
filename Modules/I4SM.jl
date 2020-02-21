@@ -32,7 +32,14 @@ end
 𝒑′₍₀₎(u)=ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # 接ベクトル
 𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
 𝒑₂₍₀₎(u)=ForwardDiff.derivative(u₂->Main.𝒑₍₀₎([u[1],u₂]),u[2])
-g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u) # 第一基本量
+𝒑₁₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₁₍₀₎([u₁,u[2]]),u[1])
+𝒑₁₂₍₀₎(u)=ForwardDiff.derivative(u₂->Main.𝒑₁₍₀₎([u[1],u₂]),u[2])
+𝒑₂₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₂₍₀₎([u₁,u[2]]),u[1])
+𝒑₂₂₍₀₎(u)=ForwardDiff.derivative(u₂->Main.𝒑₂₍₀₎([u[1],u₂]),u[2])
+𝒆₍₀₎(u)=normalize(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u)))
+g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u) # 第1基本量
+h₍₀₎(u)=[(𝒆₍₀₎(u)'*𝒑₁₁₍₀₎(u)) (𝒆₍₀₎(u)'*𝒑₁₂₍₀₎(u)) ; (𝒆₍₀₎(u)'*𝒑₂₁₍₀₎(u)) (𝒆₍₀₎(u)'*𝒑₂₂₍₀₎(u))] # 第2基本量
+K₍₀₎(u)=det(h₍₀₎(u))/det(g₍₀₎(u))
 𝝊₍₀₎(u)=norm(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u))) # 体積要素υ
 g⁻₍₀₎(u)=inv(g₍₀₎(u)) # 第一基本量の逆
 
