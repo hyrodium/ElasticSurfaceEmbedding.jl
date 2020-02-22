@@ -391,7 +391,7 @@ end
 
 function InitialConfiguration(D;n₁=15,nip=NIP)
     if (isfile(DIR*"/"*NAME*".jld"))
-        error("File already exists")
+        error("jld file already exists")
     end
     mkpath(DIR)
     mkpath(DIR*"/nurbs")

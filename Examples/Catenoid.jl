@@ -3,8 +3,8 @@ addprocs(1);
 @everywhere push!(LOAD_PATH, "Modules")
 using IntervalSets
 using Printf
-using Bspline
-using I4SM
+using BSpline
+using ElasticSurfaceEmbedding
 
 @DefineShape 𝒑₍₀₎(u)=[cos(u[2])*cosh(u[1]),sin(u[2])*cosh(u[1]),u[1]]
 
