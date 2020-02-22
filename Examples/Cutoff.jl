@@ -3,8 +3,8 @@ addprocs(1);
 @everywhere push!(LOAD_PATH, "Modules")
 using IntervalSets
 using Printf
-using Bspline
-using I4SM
+using BSpline
+using ElasticSurfaceEmbedding
 @everywhere using LinearAlgebra
 
 @DefineShape function 𝒑₍₀₎(u)
@@ -21,13 +21,12 @@ D=(-12.0..12.0, (id-1)..id)
 Settings("Cutoff-"*(@sprintf "%02d" id), up=5,down=-5,right=15,left=-15,mesh=(24,1),unit=200,slack=true)
 InitialConfiguration(D,n₁=27)
 fixed(n₁,n₂)=[[1,(n₂+1)÷2,1],[1,(n₂+1)÷2,2],[n₁,(n₂+1)÷2,1],[n₁,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1]]
-NewtonMethodIteration(nip=25,fixed=fixed)
-NewtonMethodIteration(nip=45)
-p_Refinement([0,1])
-h_Refinement([Float64[],[i-1/2]])
-NewtonMethodIteration(nip=45)
-NewtonMethodIteration(nip=45)
-NewtonMethodIteration(nip=45)
+NewtonMethodIteration(,fixed=fixed)
+NewtonMethodIteration()
+Refinement(p₊=[0,1],k₊=[Knots([]),Knots([id-/2])])
+NewtonMethodIteration()
+NewtonMethodIteration()
+NewtonMethodIteration()
 
 ShowKnots()
 
