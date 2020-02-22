@@ -2,8 +2,7 @@
 Julia code for IGA for Surface Embedding.
 
 ## Prerequisite
-* Julia(v1.1) and packages
-    * IJulia
+* Julia(≥v1.3) and packages
     * IntervalSets
     * Luxor
     * Colors
@@ -11,7 +10,6 @@ Julia code for IGA for Surface Embedding.
     * ForwardDiff
     * DifferentialEquations
     * FastGaussQuadrature
-    * (Makie)
 * Slack (optional)
     * Incoming webhook URL
     * OAuth access token
