@@ -143,7 +143,7 @@ end
 #     d=2
 #     n=length.(k)-p.-1
 #     pᵣ=p+p₊
-#     k₊=[repeat(DelDpl(k[l]),inner=p₊[l]) for l ∈ 1:d]
+#     k₊=[repeat(unique(k[l]),inner=p₊[l]) for l ∈ 1:d]
 #     kᵣ=[sort(convert(Array{Float64,1},vcat(k[l],k₊[l]))) for l ∈ 1:d]
 #     aᵣ=BsCoef2(u->BsMapping(B2,u),pᵣ,kᵣ,nip=nip)
 #     return Bs2mfd(pᵣ,kᵣ,aᵣ)
@@ -154,7 +154,7 @@ function pref(B2::Bs2mfd,p₊::Array{Int64,1})
     p₁,p₂=p
     k₁,k₂=k
     p₁′,p₂′=p′=p+p₊
-    k₊=[repeat(DelDpl(k[l]),inner=p₊[l]) for l ∈ 1:2]
+    k₊=[repeat(unique(k[l]),inner=p₊[l]) for l ∈ 1:2]
     k₁′,k₂′=k′=[sort(convert(Array{Float64,1},vcat(k[l],k₊[l]))) for l ∈ 1:2]
 
     n₁,n₂=n=length.(k)-p.-1
@@ -194,7 +194,7 @@ function BsDraw(B1::Bs1mfd;filename="BsplineCurve.svg",up=5,down=-5,right=5,left
     n=length(k)-p-1
     𝒑(t)=BsMapping(B1,t)
 
-    K=DelDpl(k[1+p:end-p])
+    K=unique(k[1+p:end-p])
     N=length(K)-1
 
     sethue("red")
@@ -227,7 +227,7 @@ function BsDraw(B2::Bs2mfd;filename="BsplineSurface.svg",up=5,down=-5,right=5,le
     n₁,n₂=n=length.(k)-p.-1
     𝒑(u)=BsMapping(B2,u)
 
-    K₁,K₂=K=[DelDpl(k[i][1+p[i]:end-p[i]]) for i ∈ 1:2]
+    K₁,K₂=K=[unique(k[i][1+p[i]:end-p[i]]) for i ∈ 1:2]
     N₁,N₂=length.(K).-1
     m₁,m₂=mesh
 
