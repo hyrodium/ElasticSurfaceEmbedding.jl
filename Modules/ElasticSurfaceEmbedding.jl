@@ -16,12 +16,11 @@ using ParametricDraw
 
 export @DefineShape, InitialConfiguration, Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, ShowMaximumStrain, Settings, Restoration
 
+include("../Config.jl")
 const d=2 # Dimension
-const 𝝂=0.25 # Poisson ratio
 const Y=1.0 # Young率Y
 const 𝝀=𝝂*Y/((1+𝝂)*(1-(d-1)*𝝂)) # Lamé constant
 const 𝝁=1/2(1+𝝂) # Lamé constant
-const NIP=10 # Default Number of Integration Points
 
 macro DefineShape(ex)
     global EXPR=ex
@@ -69,7 +68,7 @@ function FittingBSpline(f, P::BSplineSpace; nip=NIP)
     p=P.degree
     k=P.knots
     D=k[1+p]..k[end-p]
-    function Aᵢⱼ(i,j)
+    function a(i,j)
         D′=(max(k[i],k[j])..min(k[i+p+1],k[j+p+1])) ∩ D
         if width(D′)==0
             return 0
@@ -78,8 +77,8 @@ function FittingBSpline(f, P::BSplineSpace; nip=NIP)
         end
     end
     n=dim(P)
-    global A=[Aᵢⱼ(i,j) for i ∈ 1:n, j ∈ 1:n]
-    global b=[GaussianQuadrature(t->BSplineBasis(i,P,t)*f(t), ((k[i]..k[i+p+1]) ∩ D)) for i ∈ 1:n]
+    A=[a(i,j) for i ∈ 1:n, j ∈ 1:n]
+    b=[GaussianQuadrature(t->BSplineBasis(i,P,t)*f(t), ((k[i]..k[i+p+1]) ∩ D)) for i ∈ 1:n]
     return inv(A)*b
 end
 
@@ -312,7 +311,7 @@ end
 
 function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true,maximumstrain=0.0)
     global NAME=name
-    global DIR=homedir()*"/I4SM-Result/"*NAME
+    global DIR=OUT_DIR*NAME
     global UP=up
     global DOWN=down
     global RIGHT=right
@@ -391,7 +390,9 @@ function Export(M::BSplineManifold,BsTree,BsJLD;comment="",maximumstrain=MAXIMUM
 end
 
 function InitialConfiguration(D;n₁=15,nip=NIP)
-    if (isfile(DIR*"/"*NAME*".jld")) error("File already exists") end
+    if (isfile(DIR*"/"*NAME*".jld"))
+        error("File already exists")
+    end
     mkpath(DIR)
     mkpath(DIR*"/nurbs")
     mkpath(DIR*"/strain")
@@ -406,7 +407,7 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
     Export(M,BsTree,BsJLD,comment=comment)
 end
 
-function Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, parent=0)
+function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, parent=0)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
     if (parent==0) parent=length(BsTree.nodes) end
@@ -436,7 +437,9 @@ function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1]
 end
 
 function Restoration()
-    if (!isfile(DIR*"/"*NAME*".jld")) error("File doen't exists") end
+    if (!isfile(DIR*"/"*NAME*".jld"))
+        error("jld file doesn't exists")
+    end
     BsJLD=load(DIR*"/"*NAME*".jld")
     println(showtree(BsJLD["BsTree"]))
     global EXPR=BsJLD["Expr"]
