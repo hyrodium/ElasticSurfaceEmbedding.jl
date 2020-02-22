@@ -5,24 +5,23 @@ using Printf
 using Distributed
 using IntervalSets
 using ForwardDiff
+using FastGaussQuadrature
 using Dates
 using DifferentialEquations
 using JLD
 
 using Bspline
-using ElementaryCalculus
 using Slack
 using ParametricDraw
-# using POV_Ray
 
 export @DefineShape, InitialConfiguration, p_Refinement, h_Refinement, NewtonMethodIteration, FinalOutput, ShowKnots, ShowMaximumStrain, Settings, Restoration
 
-const d=2 #Dimension
-const 𝝂=0.25 #Poisson比ν
-const Y=1.0 #Young率Y
-const 𝝀=𝝂*Y/((1+𝝂)*(1-(d-1)*𝝂)) #Lamé定数λ
-const 𝝁=1/2(1+𝝂) #Lamé定数μ
-const NIP=25 # Number of Integration Points
+const d=2 # Dimension
+const 𝝂=0.25 # Poisson比ν
+const Y=1.0 # Young率Y
+const 𝝀=𝝂*Y/((1+𝝂)*(1-(d-1)*𝝂)) # Lamé定数λ
+const 𝝁=1/2(1+𝝂) # Lamé定数μ
+const NIP=10 # Default Number of Integration Points
 
 macro DefineShape(ex)
     global EXPR=ex
@@ -32,9 +31,27 @@ end
 𝒑′₍₀₎(u)=ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # 接ベクトル
 𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
 𝒑₂₍₀₎(u)=ForwardDiff.derivative(u₂->Main.𝒑₍₀₎([u[1],u₂]),u[2])
-g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u) # 第一基本量
+𝒑₁₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₁₍₀₎([u₁,u[2]]),u[1])
+𝒑₁₂₍₀₎(u)=ForwardDiff.derivative(u₂->Main.𝒑₁₍₀₎([u[1],u₂]),u[2])
+𝒑₂₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₂₍₀₎([u₁,u[2]]),u[1])
+𝒑₂₂₍₀₎(u)=ForwardDiff.derivative(u₂->Main.𝒑₂₍₀₎([u[1],u₂]),u[2])
+𝒆₍₀₎(u)=normalize(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u)))
+g₍₀₎(u)=𝒑′₍₀₎(u)'𝒑′₍₀₎(u) # 第1基本量
+h₍₀₎(u)=[(𝒆₍₀₎(u)'*𝒑₁₁₍₀₎(u)) (𝒆₍₀₎(u)'*𝒑₁₂₍₀₎(u)) ; (𝒆₍₀₎(u)'*𝒑₂₁₍₀₎(u)) (𝒆₍₀₎(u)'*𝒑₂₂₍₀₎(u))] # 第2基本量
+K₍₀₎(u)=det(h₍₀₎(u))/det(g₍₀₎(u))
 𝝊₍₀₎(u)=norm(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u))) # 体積要素υ
 g⁻₍₀₎(u)=inv(g₍₀₎(u)) # 第一基本量の逆
+
+
+function GaussianQuadrature(f,D₁,D₂;nip=NIP)
+    nodes, weights = gausslegendre(nip)
+    return sum(
+    (weights*weights').*
+    [f([x,y]) for
+            x ∈ (width(D₁)*nodes.+sum(extrema(D₁)))/2,
+            y ∈ (width(D₂)*nodes.+sum(extrema(D₂)))/2
+    ])*width(D₁)*width(D₂)/4
+end
 
 function aff(a::Array{Float64,3},A::Array{Float64,2},b::Array{Float64,1})
     #x'=Ax+b
@@ -116,13 +133,14 @@ function elm_H(g₍₀₎,B2::Bs2mfd,I₁,I₂,i,R₁,R₂,r;nip=NIP)
     p₁,p₂=p
     k₁,k₂=k
     n₁,n₂=length.(k)-p.-1
-    D̂₁=Bsupp(I₁,p₁,k₁)∩Bsupp(R₁,p₁,k₁)
-    D̂₂=Bsupp(I₂,p₂,k₂)∩Bsupp(R₂,p₂,k₂)
     𝜹=[1.0 0.0;0.0 1.0]
-    if (isnullset(D̂₁)||isnullset(D̂₂))
+    Σ₁=(maximum([I₁,R₁]):minimum([I₁,R₁])+p₁)
+    Σ₂=(maximum([I₂,R₂]):minimum([I₂,R₂])+p₂)
+
+    if (length(Σ₁)==0 || length(Σ₂)==0)
         return 0.0
     else
-        return INT2(
+        return sum(GaussianQuadrature(
             u->(
                 g=g₍₀₎(u);
                 g⁻=inv(g);
@@ -132,10 +150,11 @@ function elm_H(g₍₀₎,B2::Bs2mfd,I₁,I₂,i,R₁,R₂,r;nip=NIP)
                 sum(
                     C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*(𝜹[i,r]*𝑁[R₁,R₂,q]*(sum(Q[o,m]*Q[o,n] for o ∈ 1:d)-g[m,n])+2*𝑁[R₁,R₂,n]*Q[i,q]*Q[r,m])
                 for p ∈ 1:d, q ∈ 1:d, m ∈ 1:d, n ∈ 1:d)
-            )*𝝊,(D̂₁,D̂₂),nip=nip
-        )
+            )*𝝊, k₁[ι₁]..k₁[ι₁+1], k₂[ι₂]..k₂[ι₂+1], nip=nip
+        ) for ι₁ ∈ Σ₁, ι₂ ∈ Σ₂)
     end
 end
+
 
 function elm_F(g₍₀₎,B2::Bs2mfd,I₁,I₂,i;nip=NIP)
     p,k,a=B2.p,B2.k,B2.a
@@ -144,7 +163,10 @@ function elm_F(g₍₀₎,B2::Bs2mfd,I₁,I₂,i;nip=NIP)
     n₁,n₂=length.(k)-p.-1
     D̂₁=Bsupp(I₁,p₁,k₁)
     D̂₂=Bsupp(I₂,p₂,k₂)
-    return INT2(
+    Σ₁=(I₁:I₁+p₁)
+    Σ₂=(I₂:I₂+p₂)
+
+    return sum(GaussianQuadrature(
         u->(
             g=g₍₀₎(u);
             g⁻=inv(g);
@@ -159,8 +181,8 @@ function elm_F(g₍₀₎,B2::Bs2mfd,I₁,I₂,i;nip=NIP)
                     Q[o,m]*Q[o,n]
                 for o ∈ 1:d)-g[m,n])
             for m ∈ 1:d, n ∈ 1:d)
-        )*𝝊,(D̂₁,D̂₂),nip=nip
-    )
+        )*𝝊,k₁[ι₁]..k₁[ι₁+1], k₂[ι₂]..k₂[ι₂+1],nip=nip
+    ) for ι₁ ∈ Σ₁, ι₂ ∈ Σ₂)
 end
 
 function lineup(n,I₁,I₂,i)

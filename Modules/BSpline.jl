@@ -389,10 +389,7 @@ end
 
 
 
-
-
-
-## Examples below
+# Examples below
 
 # k¹ = Knots([0,0,1,1])
 # k² = Knots([0,0,1/2,1,1])
