@@ -1,21 +1,16 @@
-# module BSpline
-#
-# using IntervalSets
-# using Luxor
-# using ElementaryCalculus
-# import ParametricDraw.ChangeUnit
-# import ParametricDraw.BézPts
-# import ParametricDraw.LxrPt
-#
-# export Bs1mfd, Bs2mfd, Bs, Ḃs, Bsupp, BsCoef2, BsMapping, href, pref, BsDraw, BsWrite, BsRead
+module BSpline
 
-push!(LOAD_PATH, "/home/hyrodium/Git/I4SM-julia/")
-using BenchmarkTools
 using IntervalSets
 using Luxor
 import ParametricDraw.ChangeUnit
 import ParametricDraw.BézPts
 import ParametricDraw.LxrPt
+
+export Knots, BSplineSpace, 𝒫, dim
+export BSplineBasis₊₀, BSplineBasis₋₀, BSplineBasis
+export BSplineBasis′₊₀, BSplineBasis′₋₀, BSplineBasis′
+export BSplineSupport, BSplineCoefficient
+export BSplineManifold, Refinement, Mapping, BSplineSvg
 
 # Knots
 struct Knots
@@ -23,8 +18,15 @@ struct Knots
     function Knots(vector)
         new(sort(vector))
     end
+    function Knots(i::Int)
+        if (i ≠ 0)
+            error("Knots(0) is only alllowed")
+        end
+        return Knots([])
+    end
 end
 
+Base.zero(::Type{Knots}) = Knots([])
 Base.:+(k₁::Knots, k₂::Knots) = Knots(sort([k₁.vector...,k₂.vector...]))
 Base.:*(p₊::Int, k::Knots) = (
         if (p₊==0)
@@ -75,7 +77,7 @@ const 𝒫 = BSplineSpace
 function dim(bsplinespace::BSplineSpace)
     p=bsplinespace.degree
     k=bsplinespace.knots
-    return length(k)-p-1
+    return ♯(k)-p-1
 end
 
 function Base.:⊆(P::BSplineSpace, P′::BSplineSpace)
@@ -100,7 +102,7 @@ function BSplineBasis₊₀(P::BSplineSpace, t)::Array{Float64,1}
     p=P.degree
     k=P.knots
 
-    n=length(k)-p-1
+    n=dim(P)
     if (p==0)
         return [k[i] ≤ t < k[i+1] for i ∈ 1:n]
     end
@@ -108,12 +110,11 @@ function BSplineBasis₊₀(P::BSplineSpace, t)::Array{Float64,1}
     B=BSplineBasis₊₀(𝒫(p-1,k),t)
     return [K[i]*B[i]+(1-K[i+1])*B[i+1] for i ∈ 1:n]
 end
-
 function BSplineBasis₋₀(P::BSplineSpace, t)::Array{Float64,1}
     p=P.degree
     k=P.knots
 
-    n=length(k)-p-1
+    n=dim(P)
     if (p==0)
         return [k[i] < t ≤ k[i+1] for i ∈ 1:n]
     end
@@ -121,12 +122,11 @@ function BSplineBasis₋₀(P::BSplineSpace, t)::Array{Float64,1}
     B=BSplineBasis₋₀(𝒫(p-1,k),t)
     return [K[i]*B[i]+(1-K[i+1])*B[i+1] for i ∈ 1:n]
 end
-
 function BSplineBasis(P::BSplineSpace, t)::Array{Float64,1}
     p=P.degree
     k=P.knots
 
-    n=length(k)-p-1
+    n=dim(P)
     if (p==0)
         return [k[i] ≤ t < k[i+1] || (k[i] ≠ k[i+1] == k[end] == t) for i ∈ 1:n]
     end
@@ -134,27 +134,24 @@ function BSplineBasis(P::BSplineSpace, t)::Array{Float64,1}
     B=BSplineBasis(𝒫(p-1,k),t)
     return [K[i]*B[i]+(1-K[i+1])*B[i+1] for i ∈ 1:n]
 end
-
-# BSplineBasis₊₀ = BSplineBasis
-
-function BSplineBasis′(P::BSplineSpace, t)::Array{Float64,1}
+function BSplineBasis(i::Int64, P::BSplineSpace, t)::Float64
     p=P.degree
     k=P.knots
 
-    n=length(k)-p-1
     if (p==0)
-        return [0.0 for _ ∈ 1:n]
+        return k[i]≤t<k[i+1]||(k[i]≠k[i+1]==k[end]==t)
+    else
+        return (((k[i+p]-k[i]≠0) ? BSplineBasis(i,𝒫(p-1,k),t)*(t-k[i])/(k[i+p]-k[i]) : 0)
+        +((k[i+p+1]-k[i+1]≠0) ? BSplineBasis(i+1,𝒫(p-1,k),t)*(k[i+p+1]-t)/(k[i+p+1]-k[i+1]) : 0))
     end
-    K=[ifelse(k[i+p]==k[i],0,p/(k[i+p]-k[i])) for i ∈ 1:n+1]
-    B=BSplineBasis(𝒫(p-1,k),t)
-    return [K[i]*B[i]-K[i+1]*B[i+1] for i ∈ 1:n]
 end
+
 
 function BSplineBasis′₊₀(P::BSplineSpace, t)::Array{Float64,1}
     p=P.degree
     k=P.knots
 
-    n=length(k)-p-1
+    n=dim(P)
     if (p==0)
         return [0.0 for _ ∈ 1:n]
     end
@@ -162,12 +159,11 @@ function BSplineBasis′₊₀(P::BSplineSpace, t)::Array{Float64,1}
     B=BSplineBasis₊₀(𝒫(p-1,k),t)
     return [K[i]*B[i]-K[i+1]*B[i+1] for i ∈ 1:n]
 end
-
 function BSplineBasis′₋₀(P::BSplineSpace, t)::Array{Float64,1}
     p=P.degree
     k=P.knots
 
-    n=length(k)-p-1
+    n=dim(P)
     if (p==0)
         return [0.0 for _ ∈ 1:n]
     end
@@ -175,13 +171,29 @@ function BSplineBasis′₋₀(P::BSplineSpace, t)::Array{Float64,1}
     B=BSplineBasis₋₀(𝒫(p-1,k),t)
     return [K[i]*B[i]-K[i+1]*B[i+1] for i ∈ 1:n]
 end
+function BSplineBasis′(P::BSplineSpace, t)::Array{Float64,1}
+    p=P.degree
+    k=P.knots
 
-# BSplineBasis′₊₀ = BSplineBasis′
+    n=dim(P)
+    if (p==0)
+        return [0.0 for _ ∈ 1:n]
+    end
+    K=[ifelse(k[i+p]==k[i],0,p/(k[i+p]-k[i])) for i ∈ 1:n+1]
+    B=BSplineBasis(𝒫(p-1,k),t)
+    return [K[i]*B[i]-K[i+1]*B[i+1] for i ∈ 1:n]
+end
+function BSplineBasis′(i::Int64, P::BSplineSpace, t)::Float64
+    p=P.degree
+    k=P.knots
+
+    return p*(((k[i+p]-k[i]≠0) ? BSplineBasis(i,𝒫(p-1,k),t)/(k[i+p]-k[i]) : 0)
+    -((k[i+p+1]-k[i+1]≠0) ? BSplineBasis(i+1,𝒫(p-1,k),t)/(k[i+p+1]-k[i+1]) : 0))
+end
 
 function BSplineSupport(i::Int64, P::BSplineSpace)::ClosedInterval
     p=P.degree
     k=P.knots
-
     return k[i]..k[i+p+1]
 end
 
@@ -286,19 +298,47 @@ struct BSplineManifold
 end
 
 
-function Refinement(M::BSplineManifold, 𝒫s′::Array{BSplineSpace,1})
-    𝒫s = M.bsplinespaces
+function Refinement(M::BSplineManifold, Ps′::Array{BSplineSpace,1})
+    Ps = M.bsplinespaces
     𝒂 = M.controlpoints
     d̂ = size(𝒂)[end]
-    n = dim.(𝒫s)
-    n′ = dim.(𝒫s′)
-    if (prod(𝒫s .⊆ 𝒫s′))
-        A = BSplineCoefficient.(𝒫s,𝒫s′)
+    n = dim.(Ps)
+    n′ = dim.(Ps′)
+    if (prod(Ps .⊆ Ps′))
+        A = BSplineCoefficient.(Ps,Ps′)
         𝒂′ = [sum(A[1][I₁,J₁]*A[2][I₂,J₂]*𝒂[I₁,I₂,i] for I₁ ∈ 1:n[1], I₂ ∈ 1:n[2]) for J₁ ∈ 1:n′[1], J₂ ∈ 1:n′[2], i ∈ 1:d̂]
-        return BSplineManifold(𝒫s′, 𝒂′)
+        return BSplineManifold(Ps′, 𝒂′)
     else
         error("𝒫[p,k] ⊄ 𝒫[p′,k′]")
     end
+end
+
+function Refinement(M::BSplineManifold; p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing)
+    Ps = M.bsplinespaces
+    𝒂 = M.controlpoints
+    d = length(Ps)
+    d̂ = size(𝒂)[end]
+    n = dim.(Ps)
+    if (p₊ == nothing)
+        p₊=zeros(Int,d)
+    elseif (length(Ps) ≠ length(p₊))
+        error("dimension does not match")
+    end
+    if (k₊ == nothing)
+        k₊=zeros(Knots,d)
+    elseif (length(Ps) ≠ length(k₊))
+        error("dimension does not match")
+    end
+
+    Ps′=BSplineSpace[]
+    for i ∈ 1:length(Ps)
+        P=Ps[i]
+        p=P.degree
+        k=P.knots
+        push!(Ps′,𝒫(p+p₊[i], k+p₊[i]*unique(k)+k₊[i]))
+    end
+
+    return Refinement(M, Ps′)
 end
 
 # function BSplineBasis(𝒫s::Array{BSplineSpace,1},t)
@@ -326,11 +366,11 @@ end
 # end
 
 function Mapping(M::BSplineManifold, t::Array{Float64,1})
-    𝒫s = M.bsplinespaces
+    Ps = M.bsplinespaces
     𝒂 = M.controlpoints
-    d=length(𝒫s)
+    d=length(Ps)
     d̂=size(𝒂)[end]
-    return [sum(BSplineBasis(𝒫s,t).*𝒂[:,:,i]) for i ∈ 1:d̂]
+    return [sum(BSplineBasis(Ps,t).*𝒂[:,:,i]) for i ∈ 1:d̂]
 end
 
 function BSplineSvg(M::BSplineManifold; filename="Bspline.svg", up=5, down=-5, right=5, left=-5, zoom=1, mesh=(10,10), unitlength=(100,"pt"), points=true)
@@ -386,55 +426,4 @@ function BSplineSvg(M::BSplineManifold; filename="Bspline.svg", up=5, down=-5, r
     return nothing
 end
 
-
-
-
-
-
-
-## Examples below
-
-# k¹ = Knots([0,0,1,1])
-# k² = Knots([0,0,1/2,1,1])
-k¹ = Knots([0,0,1,1])
-k² = Knots([0,0,1/2,1,1])
-p¹ = 1
-p² = 1
-𝒂=Float64[ifelse(i==1, 2*I₁, 3*I₂/2) for I₁ ∈ 0:1,  I₂ ∈ 0:2, i ∈ 1:2]
-𝒫s=[𝒫(p¹,k¹), 𝒫(p²,k²)]
-M=BSplineManifold(𝒫s,𝒂)
-
-[M.bsplinespaces[i].knots for i ∈ 1:2]
-
-BSplineSvg(M)
-
-p′¹=3
-p′²=5
-k′¹=k¹+(p′¹-p¹)*unique(k¹)+Knots(rand(3))
-k′²=k²+(p′²-p²)*unique(k²)+Knots(rand(5))
-M′=Refinement(M, [𝒫(p′¹,k′¹), 𝒫(p′²,k′²)])
-
-BSplineSvg(M′,filename="hoge.svg")
-
-M == M′
-
-a=M.controlpoints
-a′=M′.controlpoints
-
-t=[rand(),2*rand()]
-println(Mapping(M,t)-Mapping(M′,t))
-
-@benchmark Mapping(M′,t)
-
-
-@benchmark Mapping2(M′,t)
-
-
-# exit()
-
-# end
-
-println(a[:,1,1])
-println(a′[:,1,1])
-
-@benchmark a′[:,1,1]
+end
