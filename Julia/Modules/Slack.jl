@@ -1,33 +1,20 @@
-module Slack
-    export SlackString, SlackDict, SlackFile
+function SlackString(str::String)
+    str2="{\"text\":\""*str*"\"}"
+    run(`curl -X POST -H 'Content-type: application/json' --data $str2 $IWhU`;wait=false)
+    return nothing
+end
 
-    function loadconfig()
-        open("slack.txt") do file
-            IWhU = readline(file)
-            OAAT = readline(file)
-            ChID = readline(file)
-            return IWhU, OAAT, ChID
-        end
+function SlackDict(dic::Dict)
+    DIC=""
+    for key ∈ sort(collect(keys(dic)))
+        DIC=DIC*key*" : "*string(dic[key])*"\n"
     end
+    DIC="{\"text\":\""*DIC*"\"}"
+    run(`curl -X POST -H 'Content-type: application/json' --data $DIC $IWhU`;wait=false)
+    return nothing
+end
 
-    function SlackString(str::String)
-        IWhU, OAAT, ChID=loadconfig()
-        str2="{\"text\":\""*str*"\"}"
-        run(`curl -X POST -H 'Content-type: application/json' --data $str2 $IWhU`;wait=false)
-    end
-
-    function SlackDict(dic::Dict)
-        IWhU, OAAT, ChID=loadconfig()
-        DIC=""
-        for key ∈ sort(collect(keys(dic)))
-            DIC=DIC*key*" : "*string(dic[key])*"\n"
-        end
-        DIC="{\"text\":\""*DIC*"\"}"
-        run(`curl -X POST -H 'Content-type: application/json' --data $DIC $IWhU`;wait=false)
-    end
-
-    function SlackFile(filename;comment="")
-        IWhU, OAAT, ChID=loadconfig()
-        run(`curl -F file=@$filename -F "initial_comment=$comment" -F channels=$ChID -H "Authorization: Bearer $OAAT" https://slack.com/api/files.upload`;wait=false)
-    end
+function SlackFile(filename;comment="")
+    run(`curl -F file=@$filename -F "initial_comment=$comment" -F channels=$ChID -H "Authorization: Bearer $OAAT" https://slack.com/api/files.upload`;wait=false)
+    return nothing
 end
