@@ -3,10 +3,7 @@
 ## Overview
 You can make a smooth surface model by this code.
 
-<img src="img/Paraboloid1.png" width="200">
-<img src="img/Paraboloid2.png" width="200">
-<img src="img/Paraboloid3.png" width="200">
-<img src="img/Paraboloid4.png" width="200">
+<img src="img/Paraboloid1.png" width="175"> <img src="img/Paraboloid2.png" width="175"> <img src="img/Paraboloid3.png" width="175"> <img src="img/Paraboloid4.jpg" width="175"> <img src="img/Paraboloid5.png" width="175">
 
 ## Prerequisite
 ### Julia
