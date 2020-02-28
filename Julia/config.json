@@ -1,0 +1,10 @@
+{
+	"Poisson's Ratio": 0.25,
+	"Default Number of Integration Points": 10,
+	"Output Directory": "~/ElasticSurfaceEmbedding-Result/",
+	"Slack":{
+		"Incoming Webhook Url": "https://hooks.slack.com/services/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",
+		"OAuth Access Token": "xoxp-587883028310-587883028694-622674491761-a37533ee7606e19d2216a6a88f185641",
+		"Channel ID": "CJK5ALKJS"
+	}
+}
