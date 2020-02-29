@@ -25,6 +25,70 @@ function N′(P₁::BSplineSpace,P₂::BSplineSpace,I₁,I₂,i,u)
     end
 end
 
+function affine(𝒂::Array{Float64,3},A::Array{Float64,2},b::Array{Float64,1})::Array{Float64,3}
+    #x'=Ax+b
+    n₁,n₂,_=size(𝒂)
+    return [(A*𝒂[I₁,I₂,:]+b)[i] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
+end
+
+function Positioning(𝒂::Array{Float64,3})::Array{Float64,3} # 制御点の位置調整
+    n₁,n₂,_=size(𝒂)
+    ind0=[(n₁+1)÷2,(n₂+1)÷2]
+    ind1=ind0-[0,1]
+    v=𝒂[ind1...,:]-𝒂[ind0...,:]
+    R=-[v[2] -v[1];v[1] v[2]]/norm(v)
+    return 𝒂=affine(𝒂,R,-R*𝒂[ind0...,:])
+end
+
+function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置調整
+    𝒫s = M.bsplinespaces
+    𝒂 = M.controlpoints
+    if (length(𝒫s) ≠ d)
+        error("dimension does not match")
+    end
+
+    p¹,p²=p=[M.bsplinespaces[i].degree for i ∈ 1:2]
+    k¹,k²=k=[M.bsplinespaces[i].knots for i ∈ 1:2]
+
+    n₁,n₂,_=size(𝒂)
+    𝒂′=Positioning(𝒂)
+    return BSplineManifold(𝒫s,𝒂′)
+end
+
+export Refinement
+function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, parent=0)
+    BsJLD=load(DIR*"/"*NAME*".jld")
+    BsTree=BsJLD["BsTree"]
+    if (parent==0) parent=length(BsTree.nodes) end
+    M=BsJLD[string(parent)]
+
+    comment="refinement with "*string(p₊)*", "*string(k₊)
+    addchild(BsTree,parent,comment)
+
+    M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
+    Export(M,BsTree,BsJLD,comment=comment)
+end
+
+export ShowKnots
+function ShowKnots(;index=0)
+    BsJLD=load(DIR*"/"*NAME*".jld")
+    BsTree=BsJLD["BsTree"]
+    if (index==0) index=length(BsTree.nodes) end
+    M=BsJLD[string(index)]
+    P₁,P₂=M.bsplinespaces
+    p₁,p₂=P₁.degree,P₂.degree
+    k₁,k₂=P₁.knots,P₂.knots
+    println("k₁: ",k₁)
+    println("k₂: ",k₂)
+    println("Suggestion:")
+    k₁′=unique(k₁)
+    k₂′=unique(k₂)
+    println("k₁₊: ",[(k₁′[i]+k₁′[i+1])/2 for i ∈ 1:(length(k₁′)-1)])
+    println("k₂₊: ",[(k₂′[i]+k₂′[i+1])/2 for i ∈ 1:(length(k₂′)-1)])
+
+    return nothing
+end
+
 # Reference State
 𝒑′₍₀₎(u)=ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # Tangent vector
 𝒑₁₍₀₎(u)=ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
@@ -76,6 +140,33 @@ g₍ₜ₎₂₂(M,u)=𝒑₂₍ₜ₎(M,u)'𝒑₂₍ₜ₎(M,u) # 第1基本�
 E(M,u)=(g₍ₜ₎(M,u)-g₍₀₎(u))/2
 E₁₁(M,u)=(g₍ₜ₎₁₁(M,u)-g₍₀₎₁₁(u))/2
 E⁽⁰⁾₁₁(M,u)=E₁₁(M,u)/g₍₀₎₁₁(u)
+
+function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
+    BsJLD=load(DIR*"/"*NAME*".jld")
+    BsTree=BsJLD["BsTree"]
+    if (index==0) index=length(BsTree.nodes) end
+    M=BsJLD[string(index)]
+    𝒂=M.controlpoints
+    P₁,P₂=P=M.bsplinespaces
+    p₁,p₂=p=P₁.degree,P₂.degree
+    k₁,k₂=k=P₁.knots,P₂.knots
+    D₁,D₂=D=k₁[1+p₁]..k₁[end-p₁],k₂[1+p₂]..k₂[end-p₂]
+
+    κ₁=range(leftendpoint(D₁),stop=rightendpoint(D₁),length=mesh[1]+1)
+    κ₂=range(leftendpoint(D₂),stop=rightendpoint(D₂),length=mesh[2]+1)
+
+    E=[E⁽⁰⁾₁₁(M,[u₁,u₂]) for u₁ ∈ κ₁, u₂ ∈ κ₂]
+
+    return (minimum(E),maximum(E))
+end
+
+export ShowMaximumStrain
+function ShowMaximumStrain(;index=0,mesh=5)
+    minE,maxE=ComputeMaximumStrain(index=index,mesh=mesh)
+    println("min",minE,", max",maxE)
+
+    return nothing
+end
 
 # Elastic Modulus
 function C(i,j,k,l,g⁻)
