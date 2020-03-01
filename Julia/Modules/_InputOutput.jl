@@ -38,15 +38,16 @@ function Export(M::BSplineManifold,BsTree,BsJLD;comment="",maximumstrain=MAXIMUM
     save(DIR*"/"*NAME*".jld",BsJLD)
     println(showtree(BsTree))
 
-    Name=NAME
-    Dir=DIR
-    Up=UP
-    Down=DOWN
-    Right=RIGHT
-    Left=LEFT
-    Mesh=MESH
-    Unit=UNIT
-    Slack=SLACK
+    # Name=NAME
+    # Dir=DIR
+    # Up=UP
+    # Down=DOWN
+    # Right=RIGHT
+    # Left=LEFT
+    # Mesh=MESH
+    # Unit=UNIT
+    # Slack=SLACK
+
     if (maximumstrain==0.0)
         MS=ComputeMaximumStrain(index=index)
         MaximumStrain=max(-MS[1],MS[2])
@@ -54,39 +55,45 @@ function Export(M::BSplineManifold,BsTree,BsJLD;comment="",maximumstrain=MAXIMUM
         MaximumStrain=maximumstrain
     end
 
-    @spawnat 1 begin
-        BSplineSvg(M,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
-        𝒂 = M.controlpoints
-        P₁,P₂=P=M.bsplinespaces
-        p₁,p₂=p=P₁.degree,P₂.degree
-        k₁,k₂=k=P₁.knots,P₂.knots
-        D₁,D₂=D=k₁[1+p₁]..k₁[end-p₁],k₂[1+p₂]..k₂[end-p₂]
-
-        rgb(u)=E⁽⁰⁾₁₁(M,u)*[1,-1,-1]/(2*MaximumStrain) .+0.5
-        # draw strain distribution (6000x6000)
-        ParametricColor(u->𝒑₍ₜ₎(M,u),D,rgb=rgb,filename=Dir*"/strain/"*Name*"-"*string(index)*"_strain.png",up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=5*Unit[1])
-        ColorBar(max=MaximumStrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png",width=(Right-Left)*Unit[1])
-
-        # 1200x1200
-        # svg to png (1600x1600)
-        run(pipeline(`convert $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg") $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
-        # add colorbar to strain distribution figure (6000x6000)
-        run(pipeline(`convert $(Dir*"/strain/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png") -gravity southeast -compose over -composite $(Dir*"/strain/"*Name*"-"*string(index)*"_swc.png")`, stdout=devnull, stderr=devnull))
-        # resize png
-        # (1200x1200)
-        run(pipeline(`convert -resize 75% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
-        # (1200x1200)
-        run(pipeline(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/strain/"*Name*"-"*string(index)*"_swc.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png")`, stdout=devnull, stderr=devnull))
-        # line up png
-        run(pipeline(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")`, stdout=devnull, stderr=devnull))
-
-        if (Slack)
-            SlackString(showtree(BsTree))
-            SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")
-        end
+    if (distributed)
+        @spawnat 1 ExportFiles(M,MaximumStrain,BsTree,index)
+    else
+        ExportFiles(M,MaximumStrain,BsTree,index)
     end
 
     return nothing
+end
+
+function ExportFiles(M::BSplineManifold,MaximumStrain,BsTree,index;Name=NAME,Dir=DIR,Up=UP,Down=DOWN,Right=RIGHT,Left=LEFT,Mesh=MESH,Unit=UNIT,Slack=SLACK)
+    BSplineSvg(M,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
+    𝒂 = M.controlpoints
+    P₁,P₂=P=M.bsplinespaces
+    p₁,p₂=p=P₁.degree,P₂.degree
+    k₁,k₂=k=P₁.knots,P₂.knots
+    D₁,D₂=D=k₁[1+p₁]..k₁[end-p₁],k₂[1+p₂]..k₂[end-p₂]
+
+    rgb(u)=E⁽⁰⁾₁₁(M,u)*[1,-1,-1]/(2*MaximumStrain) .+0.5
+    # draw strain distribution (6000x6000)
+    ParametricColor(u->𝒑₍ₜ₎(M,u),D,rgb=rgb,filename=Dir*"/strain/"*Name*"-"*string(index)*"_strain.png",up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=5*Unit[1])
+    ColorBar(max=MaximumStrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png",width=(Right-Left)*Unit[1])
+
+    # 1200x1200
+    # svg to png (1600x1600)
+    run(pipeline(`convert $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg") $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
+    # add colorbar to strain distribution figure (6000x6000)
+    run(pipeline(`convert $(Dir*"/strain/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png") -gravity southeast -compose over -composite $(Dir*"/strain/"*Name*"-"*string(index)*"_swc.png")`, stdout=devnull, stderr=devnull))
+    # resize png
+    # (1200x1200)
+    run(pipeline(`convert -resize 75% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png")`, stdout=devnull, stderr=devnull))
+    # (1200x1200)
+    run(pipeline(`convert -resize 20% -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(Dir*"/strain/"*Name*"-"*string(index)*"_swc.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png")`, stdout=devnull, stderr=devnull))
+    # line up png
+    run(pipeline(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")`, stdout=devnull, stderr=devnull))
+
+    if (Slack)
+        SlackString(showtree(BsTree))
+        SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")
+    end
 end
 
 export FinalOutput
