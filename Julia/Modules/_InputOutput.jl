@@ -40,16 +40,6 @@ function Export(M::BSplineManifold,BsTree,BsJLD;comment="",maximumstrain=MAXIMUM
     save(DIR*"/"*NAME*".jld",BsJLD)
     println(showtree(BsTree))
 
-    # Name=NAME
-    # Dir=DIR
-    # Up=UP
-    # Down=DOWN
-    # Right=RIGHT
-    # Left=LEFT
-    # Mesh=MESH
-    # Unit=UNIT
-    # Slack=SLACK
-
     if (maximumstrain==0.0)
         MS=ComputeMaximumStrain(index=index)
         MaximumStrain=max(-MS[1],MS[2])

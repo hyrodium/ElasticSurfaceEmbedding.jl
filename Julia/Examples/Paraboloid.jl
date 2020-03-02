@@ -1,10 +1,8 @@
-# using Distributed
-# addprocs(10);
-# @everywhere push!(LOAD_PATH, "Julia/Modules")
-# @everywhere push!(LOAD_PATH, "Modules")
+using Distributed
+addprocs(15);
+@everywhere push!(LOAD_PATH, "Julia/Modules")
 
-push!(LOAD_PATH, "Julia/Modules")
-push!(LOAD_PATH, "Modules")
+# push!(LOAD_PATH, "Julia/Modules")
 
 using IntervalSets
 using Printf

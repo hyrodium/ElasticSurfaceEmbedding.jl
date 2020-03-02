@@ -1,6 +1,3 @@
-if (distributed)
-    using Distributed
-end
 using Dates
 
 export NewtonMethodIteration

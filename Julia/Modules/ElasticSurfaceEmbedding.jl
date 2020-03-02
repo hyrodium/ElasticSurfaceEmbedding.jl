@@ -4,6 +4,7 @@ using LinearAlgebra
 using Printf
 using IntervalSets
 using JLD
+using Distributed
 
 using BSpline
 
