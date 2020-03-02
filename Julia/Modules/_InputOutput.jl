@@ -7,7 +7,7 @@ macro DefineShape(ex)
 end
 
 export Settings
-function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true,maximumstrain=0.0)
+function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true,maximumstrain=0.0,overwrite=false)
     global NAME=name
     global DIR=OUT_DIR*NAME
     global UP=up
@@ -18,12 +18,13 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     global UNIT=(unit,"pt")
     global SLACK=slack
     global MAXIMUMSTRAIN=maximumstrain
+    global OVERWRITE=overwrite
     return nothing
 end
 
 export Restoration
 function Restoration()
-    if (!isfile(DIR*"/"*NAME*".jld"))
+    if !isfile(DIR*"/"*NAME*".jld")
         error("jld file doesn't exists")
     end
     BsJLD=load(DIR*"/"*NAME*".jld")
@@ -40,14 +41,14 @@ function Export(M::BSplineManifold,BsTree,BsJLD;comment="",maximumstrain=MAXIMUM
     save(DIR*"/"*NAME*".jld",BsJLD)
     println(showtree(BsTree))
 
-    if (maximumstrain==0.0)
+    if maximumstrain==0.0
         MS=ComputeMaximumStrain(index=index)
         MaximumStrain=max(-MS[1],MS[2])
     else
         MaximumStrain=maximumstrain
     end
 
-    if (distributed)
+    if distributed
         @spawnat 1 ExportFiles(M,MaximumStrain,BsTree,index)
     else
         ExportFiles(M,MaximumStrain,BsTree,index)
@@ -82,7 +83,7 @@ function ExportFiles(M::BSplineManifold,MaximumStrain,BsTree,index;Name=NAME,Dir
     # line up png
     run(pipeline(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")`, stdout=devnull, stderr=devnull))
 
-    if (Slack)
+    if Slack
         SlackString(showtree(BsTree))
         SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")
     end
@@ -94,7 +95,9 @@ function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
     BsTree=BsJLD["BsTree"]
     # println(showtree(BsTree))
 
-    if (index==0) index=length(BsTree.nodes) end
+    if index==0
+        index=length(BsTree.nodes)
+    end
     M=BsJLD[string(index)]
     BSplineSvg(M,filename=DIR*"/"*NAME*"-"*string(index)*"-final.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength,points=false)
 
@@ -110,7 +113,7 @@ function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
     𝒑b(i,t)=𝒑₍ₜ₎(M,[t,rightendpoint(D₂)])-𝒆⁽⁰⁾₂([t,rightendpoint(D₂)])*i*cutout[1]/unitlength[1]
     SvgCurve([[t->𝒑a(i,t) for i ∈ 0:cutout[2]]...,[t->𝒑b(i,t) for i ∈ 0:cutout[2]]...],D₁,filename=DIR*"/"*NAME*"-"*string(index)*"-cutout.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,thickness=0.1,mesh=mesh,unitlength=unitlength)
 
-    if (SLACK)
+    if SLACK
         SlackFile(DIR*"/"*NAME*"-"*string(index)*"-final.svg")
         SlackFile(DIR*"/"*NAME*"-"*string(index)*"-cutout.svg")
     end

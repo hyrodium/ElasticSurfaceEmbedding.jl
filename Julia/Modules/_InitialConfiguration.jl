@@ -2,8 +2,12 @@ using DifferentialEquations
 
 export InitialConfiguration
 function InitialConfiguration(D;n₁=15,nip=NIP)
-    if (isfile(DIR*"/"*NAME*".jld"))
-        error("jld file already exists")
+    if isfile(DIR*"/"*NAME*".jld")
+        if OVERWRITE
+            rm(DIR, recursive=true)
+        else
+            error("jld file already exists")
+        end
     end
     mkpath(DIR)
     mkpath(DIR*"/nurbs")
