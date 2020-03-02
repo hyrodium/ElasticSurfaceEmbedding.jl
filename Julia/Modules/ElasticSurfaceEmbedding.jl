@@ -6,7 +6,6 @@ using IntervalSets
 using JLD
 
 using BSpline
-using ParametricDraw
 
 include("_Constants.jl")
 include("_NumericalIntegral.jl")

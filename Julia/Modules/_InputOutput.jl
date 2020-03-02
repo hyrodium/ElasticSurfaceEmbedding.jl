@@ -1,3 +1,5 @@
+using ParametricDraw
+
 export @DefineShape
 macro DefineShape(ex)
     global EXPR=ex
