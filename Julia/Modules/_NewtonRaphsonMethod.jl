@@ -1,3 +1,5 @@
+using Dates
+
 export NewtonMethodIteration
 function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=NIP)
     BsJLD=load(DIR*"/"*NAME*".jld")
@@ -27,20 +29,24 @@ function NewtonIteration(M::BSplineManifold,fixed;nip=NIP)
     end
 
     t₀=time()
-    Ff=Array{Any}(undef,n₁,n₂,d)
-    for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d
-        Ff[I₁,I₂,i]=@spawn elm_F(g₍₀₎,M,I₁,I₂,i,nip=nip)
+    if (distributed)
+        f=Array{Union{Future,Nothing}}(nothing,n₁,n₂,d)
+        for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d
+            f[I₁,I₂,i]=@spawn elm_F(g₍₀₎,M,I₁,I₂,i,nip=nip)
+        end
+        h=Array{Union{Future,Nothing}}(nothing,n₁,n₂,d,n₁,n₂,d)
+        for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d
+            if (lineup(I₁,I₂,i) ≤ lineup(R₁,R₂,r))
+                h[I₁,I₂,i,R₁,R₂,r]=h[R₁,R₂,r,I₁,I₂,i]=@spawn elm_H(g₍₀₎,M,I₁,I₂,i,R₁,R₂,r,nip=nip)
+            end
+        end
+        F=fetch.(f)
+        H=fetch.(h)
+    else
+        H=[elm_H(g₍₀₎,M,I₁,I₂,i,R₁,R₂,r,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d]
+        F=[elm_F(g₍₀₎,M,I₁,I₂,i,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
     end
-    F=fetch.(Ff)
-    Hf=Array{Any}(undef,n₁,n₂,d,n₁,n₂,d)
-    for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d
-        Hf[I₁,I₂,i,R₁,R₂,r]=@spawn elm_H(g₍₀₎,M,I₁,I₂,i,R₁,R₂,r,nip=nip)
-    end
-    H=fetch.(Hf)
     t₁=time()
-
-    # H=[elm_H(g₍₀₎,M,I₁,I₂,i,R₁,R₂,r,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d]
-    # F=[elm_F(g₍₀₎,M,I₁,I₂,i,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
 
     𝕟=2n₁*n₂
     Fixed=sort(collect((i->lineup(i...)).(fixed(n₁,n₂))))

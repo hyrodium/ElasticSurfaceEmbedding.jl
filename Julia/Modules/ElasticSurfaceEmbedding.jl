@@ -2,16 +2,11 @@ module ElasticSurfaceEmbedding
 
 using LinearAlgebra
 using Printf
-using Distributed
 using IntervalSets
-using ForwardDiff
-using Dates
-using DifferentialEquations
 using JLD
-using JSON
+using Distributed
 
 using BSpline
-using ParametricDraw
 
 include("_Constants.jl")
 include("_NumericalIntegral.jl")

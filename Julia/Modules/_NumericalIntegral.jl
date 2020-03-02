@@ -1,4 +1,5 @@
 using FastGaussQuadrature
+
 function GaussianQuadrature(f,D₁,D₂;nip=NIP)
     nodes, weights = gausslegendre(nip)
     return sum(
