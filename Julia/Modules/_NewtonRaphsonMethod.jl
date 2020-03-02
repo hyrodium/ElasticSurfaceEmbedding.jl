@@ -4,10 +4,14 @@ export NewtonMethodIteration
 function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=NIP)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
-    if (parent==0) parent=length(BsTree.nodes) end
+    if parent==0
+        parent=length(BsTree.nodes)
+    end
     M=BsJLD[string(parent)]
     n₁,n₂=n=dim.(M.bsplinespaces)
-    if (!isodd(n₁*n₂)) error("n₁ and n₂ should be odd numbers") end
+    if !isodd(n₁*n₂)
+        error("n₁ and n₂ should be odd numbers")
+    end
     M=Positioning(M)
     M,F,Ǧ,Δt=NewtonIteration(M,fixed,nip=nip)
     # comment="Newton Iteration - residual norm: "*(@sprintf("%.5e",norm(F)))*", Δa norm: "*(@sprintf("%.5e",norm(Ǧ)))*", computation time: "*(@sprintf("%.5e",Δt))*" sec"
@@ -29,14 +33,14 @@ function NewtonIteration(M::BSplineManifold,fixed;nip=NIP)
     end
 
     t₀=time()
-    if (distributed)
+    if distributed
         f=Array{Union{Future,Nothing}}(nothing,n₁,n₂,d)
         for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d
             f[I₁,I₂,i]=@spawn elm_F(g₍₀₎,M,I₁,I₂,i,nip=nip)
         end
         h=Array{Union{Future,Nothing}}(nothing,n₁,n₂,d,n₁,n₂,d)
         for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d
-            if (lineup(I₁,I₂,i) ≤ lineup(R₁,R₂,r))
+            if lineup(I₁,I₂,i) ≤ lineup(R₁,R₂,r)
                 h[I₁,I₂,i,R₁,R₂,r]=h[R₁,R₂,r,I₁,I₂,i]=@spawn elm_H(g₍₀₎,M,I₁,I₂,i,R₁,R₂,r,nip=nip)
             end
         end
@@ -79,7 +83,7 @@ function elm_H(g₍₀₎,M::BSplineManifold,I₁,I₂,i,R₁,R₂,r;nip=NIP)
     Σ₁=(maximum([I₁,R₁]):minimum([I₁,R₁])+p₁)
     Σ₂=(maximum([I₂,R₂]):minimum([I₂,R₂])+p₂)
 
-    if (length(Σ₁)==0 || length(Σ₂)==0)
+    if length(Σ₁)==0 || length(Σ₂)==0
         return 0.0
     else
         return sum(GaussianQuadrature(

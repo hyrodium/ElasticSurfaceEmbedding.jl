@@ -20,7 +20,7 @@ function FittingBSpline(f, P::BSplineSpace; nip=NIP) # 1-dimensional
 end
 
 function N′(P₁::BSplineSpace,P₂::BSplineSpace,I₁,I₂,i,u)
-    if (i==1)
+    if i==1
         return BSplineBasis′(I₁,P₁,u[1])*BSplineBasis(I₂,P₂,u[2])
     else
         return BSplineBasis(I₁,P₁,u[1])*BSplineBasis′(I₂,P₂,u[2])
@@ -45,7 +45,7 @@ end
 function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置調整
     𝒫s = M.bsplinespaces
     𝒂 = M.controlpoints
-    if (length(𝒫s) ≠ d)
+    if length(𝒫s) ≠ d
         error("dimension does not match")
     end
 
@@ -61,7 +61,9 @@ export Refinement
 function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, parent=0)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
-    if (parent==0) parent=length(BsTree.nodes) end
+    if parent==0
+        parent=length(BsTree.nodes)
+    end
     M=BsJLD[string(parent)]
 
     comment="refinement with "*string(p₊)*", "*string(k₊)
@@ -75,7 +77,9 @@ export ShowKnots
 function ShowKnots(;index=0)
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
-    if (index==0) index=length(BsTree.nodes) end
+    if index==0
+        index=length(BsTree.nodes)
+    end
     M=BsJLD[string(index)]
     P₁,P₂=M.bsplinespaces
     p₁,p₂=P₁.degree,P₂.degree
@@ -153,7 +157,9 @@ E⁽⁰⁾₁₁(M,u)=E₁₁(M,u)/g₍₀₎₁₁(u)
 function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
-    if (index==0) index=length(BsTree.nodes) end
+    if index==0
+        index=length(BsTree.nodes)
+    end
     M=BsJLD[string(index)]
     𝒂=M.controlpoints
     P₁,P₂=P=M.bsplinespaces
