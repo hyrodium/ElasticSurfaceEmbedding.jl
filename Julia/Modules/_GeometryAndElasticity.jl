@@ -95,33 +95,37 @@ function ShowKnots(;index=0)
     return nothing
 end
 
+
 # Reference State
 𝒑′₍₀₎(u) = ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # Tangent vector
 𝒑₁₍₀₎(u) = ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
 𝒑₂₍₀₎(u) = ForwardDiff.derivative(u₂->Main.𝒑₍₀₎([u[1],u₂]),u[2])
-𝒑₁₁₍₀₎(u) = ForwardDiff.derivative(u₁->Main.𝒑₁₍₀₎([u₁,u[2]]),u[1])
-𝒑₁₂₍₀₎(u) = ForwardDiff.derivative(u₂->Main.𝒑₁₍₀₎([u[1],u₂]),u[2])
-𝒑₂₁₍₀₎(u) = ForwardDiff.derivative(u₁->Main.𝒑₂₍₀₎([u₁,u[2]]),u[1])
-𝒑₂₂₍₀₎(u) = ForwardDiff.derivative(u₂->Main.𝒑₂₍₀₎([u[1],u₂]),u[2])
+𝒑₁₁₍₀₎(u) = ForwardDiff.derivative(u₁->𝒑₁₍₀₎([u₁,u[2]]),u[1])
+𝒑₁₂₍₀₎(u) = ForwardDiff.derivative(u₂->𝒑₁₍₀₎([u[1],u₂]),u[2])
+𝒑₂₁₍₀₎(u) = ForwardDiff.derivative(u₁->𝒑₂₍₀₎([u₁,u[2]]),u[1])
+𝒑₂₂₍₀₎(u) = ForwardDiff.derivative(u₂->𝒑₂₍₀₎([u[1],u₂]),u[2])
 𝒆₍₀₎(u) = normalize(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u))) # Normal vector
 g₍₀₎(u) = 𝒑′₍₀₎(u)'𝒑′₍₀₎(u) # 第1基本量
 g₍₀₎₁₁(u) = 𝒑₁₍₀₎(u)'𝒑₁₍₀₎(u)
 g₍₀₎₁₂(u) = 𝒑₁₍₀₎(u)'𝒑₂₍₀₎(u)
 g₍₀₎₂₁(u) = 𝒑₂₍₀₎(u)'𝒑₁₍₀₎(u)
 g₍₀₎₂₂(u) = 𝒑₂₍₀₎(u)'𝒑₂₍₀₎(u)
-h₍₀₎(u::Array{Float64,1}) = [(𝒆₍₀₎(u)'*𝒑₁₁₍₀₎(u)) (𝒆₍₀₎(u)'*𝒑₁₂₍₀₎(u)) ; (𝒆₍₀₎(u)'*𝒑₂₁₍₀₎(u)) (𝒆₍₀₎(u)'*𝒑₂₂₍₀₎(u))] # 第2基本量
-K₍₀₎(u::Array{Float64,1}) = det(h₍₀₎(u))/det(g₍₀₎(u)) # Gaussian curvature
-𝝊₍₀₎(u::Array{Float64,1}) = norm(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u))) # volume form
-g⁻₍₀₎(u::Array{Float64,1}) = inv(g₍₀₎(u)) # 第1基本量の逆
-g′₍₀₎(u::Array{Float64,1}) = reshape(ForwardDiff.jacobian(g₍₀₎,u),d,d,d) # 第1基本量の微分
-𝛤₍₀₎²₁₁(u::Array{Float64,1}) = (g⁻₍₀₎(u)[2,1]*g′₍₀₎(u)[1,1,1]+g⁻₍₀₎(u)[2,2]*(2g′₍₀₎(u)[2,1,1]-g′₍₀₎(u)[1,1,2]))/2 # Christoffel symbol
+h₍₀₎(u) = [(𝒆₍₀₎(u)'*𝒑₁₁₍₀₎(u)) (𝒆₍₀₎(u)'*𝒑₁₂₍₀₎(u)) ; (𝒆₍₀₎(u)'*𝒑₂₁₍₀₎(u)) (𝒆₍₀₎(u)'*𝒑₂₂₍₀₎(u))] # 第2基本量
+K₍₀₎(u) = det(h₍₀₎(u))/det(g₍₀₎(u)) # Gaussian curvature
+𝝊₍₀₎(u) = norm(cross(𝒑₁₍₀₎(u),𝒑₂₍₀₎(u))) # volume form
+g⁻₍₀₎(u) = inv(g₍₀₎(u)) # 第1基本量の逆
+g′₍₀₎(u) = reshape(ForwardDiff.jacobian(g₍₀₎,u),d,d,d) # 第1基本量の微分
+𝛤₍₀₎²₁₁(u) = (g⁻₍₀₎(u)[2,1]*g′₍₀₎(u)[1,1,1]+g⁻₍₀₎(u)[2,2]*(2g′₍₀₎(u)[2,1,1]-g′₍₀₎(u)[1,1,2]))/2 # Christoffel symbol
+e⁽⁰⁾₁(u)=normalize(𝒑₁₍₀₎(u))
+e⁽⁰⁾₂(u)=normalize(𝒑₂₍₀₎(u) - (g₍₀₎₁₂(u)/g₍₀₎₁₁(u))*𝒑₁₍₀₎(u))
 
 c(D₂,t)=[t,sum(extrema(D₂))/2] # 中心線に沿った座標
 ṡ₍₀₎(D₂,t)=sqrt(g₍₀₎₁₁(c(D₂,t)))
-# s̈₍₀₎(D₂,t)=ForwardDiff.derivative(t->ṡ₍₀₎(D₂,t),t)
 s̈₍₀₎(D₂,t)=(1/2)*(g′₍₀₎(c(D₂,t)))[1,1,1]/sqrt(g₍₀₎₁₁(c(D₂,t)))
 𝜅₍₀₎(D₂,t)=𝛤₍₀₎²₁₁(c(D₂,t))*𝝊₍₀₎(c(D₂,t))/ṡ₍₀₎(D₂,t)^3 # Geodesic curvature
-K₍₀₎(D₂,u::Array{Float64,1})=det(h₍₀₎(c(D₂,t)))/det(g₍₀₎(c(D₂,t))) # Gaussian curvature
+K₍₀₎(D₂,t)=K₍₀₎(c(D₂,t)) # Gaussian curvature
+B̃(D₂,t)=dot(e⁽⁰⁾₂(c(D₂,t)),𝒑₂₍₀₎(c(D₂,t)))*width(D₂)/2 # Breadth of the piece of surface
+
 
 # Current State
 𝒑₍ₜ₎(M,u)=Mapping(M,u)
@@ -149,10 +153,28 @@ g₍ₜ₎₁₂(M,u)=𝒑₁₍ₜ₎(M,u)'𝒑₂₍ₜ₎(M,u) # 第1基本�
 g₍ₜ₎₂₁(M,u)=𝒑₂₍ₜ₎(M,u)'𝒑₁₍ₜ₎(M,u) # 第1基本量
 g₍ₜ₎₂₂(M,u)=𝒑₂₍ₜ₎(M,u)'𝒑₂₍ₜ₎(M,u) # 第1基本量
 
+
 # Strain
 E(M,u)=(g₍ₜ₎(M,u)-g₍₀₎(u))/2
-E₁₁(M,u)=(g₍ₜ₎₁₁(M,u)-g₍₀₎₁₁(u))/2
-E⁽⁰⁾₁₁(M,u)=E₁₁(M,u)/g₍₀₎₁₁(u)
+E₁₁(M::BSplineManifold,u)=(g₍ₜ₎₁₁(M,u)-g₍₀₎₁₁(u))/2
+E⁽⁰⁾₁₁(M::BSplineManifold,u)=E₁₁(M,u)/g₍₀₎₁₁(u)
+
+function Ẽ⁽⁰⁾₁₁(D₂::ClosedInterval,u)
+    b=width(D₂)/2
+    c=sum(extrema(D₂))/2
+    r=(u[2]-c)/b
+    return (1/2)*K₍₀₎(D₂,u[1])*B̃(D₂,u[1])^2*(r^2-1/3)
+end
+
+function Ẽ⁽⁰⁾₁₁(M::BSplineManifold,u)
+    P₁,P₂=M.bsplinespaces
+    p₁,p₂=P₁.degree,P₂.degree
+    k₁,k₂=P₁.knots,P₂.knots
+    D₂=k₂[1+p₂]..k₂[end-p₂]
+    return Ẽ⁽⁰⁾₁₁(D₂,u)
+end
+
+# E⁽⁰⁾₁₁(M,u)=Ẽ⁽⁰⁾₁₁(M,u)
 
 function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
     BsJLD=load(DIR*"/"*NAME*".jld")
@@ -182,6 +204,7 @@ function ShowMaximumStrain(;index=0,mesh=5)
 
     return nothing
 end
+
 
 # Elastic Modulus
 function C(i,j,k,l,g⁻)
