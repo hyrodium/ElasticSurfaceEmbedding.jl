@@ -174,8 +174,6 @@ function Ẽ⁽⁰⁾₁₁(M::BSplineManifold,u)
     return Ẽ⁽⁰⁾₁₁(D₂,u)
 end
 
-# E⁽⁰⁾₁₁(M,u)=Ẽ⁽⁰⁾₁₁(M,u)
-
 function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
     BsJLD=load(DIR*"/"*NAME*".jld")
     BsTree=BsJLD["BsTree"]
@@ -197,10 +195,27 @@ function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
     return (minimum(E),maximum(E))
 end
 
+function PredictMaximumStrain(D;mesh=tuple(20*[MESH...]...))
+    D₁,D₂=D
+
+    κ₁=range(leftendpoint(D₁),stop=rightendpoint(D₁),length=mesh[1]+1)
+    κ₂=range(leftendpoint(D₂),stop=rightendpoint(D₂),length=mesh[2]+1)
+
+    E=[Ẽ⁽⁰⁾₁₁(D₂,[u₁,u₂]) for u₁ ∈ κ₁, u₂ ∈ κ₂]
+
+    return (minimum(E),maximum(E))
+end
+
 export ShowMaximumStrain
-function ShowMaximumStrain(;index=0,mesh=5)
-    minE,maxE=ComputeMaximumStrain(index=index,mesh=mesh)
-    println("min",minE,", max",maxE)
+function ShowMaximumStrain(D;index=0)
+    minE,maxE=PredictMaximumStrain(D)
+
+    println("Predicted: (min: ",minE,", max: ",maxE,")")
+
+    if JLDexists()
+        minE,maxE=ComputeMaximumStrain(index=index)
+        println("Computed: (min: ",minE,", max: ",maxE,")")
+    end
 
     return nothing
 end
