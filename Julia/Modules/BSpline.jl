@@ -153,7 +153,7 @@ function BSplineBasis′₊₀(P::BSplineSpace, t)::Array{Float64,1}
 
     n=dim(P)
     if p==0
-        return [0.0 for _ ∈ 1:n]
+        return zeros(n)
     end
     K=[ifelse(k[i+p]==k[i],0,p/(k[i+p]-k[i])) for i ∈ 1:n+1]
     B=BSplineBasis₊₀(𝒫(p-1,k),t)
@@ -165,7 +165,7 @@ function BSplineBasis′₋₀(P::BSplineSpace, t)::Array{Float64,1}
 
     n=dim(P)
     if p==0
-        return [0.0 for _ ∈ 1:n]
+        return zeros(n)
     end
     K=[ifelse(k[i+p]==k[i],0,p/(k[i+p]-k[i])) for i ∈ 1:n+1]
     B=BSplineBasis₋₀(𝒫(p-1,k),t)
@@ -177,7 +177,7 @@ function BSplineBasis′(P::BSplineSpace, t)::Array{Float64,1}
 
     n=dim(P)
     if p==0
-        return [0.0 for _ ∈ 1:n]
+        return zeros(n)
     end
     K=[ifelse(k[i+p]==k[i],0,p/(k[i+p]-k[i])) for i ∈ 1:n+1]
     B=BSplineBasis(𝒫(p-1,k),t)

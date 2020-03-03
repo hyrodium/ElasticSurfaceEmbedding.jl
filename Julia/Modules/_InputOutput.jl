@@ -22,9 +22,13 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     return nothing
 end
 
+function JLDexists()
+    return isfile(DIR*"/"*NAME*".jld")
+end
+
 export Restoration
 function Restoration()
-    if !isfile(DIR*"/"*NAME*".jld")
+    if !JLDexists()
         error("jld file doesn't exists")
     end
     BsJLD=load(DIR*"/"*NAME*".jld")

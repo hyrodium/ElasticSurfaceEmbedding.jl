@@ -2,7 +2,7 @@ using DifferentialEquations
 
 export InitialConfiguration
 function InitialConfiguration(D;n₁=15,nip=NIP)
-    if isfile(DIR*"/"*NAME*".jld")
+    if JLDexists()
         if OVERWRITE
             rm(DIR, recursive=true)
         else
@@ -33,9 +33,9 @@ function InitBs(D,n₁;nip=NIP)::BSplineManifold
         𝒄̇𝒄̈[4]=dot([𝜅₍₀₎(D₂,t)*ṡ₍₀₎(D₂,t),s̈₍₀₎(D₂,t)/ṡ₍₀₎(D₂,t)],𝒄𝒄̇[3:4])
     end
     𝒄𝒄̇₀=vcat([0.0,0.0],[1.,0.]*ṡ₍₀₎(D₂,minimum(D₁)))
-    sol=solve(ODEProblem(ode,𝒄𝒄̇₀,extrema(D₁)))
-    𝒄(t)=sol(t)[1:d] # 解となる中心曲線
-    𝒄₁(t)=sol(t)[(d+1):(2d)] # その導関数
+    curve=solve(ODEProblem(ode,𝒄𝒄̇₀,extrema(D₁)))
+    𝒄(t)=curve(t)[1:d] # 解となる中心曲線
+    𝒄₁(t)=curve(t)[(1:d).+d] # その導関数
     𝒄₂(t)=[g₍₀₎₁₂(c(D₂,t)) -𝝊₍₀₎(c(D₂,t));𝝊₍₀₎(c(D₂,t)) g₍₀₎₁₂(c(D₂,t))]*𝒄₁(t)/g₍₀₎₁₁(c(D₂,t)) # 中心曲線上の幅方向のベクトル場
 
     p₁=3

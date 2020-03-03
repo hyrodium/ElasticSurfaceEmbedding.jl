@@ -36,23 +36,23 @@ function NewtonIteration(M::BSplineManifold,fixed;nip=NIP)
     if distributed
         f=Array{Union{Future,Nothing}}(nothing,n₁,n₂,d)
         for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d
-            f[I₁,I₂,i]=@spawn elm_F(g₍₀₎,M,I₁,I₂,i,nip=nip)
+            f[I₁,I₂,i]=@spawn elm_F(M,I₁,I₂,i,nip=nip)
         end
         h=Array{Union{Future,Nothing}}(nothing,n₁,n₂,d,n₁,n₂,d)
         for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d
             if lineup(I₁,I₂,i) ≤ lineup(R₁,R₂,r)
-                h[I₁,I₂,i,R₁,R₂,r]=h[R₁,R₂,r,I₁,I₂,i]=@spawn elm_H(g₍₀₎,M,I₁,I₂,i,R₁,R₂,r,nip=nip)
+                h[I₁,I₂,i,R₁,R₂,r]=h[R₁,R₂,r,I₁,I₂,i]=@spawn elm_H(M,I₁,I₂,i,R₁,R₂,r,nip=nip)
             end
         end
         F=fetch.(f)
         H=fetch.(h)
     else
-        H=[elm_H(g₍₀₎,M,I₁,I₂,i,R₁,R₂,r,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d]
-        F=[elm_F(g₍₀₎,M,I₁,I₂,i,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
+        H=[elm_H(M,I₁,I₂,i,R₁,R₂,r,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d, R₁ ∈ 1:n₁, R₂ ∈ 1:n₂, r ∈ 1:d]
+        F=[elm_F(M,I₁,I₂,i,nip=nip) for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
     end
     t₁=time()
 
-    𝕟=2n₁*n₂
+    𝕟=n₁*n₂*d
     Fixed=sort(collect((i->lineup(i...)).(fixed(n₁,n₂))))
     Unfixed=deleteat!(collect(1:𝕟),Fixed)
 
@@ -72,7 +72,7 @@ function NewtonIteration(M::BSplineManifold,fixed;nip=NIP)
     return (M,F,Ǧ,t₁-t₀)
 end
 
-function elm_H(g₍₀₎,M::BSplineManifold,I₁,I₂,i,R₁,R₂,r;nip=NIP)
+function elm_H(M::BSplineManifold,I₁,I₂,i,R₁,R₂,r;nip=NIP)
     𝒂=M.controlpoints
     P₁,P₂=P=M.bsplinespaces
     p₁,p₂=p=P₁.degree,P₂.degree
@@ -101,7 +101,7 @@ function elm_H(g₍₀₎,M::BSplineManifold,I₁,I₂,i,R₁,R₂,r;nip=NIP)
     end
 end
 
-function elm_F(g₍₀₎,M::BSplineManifold,I₁,I₂,i;nip=NIP)
+function elm_F(M::BSplineManifold,I₁,I₂,i;nip=NIP)
     𝒂=M.controlpoints
     P₁,P₂=P=M.bsplinespaces
     p₁,p₂=p=P₁.degree,P₂.degree

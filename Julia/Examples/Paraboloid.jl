@@ -1,19 +1,24 @@
-# using Distributed
-# addprocs(15);
-# @everywhere push!(LOAD_PATH, "Julia/Modules")
+# %% if use Distibuted
+using Distributed
+addprocs(15);
+@everywhere push!(LOAD_PATH, "Julia/Modules")
 
+# %% if do not use Distibuted
 push!(LOAD_PATH, "Julia/Modules")
 
+# %%
 using Revise
 using IntervalSets
 using Printf
 using BSpline
 using ElasticSurfaceEmbedding
 
+# %%
 @DefineShape 𝒑₍₀₎(u)=[u...,u'*u]
 n=10
 id=1
 
+# %%
 D=(-1.0..1.0, (id-1)/10..id/10)
 Settings("Paraboloid-"*(@sprintf "%02d" id),up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true,overwrite=true)
 InitialConfiguration(D)
@@ -27,3 +32,5 @@ NewtonMethodIteration()
 NewtonMethodIteration()
 NewtonMethodIteration()
 NewtonMethodIteration()
+
+ShowMaximumStrain(D)
