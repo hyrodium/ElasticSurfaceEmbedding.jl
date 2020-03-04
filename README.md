@@ -11,17 +11,19 @@ We determined the embedding by minimizing its elastic strain energy.
 This is the meaning of "Elastic Surface Embedding".
 
 ## How to make a surface model (overview)
-### step 1 : Define a shape of surface
+### step 1 : Define a shape of piece of surface (and split into strips)
 The definition must consists of parametric mapping and its domain.
 
-<img src="img/Paraboloid-eqn.png" width="400">
+![](img/Paraboloid-parametricmapping.png)
+
+![](img/Paraboloid-domain.png)
 
 ### step 2 : Numerical analysis
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
 For more information, read [this document](/Julia/HowToRunJuliaCode.md).
 
-<img src="img/strain.png" width="900">
+<img src="img/NurbsStrain.png" width="800">
 
 ### step 3 : Edit on vector graphics editor
 The output files are svg format.
@@ -37,19 +39,22 @@ Cut papers into strips, and weave and glue the paper strips.
 
 
 ## If you like..
-### making crafts
+### ..making crafts
 Download the [Paraboloid example](/Example/Paraboloid.pdf), print it, cut it, glue them, and make your own surface model!
-[Make your own surface model](Example/HowToMakePaperModel.md)
 
-### computing
+Document: [How to Make your own surface model:scissors:](Example/HowToMakePaperModel.md)
+
+### ..computing
 Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)
 
-### mathematics or physics
-Read my upcoming paper.
-Very interesting for you, I guess.
+Any issues and pull requests are welcomed. :octocat:
 
-### me
-Follow [my twitter account](https://twitter.com/Hyrodium), visit [my website](https://hyrodium.github.io/Profile) and read my upcoming paper.
+### ..mathematics or physics
+Read my upcoming paper.
+
+
+### ..me!
+Follow [my twitter account](https://twitter.com/Hyrodium), visit [my website](https://hyrodium.github.io/Profile) and read my upcoming paper. :bowtie:
 
 ## Theoretical framework
 
