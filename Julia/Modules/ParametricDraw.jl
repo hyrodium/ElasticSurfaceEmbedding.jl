@@ -117,6 +117,7 @@ function SvgSurface(𝒑,k,n;filename="BSA.svg",up=5,down=-5,right=5,left=-5,ste
     strokepath()
     finish()
     ChangeUnit!(filename,"pt","mm")
+    return nothing
 end
 
 function ParametricColor(𝒑,D;rgb=(u->[0.5,0.5,0.5]),filename="ParametricColor.png",up=5,down=-5,right=5,left=-5,mesh=(10,10),unit=100)
