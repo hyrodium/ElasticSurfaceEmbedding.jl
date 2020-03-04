@@ -10,26 +10,26 @@ In mathematics, this mapping is called "embedding".
 We determined the embedding by minimizing its elastic strain energy.
 This is the meaning of "Elastic Surface Embedding".
 
-## How to make a surface model (Overview)
-### Step 1 : Define a shape of surface
+## How to make a surface model (overview)
+### step 1 : Define a shape of surface
 The definition must consists of parametric mapping and its domain.
 
 [Expression here]
 
-### Step 2 : Numerical analysis
+### step 2 : Numerical analysis
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
 For more information, read [this document](/Julia/usage.md).
 
 [Graphics here]
 
-### Step 3 : Edit on vector graphics editor
+### step 3 : Edit on vector graphics editor
 The output files are svg format.
 You can print the graphics or cut papers by laser cutting machine, so this step is for preparation.
 
 [Graphics here]
 
-### Step 4 : Craft a paper model
+### step 4 : Craft a paper model
 This is the final step.
 Cut papers into strips, and weave and glue the paper strips.
 
@@ -37,13 +37,13 @@ Cut papers into strips, and weave and glue the paper strips.
 
 
 ## If you like:
-### Making crafts
+### making crafts
 Download the [Paraboloid example](/Example/Paraboloid.pdf), print it, cut it out and glue it together!
 
-### Computing
+### computing
 Clone this repository, and run the [Julia code](/Julia/usage.md) or [Wolfram code](/Wolfram/usage.md)
 
-### Mathematics or physics
+### mathematics or physics
 Read my upcoming paper.
 Very interesting for you, I guess.
 
