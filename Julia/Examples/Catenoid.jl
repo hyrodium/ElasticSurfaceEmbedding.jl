@@ -6,7 +6,7 @@ using Printf
 using BSpline
 using ElasticSurfaceEmbedding
 
-@DefineShape 𝒑₍₀₎(u)=[cos(u[2])*cosh(u[1]),sin(u[2])*cosh(u[1]),u[1]]
+@ParametricMapping 𝒑₍₀₎(u)=[cos(u[2])*cosh(u[1]),sin(u[2])*cosh(u[1]),u[1]]
 
 n=9
 
@@ -28,7 +28,7 @@ NewtonMethodIteration(nip=45)
 
 FinalOutput(unitlength=(50,"mm"))
 
-@DefineShape 𝒑₍₀₎(u)=[cos(u[1])*cosh(u[2]),sin(u[1])*cosh(u[2]),u[2]]
+@ParametricMapping 𝒑₍₀₎(u)=[cos(u[1])*cosh(u[2]),sin(u[1])*cosh(u[2]),u[2]]
 
 id=1
 D=(-π..π,(id-1)*π/(2n)..id*π/(2n)) #横方向

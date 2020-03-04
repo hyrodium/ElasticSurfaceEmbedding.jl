@@ -8,7 +8,7 @@ using ElasticSurfaceEmbedding
 
 n=30
 id=19
-@DefineShape 𝒑₍₀₎(u)=5.0*[((1+sqrt(2))*sinpi((u[1]+u[2])))/(-2-sqrt(2)+(1+sqrt(2))*sinpi((u[1]-u[2]))),-(((1+sqrt(2))*cospi((u[1]+u[2])))/(-2-sqrt(2)+(1+sqrt(2))*sinpi((u[1]-u[2])))),(2*(1+sqrt(2))*cot(1/4*π*(3-2u[1]+2u[2])))/(1+(3+2*sqrt(2))*cot(1/4*π*(3-2u[1]+2u[2]))^2)]
+@ParametricMapping 𝒑₍₀₎(u)=5.0*[((1+sqrt(2))*sinpi((u[1]+u[2])))/(-2-sqrt(2)+(1+sqrt(2))*sinpi((u[1]-u[2]))),-(((1+sqrt(2))*cospi((u[1]+u[2])))/(-2-sqrt(2)+(1+sqrt(2))*sinpi((u[1]-u[2])))),(2*(1+sqrt(2))*cot(1/4*π*(3-2u[1]+2u[2])))/(1+(3+2*sqrt(2))*cot(1/4*π*(3-2u[1]+2u[2]))^2)]
 D=(0.0..1.0,(id-1)/nf..id/nf)
 Settings("Torus"*(@sprintf "%02d" id),up=25,down=-15,right=25,left=-15,mesh=(nf,1),unit=20,slack=true)
 InitialConfiguration(D,n₁=33)

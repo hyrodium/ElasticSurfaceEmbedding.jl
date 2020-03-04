@@ -6,7 +6,7 @@ using Printf
 using BSpline
 using ElasticSurfaceEmbedding
 
-@DefineShape 𝒑₍₀₎(u)=[cos(u[2])*sinh(u[1]),sin(u[2])*sinh(u[1]),u[2]]
+@ParametricMapping 𝒑₍₀₎(u)=[cos(u[2])*sinh(u[1]),sin(u[2])*sinh(u[1]),u[2]]
 
 D=(-π/2..π/2,-π/(4n)..π/(4n))
 Settings("Helicoid",up=3,down=-3,right=3,left=-3,mesh=(2n,1),unit=150,slack=true)
@@ -25,7 +25,7 @@ NewtonMethodIteration()
 FinalOutput(unitlength=(50,"mm"))
 
 
-@DefineShape 𝒑₍₀₎(u)=[cos(u[1])*sinh(u[2]),sin(u[1])*sinh(u[2]),u[1]]
+@ParametricMapping 𝒑₍₀₎(u)=[cos(u[1])*sinh(u[2]),sin(u[1])*sinh(u[2]),u[1]]
 
 n=9
 id=7

@@ -7,7 +7,7 @@ using BSpline
 using ElasticSurfaceEmbedding
 @everywhere using LinearAlgebra
 
-@DefineShape function 𝒑₍₀₎(u)
+@ParametricMapping function 𝒑₍₀₎(u)
     s=(norm(u)-7.33/2)/(9.0-7.33/2)
     Cf1=ifelse(s>0.0,exp(-sqrt(3/4)/s),0.0)
     Cf2=ifelse(1-s>0.0,exp(-sqrt(3/4)/(1-s)),0.0)
