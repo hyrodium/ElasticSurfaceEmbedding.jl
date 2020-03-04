@@ -1,7 +1,7 @@
 # Elastic Surface Embedding
 
 ## TL;DR
-You can make a smooth surface model by using this repository.
+You can make a *holdable* smooth surface model with this repository.
 
 <img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
 
@@ -10,40 +10,41 @@ In mathematics, this mapping is called "embedding".
 We determined the embedding by minimizing its elastic strain energy.
 This is the meaning of "Elastic Surface Embedding".
 
-## How to make a surface model (Overview)
-### Step 1 : Define a shape of surface
+## How to make a surface model (overview)
+### step 1 : Define a shape of surface
 The definition must consists of parametric mapping and its domain.
 
 [Expression here]
 
-### Step 2 : Numerical analysis
+### step 2 : Numerical analysis
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
-For more information, read [this document](/Julia/usage.md).
+For more information, read [this document](/Julia/HowToRunJuliaCode.md).
 
 [Graphics here]
 
-### Step 3 : Edit on vector graphics editor
+### step 3 : Edit on vector graphics editor
 The output files are svg format.
 You can print the graphics or cut papers by laser cutting machine, so this step is for preparation.
 
 [Graphics here]
 
-### Step 4 : Craft a paper model
+### step 4 : Craft a paper model
 This is the final step.
 Cut papers into strips, and weave and glue the paper strips.
 
 [Graphics here]
 
 
-## If you like:
-### Making crafts
-Download the [Paraboloid example](/Example/Paraboloid.pdf), print it, cut it out and glue it together!
+## If you like..
+### making crafts
+Download the [Paraboloid example](/Example/Paraboloid.pdf), print it, cut it, glue them, and make your own surface model!
+[Make your own surface model](Example/HowToMakePaperModel.md)
 
-### Computing
-Clone this repository, and run the [Julia code](/Julia/usage.md) or [Wolfram code](/Wolfram/usage.md)
+### computing
+Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)
 
-### Mathematics or physics
+### mathematics or physics
 Read my upcoming paper.
 Very interesting for you, I guess.
 
@@ -63,6 +64,8 @@ For more information, my upcoming paper.
 
 ## Gallery
 <img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
+
+[gif animation of catenoid and helicoid]
 
 
 

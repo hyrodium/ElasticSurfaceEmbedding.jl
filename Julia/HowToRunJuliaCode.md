@@ -1,4 +1,4 @@
-# How to use (Julia code for Elastic Surface Embedding)
+# Julia code for Elastic Surface Embedding
 
 ## Overview
 ### Input
