@@ -1,7 +1,7 @@
 # Elastic Surface Embedding
 
 ## TL;DR
-You can make a smooth surface model by using this package.
+You can make a smooth surface model by using this repository.
 
 <img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
 
@@ -19,7 +19,7 @@ The definition must consists of parametric mapping and its domain.
 ### Step 2 : Numerical analysis
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
-For more information, read [this](/Julia/usage.md).
+For more information, read [this document](/Julia/usage.md).
 
 [Graphics here]
 
@@ -35,6 +35,21 @@ Cut papers into strips, and weave and glue the paper strips.
 
 [Graphics here]
 
+
+## If you like:
+### Making crafts
+Download the [Paraboloid example](/Example/Paraboloid.pdf), print it, cut it out and glue it together!
+
+### Computing
+Clone this repository, and run the [Julia code](/Julia/usage.md) or [Wolfram code](/Wolfram/usage.md)
+
+### Mathematics or physics
+Read my upcoming paper.
+Very interesting for you, I guess.
+
+### me
+Follow [my twitter account](https://twitter.com/Hyrodium), visit [my website](https://hyrodium.github.io/Profile) and read my upcoming paper.
+
 ## Theoretical framework
 
 * [Elasticity](https://en.m.wikipedia.org/wiki/Elasticity_(physics))
@@ -44,5 +59,10 @@ Cut papers into strips, and weave and glue the paper strips.
     * [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method)
     * [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method)
 
-## More information
-Visit [my website](https://hyrodium.github.io/Profile/) or read my upcoming paper.
+For more information, my upcoming paper.
+
+## Gallery
+<img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
+
+
+
