@@ -1,7 +1,7 @@
 # Elastic Surface Embedding
 
 ## TL;DR
-You can make a smooth surface model by using this repository.
+You can make a *holdable* smooth surface model with this repository.
 
 <img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
 
@@ -19,7 +19,7 @@ The definition must consists of parametric mapping and its domain.
 ### step 2 : Numerical analysis
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
-For more information, read [this document](/Julia/usage.md).
+For more information, read [this document](/Julia/HowToRunJuliaCode.md).
 
 [Graphics here]
 
@@ -36,12 +36,13 @@ Cut papers into strips, and weave and glue the paper strips.
 [Graphics here]
 
 
-## If you like:
+## If you like..
 ### making crafts
-Download the [Paraboloid example](/Example/Paraboloid.pdf), print it, cut it out and glue it together!
+Download the [Paraboloid example](/Example/Paraboloid.pdf), print it, cut it, glue them, and make your own surface model!
+[Make your own surface model](Example/HowToMakePaperModel.md)
 
 ### computing
-Clone this repository, and run the [Julia code](/Julia/usage.md) or [Wolfram code](/Wolfram/usage.md)
+Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)
 
 ### mathematics or physics
 Read my upcoming paper.
@@ -63,6 +64,8 @@ For more information, my upcoming paper.
 
 ## Gallery
 <img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
+
+[gif animation of catenoid and helicoid]
 
 
 
