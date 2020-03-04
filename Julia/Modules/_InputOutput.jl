@@ -1,9 +1,13 @@
 using ParametricDraw
 
-export @DefineShape
-macro DefineShape(ex)
+export @ParametricMapping
+macro ParametricMapping(ex)
     global EXPR=ex
-    return :(@everywhere $ex)
+    if startswith(repr(EXPR),":(function 𝒑₍₀₎(u)\n") || startswith(repr(EXPR),":(𝒑₍₀₎(u) =")
+        return :(@everywhere $EXPR)
+    else
+        error("Symbol of parametric mapping must be 𝒑₍₀₎(u)")
+    end
 end
 
 export Settings

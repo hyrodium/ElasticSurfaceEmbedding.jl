@@ -14,7 +14,7 @@ using BSpline
 using ElasticSurfaceEmbedding
 
 # %%
-@DefineShape 𝒑₍₀₎(u)=[u...,u'*u]
+@ParametricMapping 𝒑₍₀₎(u)=[u...,u'*u]
 n=10
 id=1
 
