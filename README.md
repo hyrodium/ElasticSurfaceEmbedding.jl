@@ -14,14 +14,14 @@ This is the meaning of "Elastic Surface Embedding".
 ### step 1 : Define a shape of surface
 The definition must consists of parametric mapping and its domain.
 
-[Expression here]
+<img src="img/Paraboloid-eqn.png" width="400">
 
 ### step 2 : Numerical analysis
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
 For more information, read [this document](/Julia/HowToRunJuliaCode.md).
 
-[Graphics here]
+<img src="img/strain.png" width="900">
 
 ### step 3 : Edit on vector graphics editor
 The output files are svg format.
@@ -65,7 +65,4 @@ For more information, my upcoming paper.
 ## Gallery
 <img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
 
-[gif animation of catenoid and helicoid]
-
-
-
+<img src="img/CatenoidHelicoid.gif" width="400">
