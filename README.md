@@ -39,20 +39,20 @@ Cut papers into strips, and weave the paper strips.
 
 
 ## If you like..
-### ..making crafts
-| <img src="img/Paraboloid5.png" align="top" width="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Example/HowToMakePaperModel.md):scissors: <br> Laser cutting machine is useful, but it's not necessary:boom: |
+### ..making crafts:scissors:
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Example/HowToMakePaperModel.md). <br> Laser cutting machine is useful, but it's not necessary. |
 | --- |:--|
 
-### ..computing
-| <img src="img/Paraboloid5.png" align="top" width="150"> | Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)! <br> Any issues and pull requests are welcomed:octocat: |
+### ..computing:octocat:
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)! <br> Any issues and pull requests are welcomed. |
 | --- |:--|
 
-### ..mathematics or physics
+### ..mathematics or physics:globe_with_meridians:
 | <img src="img/Paraboloid5.png" align="top" width="150"> | Read my upcoming paper. |
 | --- |:--|
 
-### ..me!
-| <img src="img/Paraboloid5.png" align="top" width="150"> | Follow [my twitter account](https://twitter.com/Hyrodium), visit [my website](https://hyrodium.github.io/Profile) and read my upcoming paper. :bowtie: |
+### ..me!:bowtie:
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Follow [my twitter account](https://twitter.com/Hyrodium), visit [my website](https://hyrodium.github.io/Profile) and read my upcoming paper. |
 | --- |:--|
 
 ## Theoretical framework
