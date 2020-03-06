@@ -41,30 +41,20 @@ Cut papers into strips, and weave the paper strips.
 ## If you like..
 ### ..making crafts:scissors:
 | <img src="img/Paraboloid5.png" align="top" width="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Example/HowToMakePaperModel.md). <br> Laser cutting machine is useful, but it's not necessary. |
-| --- |:--|
+| --- | :-- |
 
 ### ..computing:octocat:
 | <img src="img/Paraboloid5.png" align="top" width="150"> | Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)! <br> Any issues and pull requests are welcomed. |
-| --- |:--|
+| --- | :-- |
 
 ### ..mathematics or physics:globe_with_meridians:
-| <img src="img/Paraboloid5.png" align="top" width="150"> | Read my upcoming paper. |
-| --- |:--|
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Read my upcoming paper. <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
+| --- | :-- |
 
 ### ..me!:bowtie:
-| <img src="img/Paraboloid5.png" align="top" width="150"> | Follow [my twitter account](https://twitter.com/Hyrodium), visit [my website](https://hyrodium.github.io/Profile) and read my upcoming paper. |
-| --- |:--|
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/Profile). <br> Read my upcoming paper. |
+| --- | :-- |
 
-## Theoretical framework
-
-* [Elasticity](https://en.m.wikipedia.org/wiki/Elasticity_(physics))
-    * [Nonlinear elasticity (geometric non-linearity)](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold)
-* Numerical analysis
-    * [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline)
-    * [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method)
-    * [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method)
-
-For more information, read my upcoming paper.
 
 ## Gallery
 <img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
