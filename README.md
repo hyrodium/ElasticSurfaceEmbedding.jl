@@ -40,11 +40,11 @@ Cut papers into strips, and weave the paper strips.
 
 ## If you like..
 ### ..making crafts
-| <img src="img/Paraboloid5.png" align="top" width="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model:scissors:](Example/HowToMakePaperModel.md)  Laser cutting machine is useful, but it's not necessary:boom: |
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Example/HowToMakePaperModel.md):scissors: <br> Laser cutting machine is useful, but it's not necessary:boom: |
 | --- |:--|
 
 ### ..computing
-| <img src="img/Paraboloid5.png" align="top" width="150"> | Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)!  Any issues and pull requests are welcomed:octocat: |
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)! <br> Any issues and pull requests are welcomed:octocat: |
 | --- |:--|
 
 ### ..mathematics or physics
@@ -64,7 +64,7 @@ Cut papers into strips, and weave the paper strips.
     * [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method)
     * [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method)
 
-For more information, my upcoming paper.
+For more information, read my upcoming paper.
 
 ## Gallery
 <img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
