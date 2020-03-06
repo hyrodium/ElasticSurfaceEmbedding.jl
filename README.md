@@ -33,28 +33,27 @@ You can print the graphics or cut papers by laser cutting machine, so this step 
 
 ### step 4 : Craft a paper model
 This is the final step.
-Cut papers into strips, and weave and glue the paper strips.
+Cut papers into strips, and weave the paper strips.
 
 [Graphics here]
 
 
 ## If you like..
 ### ..making crafts
-Download the [Paraboloid example](/Example/Paraboloid.pdf), print it, cut it, glue them, and make your own surface model!
-
-Document: [How to Make your own surface model:scissors:](Example/HowToMakePaperModel.md)
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model:scissors:](Example/HowToMakePaperModel.md)  Laser cutting machine is useful, but it's not necessary:boom: |
+| --- |:--|
 
 ### ..computing
-Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)
-
-Any issues and pull requests are welcomed. :octocat:
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)!  Any issues and pull requests are welcomed:octocat: |
+| --- |:--|
 
 ### ..mathematics or physics
-Read my upcoming paper.
-
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Read my upcoming paper. |
+| --- |:--|
 
 ### ..me!
-Follow [my twitter account](https://twitter.com/Hyrodium), visit [my website](https://hyrodium.github.io/Profile) and read my upcoming paper. :bowtie:
+| <img src="img/Paraboloid5.png" align="top" width="150"> | Follow [my twitter account](https://twitter.com/Hyrodium), visit [my website](https://hyrodium.github.io/Profile) and read my upcoming paper. :bowtie: |
+| --- |:--|
 
 ## Theoretical framework
 
