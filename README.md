@@ -60,3 +60,6 @@ Cut papers into strips, and weave the paper strips.
 <img src="img/Paraboloid1.png" width="160"> <img src="img/Paraboloid2.png" width="160"> <img src="img/Paraboloid3.png" width="160"> <img src="img/Paraboloid4.jpg" width="160"> <img src="img/Paraboloid5.png" width="160">
 
 <img src="img/CatenoidHelicoid.gif" width="400">
+
+**Notice**: If you made a surface with this repository, I'd like to add pictures of your work!
+Feel free to contact me, thanks!
