@@ -35,14 +35,21 @@ function Restoration()
     if !JLDexists()
         error("jld file doesn't exists")
     end
-    BsJLD=load(DIR*"/"*NAME*".jld")
-    println(showtree(BsJLD["BsTree"]))
+    Expr, _, BsTree =loadEMT()
+
+    println(showtree(BsTree))
     global EXPR=BsJLD["Expr"]
     eval(:(@everywhere $EXPR))
     return nothing
 end
 
-function Export(M::BSplineManifold,BsTree,BsJLD;comment="",maximumstrain=MAXIMUMSTRAIN)
+function Export(M::BSplineManifold,BsTree;comment="",maximumstrain=MAXIMUMSTRAIN)
+    if JLDexists()
+        BsJLD=load(DIR*"/"*NAME*".jld")
+    else
+        BsJLD=Dict{String,Any}("Expr"=>EXPR)
+    end
+
     index=length(BsTree.nodes)
     BsJLD[string(index)]=M
     BsJLD["BsTree"]=BsTree
@@ -102,16 +109,20 @@ function ExportFiles(M::BSplineManifold,MaximumStrain,BsTree,index;Name=NAME,Dir
     end
 end
 
-export FinalOutput
-function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
+function loadEMT(;index=0)
     BsJLD=load(DIR*"/"*NAME*".jld")
+    Expr=BsJLD["Expr"]
     BsTree=BsJLD["BsTree"]
-    # println(showtree(BsTree))
-
     if index==0
         index=length(BsTree.nodes)
     end
     M=BsJLD[string(index)]
+    return Expr, M, BsTree
+end
+
+export FinalOutput
+function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
+    _, M, BsTree =loadEMT(index=index)
     BSplineSvg(M,filename=DIR*"/"*NAME*"-"*string(index)*"-final.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength,points=false)
 
     P₁,P₂=P=M.bsplinespaces

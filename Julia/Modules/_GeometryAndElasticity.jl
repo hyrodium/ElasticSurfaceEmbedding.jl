@@ -58,29 +58,20 @@ function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置�
 end
 
 export Refinement
-function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, parent=0)
-    BsJLD=load(DIR*"/"*NAME*".jld")
-    BsTree=BsJLD["BsTree"]
-    if parent==0
-        parent=length(BsTree.nodes)
-    end
-    M=BsJLD[string(parent)]
+function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, index=0)
+    _, M, BsTree=loadEMT(index=index)
 
     comment="refinement with "*string(p₊)*", "*string(k₊)
-    addchild(BsTree,parent,comment)
+    addchild(BsTree,index,comment)
 
     M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
-    Export(M,BsTree,BsJLD,comment=comment)
+    Export(M,BsTree,comment=comment)
 end
 
 export ShowKnots
 function ShowKnots(;index=0)
-    BsJLD=load(DIR*"/"*NAME*".jld")
-    BsTree=BsJLD["BsTree"]
-    if index==0
-        index=length(BsTree.nodes)
-    end
-    M=BsJLD[string(index)]
+    _, M, _=loadEMT(index=index)
+
     P₁,P₂=M.bsplinespaces
     p₁,p₂=P₁.degree,P₂.degree
     k₁,k₂=P₁.knots,P₂.knots
@@ -175,12 +166,7 @@ function Ẽ⁽⁰⁾₁₁(M::BSplineManifold,u)
 end
 
 function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
-    BsJLD=load(DIR*"/"*NAME*".jld")
-    BsTree=BsJLD["BsTree"]
-    if index==0
-        index=length(BsTree.nodes)
-    end
-    M=BsJLD[string(index)]
+    _, M, _=loadEMT(index=index)
     𝒂=M.controlpoints
     P₁,P₂=P=M.bsplinespaces
     p₁,p₂=p=P₁.degree,P₂.degree

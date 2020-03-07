@@ -14,13 +14,12 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
     mkpath(DIR*"/slack")
-    BsJLD=Dict{String,Any}("Expr"=>EXPR)
 
     M=InitBs(D,n₁,nip=nip)
     comment="Initial Configuration"
     BsTree=Tree()
 
-    Export(M,BsTree,BsJLD,comment=comment)
+    Export(M,BsTree,comment=comment)
 end
 
 function InitBs(D,n₁;nip=NIP)::BSplineManifold

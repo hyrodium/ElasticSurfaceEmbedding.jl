@@ -10,11 +10,15 @@ end
 
 Tree() = Tree([TreeNode(0, Vector{Int}(),"Initial Configuration")])
 
-function addchild(tree::Tree, id::Int, comment::String)
-    1 <= id <= length(tree.nodes) || throw(BoundsError(tree, id))
-    push!(tree.nodes, TreeNode(id, Vector{}(),comment))
+function addchild(tree::Tree, index::Int, comment::String)
+    if index == 0
+        index = length(tree.nodes)
+    elseif index < 0
+        throw(BoundsError(tree, index))
+    end
+    push!(tree.nodes, TreeNode(index, Vector{}(),comment))
     child = length(tree.nodes)
-    push!(tree.nodes[id].children, child)
+    push!(tree.nodes[index].children, child)
     child
 end
 
