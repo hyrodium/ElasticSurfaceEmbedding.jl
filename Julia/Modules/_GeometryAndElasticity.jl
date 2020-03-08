@@ -59,12 +59,14 @@ end
 
 export Refinement
 function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, parent=0)
+    parent=Parent(parent)
+
     _, M, _=loadEMT(index=parent)
 
     comment="refinement with "*string(p₊)*", "*string(k₊)
 
     M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
-    Export(M,comment=comment,parent=parent)
+    Export(M,parent,comment=comment)
 end
 
 export ShowKnots

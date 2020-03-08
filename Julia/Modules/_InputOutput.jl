@@ -26,8 +26,52 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     return nothing
 end
 
+function toJSON(k::Knots)
+    return k.vector
+end
+function toJSON(P::BSplineSpace)
+    return Dict("degree"=>P.degree, "knots"=>toJSON(P.knots))
+end
+function toJSON(P::Array{BSplineSpace,1})
+    return convert(Array{Any,1}, toJSON.(P))
+end
+function toJSON(𝒂::Array{Float64})
+    return convert(Array{Any,1}, 𝒂[:])
+end
+function toJSON(M::BSplineManifold)
+    return Dict("bsplinespaces"=>toJSON(M.bsplinespaces), "controlpoints"=>toJSON(M.controlpoints))
+end
+
+function JSONtoBSplineSpace(jP::Dict)
+    return BSplineSpace(jP["degree"],Knots(jP["knots"]))
+end
+function JSONtoBSplineSpaces(jPs::Array)
+    return [JSONtoBSplineSpace(jP) for jP ∈ jPs]
+end
+function JSONtoControlPoints(j𝒂, dims)
+    n = prod(dims)
+    d = length(j𝒂) ÷ n
+    return reshape(convert(Array{Float64},j𝒂),dims...,d)
+end
+function JSONtoBSplineManifold(dict::Dict)
+    P = JSONtoBSplineSpaces(dict["bsplinespaces"])
+    dims = dim.(P)
+    𝒂 = JSONtoControlPoints(dict["controlpoints"], dims)
+    return BSplineManifold(P,𝒂)
+end
+
+
 function isTheShapeComputed()
     return isfile(DIR*"/"*NAME*".jld")
+end
+
+function Parent(index::Int)
+    _, _, BsTree=loadEMT()
+    if index==0
+        return length(BsTree.nodes)
+    else
+        return index
+    end
 end
 
 function loadEMT(;index=0)
@@ -54,19 +98,31 @@ function Restoration()
     return nothing
 end
 
-function Export(M::BSplineManifold;comment="",maximumstrain=MAXIMUMSTRAIN,parent=0)
+function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMSTRAIN)
     if isTheShapeComputed()
         BsJLD=load(DIR*"/"*NAME*".jld")
         BsTree=BsJLD["BsTree"]
         addchild(BsTree,parent,comment)
+
+        open(DIR*"/"*NAME*".json","r") do f
+            dict=JSON.parse(f)
+        end
     else
         BsJLD=Dict{String,Any}("Expr"=>EXPR)
         BsTree=Tree()
+
+        dict=Dict{String,Any}("Expr" => string(EXPR))
     end
 
     index=length(BsTree.nodes)
     BsJLD[string(index)]=M
     BsJLD["BsTree"]=BsTree
+    dict[string(index)]=Dict{String,Any}("parent" => string(parent))
+    dict[string(index)]["bsplinemanifold"]=toJSON(M)
+    dict[string(index)]["comment"]=comment
+    open(DIR*"/"*NAME*".json","w") do f
+        JSON.print(f, dict,4)
+    end
     save(DIR*"/"*NAME*".jld",BsJLD)
     println(showtree(BsTree))
 
@@ -125,7 +181,7 @@ end
 
 export FinalOutput
 function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
-    _, M, BsTree =loadEMT(index=index)
+    _, M, _ =loadEMT(index=index)
     BSplineSvg(M,filename=DIR*"/"*NAME*"-"*string(index)*"-final.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength,points=false)
 
     P₁,P₂=P=M.bsplinespaces
