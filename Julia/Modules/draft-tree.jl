@@ -73,3 +73,7 @@ dict["2"]
 print(TreeString(dict))
 
 NodeSeries(dict,"7")
+
+keys(dict)
+
+delete!(dict,"Expr")
