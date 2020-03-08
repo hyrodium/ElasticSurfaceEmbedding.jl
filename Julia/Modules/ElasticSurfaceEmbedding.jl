@@ -17,7 +17,4 @@ include("_InputOutput.jl")
 include("_InitialConfiguration.jl")
 include("_NewtonRaphsonMethod.jl")
 
-test()=Knots([1,2,5])[3]
-
-
 end # module
