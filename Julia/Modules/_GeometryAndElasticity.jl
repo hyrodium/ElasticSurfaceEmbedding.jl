@@ -198,9 +198,9 @@ function ShowMaximumStrain(D;index=0)
 
     println("Predicted: (min: ",minE,", max: ",maxE,")")
 
-    if JLDexists()
+    if isTheShapeComputed()
         minE,maxE=ComputeMaximumStrain(index=index)
-        println("Computed: (min: ",minE,", max: ",maxE,")")
+        println("isTheShapeComputed: (min: ",minE,", max: ",maxE,")")
     end
 
     return nothing

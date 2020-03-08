@@ -26,15 +26,26 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     return nothing
 end
 
-function JLDexists()
+function isTheShapeComputed()
     return isfile(DIR*"/"*NAME*".jld")
+end
+
+function loadEMT(;index=0)
+    if !isTheShapeComputed()
+        error("jld file doesn't exists")
+    end
+    BsJLD=load(DIR*"/"*NAME*".jld")
+    Expr=BsJLD["Expr"]
+    BsTree=BsJLD["BsTree"]
+    if index==0
+        index=length(BsTree.nodes)
+    end
+    M=BsJLD[string(index)]
+    return Expr, M, BsTree
 end
 
 export Restoration
 function Restoration()
-    if !JLDexists()
-        error("jld file doesn't exists")
-    end
     Expr, _, BsTree =loadEMT()
 
     println(showtree(BsTree))
@@ -44,7 +55,7 @@ function Restoration()
 end
 
 function Export(M::BSplineManifold,BsTree;comment="",maximumstrain=MAXIMUMSTRAIN)
-    if JLDexists()
+    if isTheShapeComputed()
         BsJLD=load(DIR*"/"*NAME*".jld")
     else
         BsJLD=Dict{String,Any}("Expr"=>EXPR)
@@ -107,17 +118,6 @@ function ExportFiles(M::BSplineManifold,MaximumStrain,BsTree,index;Name=NAME,Dir
         SlackString(showtree(BsTree))
         SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")
     end
-end
-
-function loadEMT(;index=0)
-    BsJLD=load(DIR*"/"*NAME*".jld")
-    Expr=BsJLD["Expr"]
-    BsTree=BsJLD["BsTree"]
-    if index==0
-        index=length(BsTree.nodes)
-    end
-    M=BsJLD[string(index)]
-    return Expr, M, BsTree
 end
 
 export FinalOutput

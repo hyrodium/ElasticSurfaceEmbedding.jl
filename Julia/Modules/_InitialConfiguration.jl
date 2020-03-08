@@ -2,7 +2,7 @@ using DifferentialEquations
 
 export InitialConfiguration
 function InitialConfiguration(D;n₁=15,nip=NIP)
-    if JLDexists()
+    if isTheShapeComputed()
         if OVERWRITE
             rm(DIR, recursive=true)
         else
