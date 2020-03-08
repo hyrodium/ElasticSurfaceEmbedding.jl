@@ -1,8 +1,8 @@
 using Dates
 
 export NewtonMethodIteration
-function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),index=0,nip=NIP)
-    _, M, BsTree=loadEMT(index=index)
+function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=NIP)
+    _, M, _=loadEMT(index=parent)
 
     n₁,n₂=n=dim.(M.bsplinespaces)
     if !isodd(n₁*n₂)
@@ -11,9 +11,7 @@ function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1]
     M=Positioning(M)
     M,F,Ǧ,Δt=NewtonIteration(M,fixed,nip=nip)
     comment="Newton Iteration - residual norm: "*(@sprintf("%.5e",norm(F)))*", Δa norm: "*(@sprintf("%.5e",norm(Ǧ)))*", computation time: "*string(Dates.canonicalize(Dates.CompoundPeriod(Dates.Millisecond(1000Δt÷1))))
-    print
-    addchild(BsTree,index,comment)
-    Export(M,BsTree,comment=comment)
+    Export(M,comment=comment,parent=parent)
 end
 
 function NewtonIteration(M::BSplineManifold,fixed;nip=NIP)

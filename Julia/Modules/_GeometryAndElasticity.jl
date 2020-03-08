@@ -58,14 +58,13 @@ function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置�
 end
 
 export Refinement
-function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, index=0)
-    _, M, BsTree=loadEMT(index=index)
+function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, parent=0)
+    _, M, _=loadEMT(index=parent)
 
     comment="refinement with "*string(p₊)*", "*string(k₊)
-    addchild(BsTree,index,comment)
 
     M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
-    Export(M,BsTree,comment=comment)
+    Export(M,comment=comment,parent=parent)
 end
 
 export ShowKnots

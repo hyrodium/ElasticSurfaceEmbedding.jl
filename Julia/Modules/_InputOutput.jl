@@ -54,11 +54,14 @@ function Restoration()
     return nothing
 end
 
-function Export(M::BSplineManifold,BsTree;comment="",maximumstrain=MAXIMUMSTRAIN)
+function Export(M::BSplineManifold;comment="",maximumstrain=MAXIMUMSTRAIN,parent=0)
     if isTheShapeComputed()
         BsJLD=load(DIR*"/"*NAME*".jld")
+        BsTree=BsJLD["BsTree"]
+        addchild(BsTree,parent,comment)
     else
         BsJLD=Dict{String,Any}("Expr"=>EXPR)
+        BsTree=Tree()
     end
 
     index=length(BsTree.nodes)

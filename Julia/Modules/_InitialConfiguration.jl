@@ -17,9 +17,8 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
 
     M=InitBs(D,n₁,nip=nip)
     comment="Initial Configuration"
-    BsTree=Tree()
 
-    Export(M,BsTree,comment=comment)
+    Export(M,comment=comment,parent=0)
 end
 
 function InitBs(D,n₁;nip=NIP)::BSplineManifold
