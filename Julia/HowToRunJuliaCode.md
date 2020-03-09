@@ -21,7 +21,6 @@ In this repository, Julia is for numerical analysis of surface embedding.
     * IntervalSets
     * Luxor
     * Colors
-    * JLD
     * ForwardDiff
     * DifferentialEquations
     * FastGaussQuadrature
