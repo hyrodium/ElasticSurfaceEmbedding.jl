@@ -49,10 +49,80 @@ Here's an example:
 ```
 
 ## Running code
+You can run the code in REPL, Juno, or Jupyter notebook.
+I strongly reccomend Juno.
+
+### Flowchart
+The computation process proceeds like this flowchart:
+
 [flow chart here]
 
-1. define the shape
-1. initial
+* Define the shape of surface
+* Split the surface into strips
+* Check the strain prediction
+* Initial configuration
+* Newton-Raphson method itteration
+* Refinement B-spline manifold
+* Finish Computation
+
+### (Load packages)
+```
+using IntervalSets
+...
+```
+
+### Define the shape of surface
+Through this document, we treat a paraboloid as an example.
+
+```
+@ParametricMapping ...
+```
+
+### Split the surface into strips
+Define a domain of the strip with symbol `D`.
+
+```
+D = [0..1,0..1]
+```
+
+### Check the strain prediction
+
+```
+ShowStrain(D)
+```
+
+Negative number means compression, and positive number means tension.
+The absolute value of these numbers should be less than 0.01.
+
+### Initial configuration
+If you finished checking the strain prediction, the next step is determine the initial configuration.
+
+```
+InitialConfiguration(D)
+```
 
 
+### Newton-Raphson method itteration
 
+```
+NewtonMethod(D)
+```
+
+You can choose the fixing method:
+* hoge (default)
+* fuga
+* FixThreePoints
+
+
+### Refinement B-spline manifold
+
+
+```
+Refinement()
+```
+
+### Finish
+
+```
+FinishComputation()
+```
