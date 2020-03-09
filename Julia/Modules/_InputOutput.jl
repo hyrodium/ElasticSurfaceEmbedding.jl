@@ -60,71 +60,116 @@ function JSONtoBSplineManifold(dict::Dict)
     return BSplineManifold(P,𝒂)
 end
 
+function NodeSeries(tree::Dict,node)
+    Nodes=[node]
+    while Nodes[end] ≠ "0"
+        push!(Nodes, tree[Nodes[end]]["parent"])
+    end
+    return Nodes
+end
+
+function TreeString(tree::Dict)
+    serieses=Array{Int,1}[]
+    for key in keys(tree)
+        push!(serieses,(s->parse(Int,s)).(reverse(NodeSeries(tree,key))))
+    end
+    sort!(serieses)
+    lowstrings=String[]
+    n = length(serieses)
+    for i in 1:n
+        l=length(serieses[i])
+        key=string(serieses[i][end])
+        comment=tree[key]["comment"]
+        if l == 2
+            lowstring=key*": "*comment
+            push!(lowstrings,lowstring)
+        elseif l ≥ 3
+            lowstring="  "^(l-3)*"└─"*key*": "*comment
+            push!(lowstrings,lowstring)
+            for j in 1:(i-1)
+                chars=collect(lowstrings[end-j])
+                if chars[2(l-3)+1]==' '
+                    lowstrings[end-j]=join(chars[1:2(l-3)])*"│"*join(chars[2(l-3)+2:end])
+                elseif chars[2(l-3)+1]=='└'
+                    lowstrings[end-j]=join(chars[1:2(l-3)])*"├"*join(chars[2(l-3)+2:end])
+                    break
+                else
+                    break
+                end
+            end
+        end
+    end
+    outsting=""
+    for s in lowstrings
+        outsting=outsting*s*"\n"
+    end
+    return outsting
+end
+
 
 function isTheShapeComputed()
     return isfile(DIR*"/"*NAME*".jld")
 end
 
 function Parent(index::Int)
-    _, _, BsTree=loadEMT()
+    dict=LoadResultDict()
     if index==0
-        return length(BsTree.nodes)
+        return length(keys(dict["Result"]))
     else
         return index
     end
 end
 
-function loadEMT(;index=0)
+function loadEM(;index=0)
     if !isTheShapeComputed()
         error("jld file doesn't exists")
     end
+    dict=LoadResultDict()
+    index=Parent(index)
     BsJLD=load(DIR*"/"*NAME*".jld")
     Expr=BsJLD["Expr"]
-    BsTree=BsJLD["BsTree"]
-    if index==0
-        index=length(BsTree.nodes)
-    end
-    M=BsJLD[string(index)]
-    return Expr, M, BsTree
+    M=JSONtoBSplineManifold(dict["Result"][string(index)]["bsplinemanifold"])
+    return Expr, M
 end
 
 export Restoration
 function Restoration()
-    Expr, _, BsTree =loadEMT()
+    Expr, _=loadEM()
+    dict=LoadResultDict()
 
-    println(showtree(BsTree))
+    println(TreeString(dict["Result"]))
     global EXPR=BsJLD["Expr"]
     eval(:(@everywhere $EXPR))
     return nothing
 end
 
+function LoadResultDict()
+    f=open(DIR*"/"*NAME*".json","r")
+    dict=JSON.parse(f)
+    close(f)
+    return dict
+end
+
 function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMSTRAIN)
     if isTheShapeComputed()
         BsJLD=load(DIR*"/"*NAME*".jld")
-        BsTree=BsJLD["BsTree"]
-        addchild(BsTree,parent,comment)
-
-        open(DIR*"/"*NAME*".json","r") do f
-            dict=JSON.parse(f)
-        end
+        dict=LoadResultDict()
+        index=Parent(0)+1
     else
         BsJLD=Dict{String,Any}("Expr"=>EXPR)
-        BsTree=Tree()
-
         dict=Dict{String,Any}("Expr" => string(EXPR))
+        dict["Result"]=Dict{String,Any}()
+        index=1
     end
 
-    index=length(BsTree.nodes)
-    BsJLD[string(index)]=M
-    BsJLD["BsTree"]=BsTree
-    dict[string(index)]=Dict{String,Any}("parent" => string(parent))
-    dict[string(index)]["bsplinemanifold"]=toJSON(M)
-    dict[string(index)]["comment"]=comment
+    dict["Result"][string(index)]=Dict{String,Any}("parent" => string(parent))
+    dict["Result"][string(index)]["bsplinemanifold"]=toJSON(M)
+    dict["Result"][string(index)]["comment"]=comment
     open(DIR*"/"*NAME*".json","w") do f
         JSON.print(f, dict,4)
     end
     save(DIR*"/"*NAME*".jld",BsJLD)
-    println(showtree(BsTree))
+    println(TreeString(dict["Result"]))
 
     if maximumstrain==0.0
         MS=ComputeMaximumStrain(index=index)
@@ -134,15 +179,16 @@ function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMS
     end
 
     if distributed
-        @spawnat 1 ExportFiles(M,MaximumStrain,BsTree,index)
+        @spawnat 1 ExportFiles(M,MaximumStrain,index)
     else
-        ExportFiles(M,MaximumStrain,BsTree,index)
+        ExportFiles(M,MaximumStrain,index)
     end
 
     return nothing
 end
 
-function ExportFiles(M::BSplineManifold,MaximumStrain,BsTree,index;Name=NAME,Dir=DIR,Up=UP,Down=DOWN,Right=RIGHT,Left=LEFT,Mesh=MESH,Unit=UNIT,Slack=SLACK)
+function ExportFiles(M::BSplineManifold,MaximumStrain,index;Name=NAME,Dir=DIR,Up=UP,Down=DOWN,Right=RIGHT,Left=LEFT,Mesh=MESH,Unit=UNIT,Slack=SLACK)
+    dict=LoadResultDict()
     BSplineSvg(M,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
     𝒂 = M.controlpoints
     P₁,P₂=P=M.bsplinespaces
@@ -174,14 +220,14 @@ function ExportFiles(M::BSplineManifold,MaximumStrain,BsTree,index;Name=NAME,Dir
     run(pipeline(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")`, stdout=devnull, stderr=devnull))
 
     if Slack
-        SlackString(showtree(BsTree))
+        SlackString("```\n"*TreeString(dict["Result"])*"```")
         SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")
     end
 end
 
 export FinalOutput
 function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
-    _, M, _ =loadEMT(index=index)
+    _, M=loadEM(index=index)
     BSplineSvg(M,filename=DIR*"/"*NAME*"-"*string(index)*"-final.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength,points=false)
 
     P₁,P₂=P=M.bsplinespaces

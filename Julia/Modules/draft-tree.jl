@@ -25,24 +25,24 @@ function TreeString(tree)
         push!(serieses,(s->parse(Int,s)).(reverse(NodeSeries(tree,key))))
     end
     sort!(serieses)
-    strs=String[]
+    lowstrings=String[]
     n = length(serieses)
     for i in 1:n
         l=length(serieses[i])
         key=string(serieses[i][end])
         comment=tree[key]["comment"]
         if l == 2
-            S=key*": "*comment
-            push!(strs,S)
+            lowstring=key*": "*comment
+            push!(lowstrings,lowstring)
         elseif l ≥ 3
-            S="  "^(l-3)*"└─"*key*": "*comment
-            push!(strs,S)
+            lowstring="  "^(l-3)*"└─"*key*": "*comment
+            push!(lowstrings,lowstring)
             for j in 1:(i-1)
-                sss=collect(strs[end-j])
-                if sss[2(l-3)+1]==' '
-                    strs[end-j]=join(sss[1:2(l-3)])*"│"*join(sss[2(l-3)+2:end])
-                elseif sss[2(l-3)+1]=='└'
-                    strs[end-j]=join(sss[1:2(l-3)])*"├"*join(sss[2(l-3)+2:end])
+                chars=collect(lowstrings[end-j])
+                if chars[2(l-3)+1]==' '
+                    lowstrings[end-j]=join(chars[1:2(l-3)])*"│"*join(chars[2(l-3)+2:end])
+                elseif chars[2(l-3)+1]=='└'
+                    lowstrings[end-j]=join(chars[1:2(l-3)])*"├"*join(chars[2(l-3)+2:end])
                     break
                 else
                     break
@@ -50,11 +50,11 @@ function TreeString(tree)
             end
         end
     end
-    STR=""
-    for s in strs
-        STR=STR*s*"\n"
+    outsting=""
+    for s in lowstrings
+        outsting=outsting*s*"\n"
     end
-    return STR
+    return outsting
 end
 
 print(TreeString(tree))
