@@ -1,5 +1,3 @@
-using JSON
-
 f=open("Julia/config.json", "r")
 dict=JSON.parse(f)  # parse and transform data
 const NIP=dict["Default Number of Integration Points"] :: Int

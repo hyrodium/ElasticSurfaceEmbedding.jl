@@ -59,28 +59,20 @@ end
 
 export Refinement
 function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, parent=0)
-    BsJLD=load(DIR*"/"*NAME*".jld")
-    BsTree=BsJLD["BsTree"]
-    if parent==0
-        parent=length(BsTree.nodes)
-    end
-    M=BsJLD[string(parent)]
+    parent=Parent(parent)
 
-    comment="refinement with "*string(p₊)*", "*string(k₊)
-    addchild(BsTree,parent,comment)
+    M=loadM(index=parent)
+
+    comment="Refinement with p₊:"*string(p₊)*", k₊:"*string(k₊)
 
     M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
-    Export(M,BsTree,BsJLD,comment=comment)
+    Export(M,parent,comment=comment)
 end
 
 export ShowKnots
 function ShowKnots(;index=0)
-    BsJLD=load(DIR*"/"*NAME*".jld")
-    BsTree=BsJLD["BsTree"]
-    if index==0
-        index=length(BsTree.nodes)
-    end
-    M=BsJLD[string(index)]
+    M=loadM(index=index)
+
     P₁,P₂=M.bsplinespaces
     p₁,p₂=P₁.degree,P₂.degree
     k₁,k₂=P₁.knots,P₂.knots
@@ -175,12 +167,7 @@ function Ẽ⁽⁰⁾₁₁(M::BSplineManifold,u)
 end
 
 function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
-    BsJLD=load(DIR*"/"*NAME*".jld")
-    BsTree=BsJLD["BsTree"]
-    if index==0
-        index=length(BsTree.nodes)
-    end
-    M=BsJLD[string(index)]
+    M=loadM(index=index)
     𝒂=M.controlpoints
     P₁,P₂=P=M.bsplinespaces
     p₁,p₂=p=P₁.degree,P₂.degree
@@ -212,9 +199,9 @@ function ShowMaximumStrain(D;index=0)
 
     println("Predicted: (min: ",minE,", max: ",maxE,")")
 
-    if JLDexists()
+    if isTheShapeComputed()
         minE,maxE=ComputeMaximumStrain(index=index)
-        println("Computed: (min: ",minE,", max: ",maxE,")")
+        println("isTheShapeComputed: (min: ",minE,", max: ",maxE,")")
     end
 
     return nothing

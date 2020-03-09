@@ -2,25 +2,18 @@ using DifferentialEquations
 
 export InitialConfiguration
 function InitialConfiguration(D;n₁=15,nip=NIP)
-    if JLDexists()
-        if OVERWRITE
-            rm(DIR, recursive=true)
-        else
-            error("jld file already exists")
-        end
-    end
+    parent=0
     mkpath(DIR)
     mkpath(DIR*"/nurbs")
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
     mkpath(DIR*"/slack")
-    BsJLD=Dict{String,Any}("Expr"=>EXPR)
 
+    D₁,D₂=D
     M=InitBs(D,n₁,nip=nip)
-    comment="Initial Configuration"
-    BsTree=Tree()
+    comment="Initial Configuration with a domain "*repr([endpoints(D₁)...])*"×"*repr([endpoints(D₂)...])
 
-    Export(M,BsTree,BsJLD,comment=comment)
+    Export(M,parent,comment=comment)
 end
 
 function InitBs(D,n₁;nip=NIP)::BSplineManifold
@@ -34,8 +27,8 @@ function InitBs(D,n₁;nip=NIP)::BSplineManifold
     end
     𝒄𝒄̇₀=vcat([0.0,0.0],[1.,0.]*ṡ₍₀₎(D₂,minimum(D₁)))
     curve=solve(ODEProblem(ode,𝒄𝒄̇₀,extrema(D₁)))
-    𝒄(t)=curve(t)[1:d] # 解となる中心曲線
-    𝒄₁(t)=curve(t)[(1:d).+d] # その導関数
+    𝒄(t)=curve(t)[1:d] # center curve of the solution
+    𝒄₁(t)=curve(t)[(1:d).+d] # its derivative
     𝒄₂(t)=[g₍₀₎₁₂(c(D₂,t)) -𝝊₍₀₎(c(D₂,t));𝝊₍₀₎(c(D₂,t)) g₍₀₎₁₂(c(D₂,t))]*𝒄₁(t)/g₍₀₎₁₁(c(D₂,t)) # 中心曲線上の幅方向のベクトル場
 
     p₁=3
