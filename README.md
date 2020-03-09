@@ -52,7 +52,7 @@ Cut papers into strips, and weave the paper strips.
 | --- | :-- |
 
 ### ..me!:bowtie:
-| <img src="img/Paraboloid5.png" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/Profile). <br> Read my upcoming paper. |
+| <img src="img/me.jpg" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/Profile). <br> Read my upcoming paper. |
 | --- | :-- |
 
 
