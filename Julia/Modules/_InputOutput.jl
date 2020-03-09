@@ -22,6 +22,12 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     global UNIT=(unit,"pt")
     global SLACK=slack
     global MAXIMUMSTRAIN=maximumstrain
+    if isTheShapeComputed()
+        dict=LoadResultDict()
+        println(TreeString(dict["Result"]))
+        global EXPR=Meta.parse(dict["Expr"])
+        eval(:(@everywhere $EXPR))
+    end
     return nothing
 end
 
@@ -119,26 +125,14 @@ function Parent(index::Int)
     end
 end
 
-function loadEM(;index=0)
+function loadM(;index=0)
     if !isTheShapeComputed()
         error("Result file doesn't exists")
     end
     dict=LoadResultDict()
     index=Parent(index)
-    Expr=Meta.parse(dict["Expr"])
     M=JSONtoBSplineManifold(dict["Result"][string(index)]["bsplinemanifold"])
-    return Expr, M
-end
-
-export Restoration
-function Restoration()
-    Expr, _=loadEM()
-    dict=LoadResultDict()
-
-    println(TreeString(dict["Result"]))
-    global EXPR=Expr
-    eval(:(@everywhere $EXPR))
-    return nothing
+    return M
 end
 
 function LoadResultDict()
@@ -222,7 +216,7 @@ end
 
 export FinalOutput
 function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
-    _, M=loadEM(index=index)
+    M=loadM(index=index)
     BSplineSvg(M,filename=DIR*"/"*NAME*"-"*string(index)*"-final.svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength,points=false)
 
     P₁,P₂=P=M.bsplinespaces

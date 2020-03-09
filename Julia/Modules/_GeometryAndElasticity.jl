@@ -61,7 +61,7 @@ export Refinement
 function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Union{Nothing,Array{Knots,1}}=nothing, parent=0)
     parent=Parent(parent)
 
-    _, M=loadEM(index=parent)
+    M=loadM(index=parent)
 
     comment="Refinement with p₊:"*string(p₊)*", k₊:"*string(k₊)
 
@@ -71,7 +71,7 @@ end
 
 export ShowKnots
 function ShowKnots(;index=0)
-    _, M=loadEM(index=index)
+    M=loadM(index=index)
 
     P₁,P₂=M.bsplinespaces
     p₁,p₂=P₁.degree,P₂.degree
@@ -167,7 +167,7 @@ function Ẽ⁽⁰⁾₁₁(M::BSplineManifold,u)
 end
 
 function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
-    _, M=loadEM(index=index)
+    M=loadM(index=index)
     𝒂=M.controlpoints
     P₁,P₂=P=M.bsplinespaces
     p₁,p₂=p=P₁.degree,P₂.degree

@@ -9,8 +9,9 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
     mkpath(DIR*"/colorbar")
     mkpath(DIR*"/slack")
 
+    D₁,D₂=D
     M=InitBs(D,n₁,nip=nip)
-    comment="Initial Configuration"
+    comment="Initial Configuration with a domain "*repr([endpoints(D₁)...])*"×"*repr([endpoints(D₂)...])
 
     Export(M,parent,comment=comment)
 end
