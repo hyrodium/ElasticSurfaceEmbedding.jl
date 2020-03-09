@@ -3,7 +3,6 @@ module ElasticSurfaceEmbedding
 using LinearAlgebra
 using Printf
 using IntervalSets
-using JLD
 using JSON
 using Distributed
 

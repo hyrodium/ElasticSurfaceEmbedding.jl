@@ -108,7 +108,7 @@ end
 
 
 function isTheShapeComputed()
-    return isfile(DIR*"/"*NAME*".jld")
+    return isfile(DIR*"/"*NAME*".json")
 end
 
 function Parent(index::Int)
@@ -122,12 +122,11 @@ end
 
 function loadEM(;index=0)
     if !isTheShapeComputed()
-        error("jld file doesn't exists")
+        error("Result file doesn't exists")
     end
     dict=LoadResultDict()
     index=Parent(index)
-    BsJLD=load(DIR*"/"*NAME*".jld")
-    Expr=BsJLD["Expr"]
+    Expr=Meta.parse(dict["Expr"])
     M=JSONtoBSplineManifold(dict["Result"][string(index)]["bsplinemanifold"])
     return Expr, M
 end
@@ -138,7 +137,7 @@ function Restoration()
     dict=LoadResultDict()
 
     println(TreeString(dict["Result"]))
-    global EXPR=BsJLD["Expr"]
+    global EXPR=Expr
     eval(:(@everywhere $EXPR))
     return nothing
 end
@@ -152,11 +151,9 @@ end
 
 function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMSTRAIN)
     if isTheShapeComputed()
-        BsJLD=load(DIR*"/"*NAME*".jld")
         dict=LoadResultDict()
         index=Parent(0)+1
     else
-        BsJLD=Dict{String,Any}("Expr"=>EXPR)
         dict=Dict{String,Any}("Expr" => string(EXPR))
         dict["Result"]=Dict{String,Any}()
         index=1
@@ -168,7 +165,6 @@ function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMS
     open(DIR*"/"*NAME*".json","w") do f
         JSON.print(f, dict,4)
     end
-    save(DIR*"/"*NAME*".jld",BsJLD)
     println(TreeString(dict["Result"]))
 
     if maximumstrain==0.0

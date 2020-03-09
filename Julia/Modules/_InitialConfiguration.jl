@@ -7,7 +7,7 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
         if OVERWRITE
             rm(DIR, recursive=true)
         else
-            error("jld file already exists")
+            error("file already exists")
         end
     end
     mkpath(DIR)
