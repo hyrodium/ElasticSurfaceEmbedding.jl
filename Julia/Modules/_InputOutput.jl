@@ -11,7 +11,7 @@ macro ParametricMapping(ex)
 end
 
 export Settings
-function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true,maximumstrain=0.0,overwrite=false)
+function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=true,maximumstrain=0.0)
     global NAME=name
     global DIR=OUT_DIR*NAME
     global UP=up
@@ -22,7 +22,6 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     global UNIT=(unit,"pt")
     global SLACK=slack
     global MAXIMUMSTRAIN=maximumstrain
-    global OVERWRITE=overwrite
     return nothing
 end
 

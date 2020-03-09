@@ -3,13 +3,6 @@ using DifferentialEquations
 export InitialConfiguration
 function InitialConfiguration(D;n₁=15,nip=NIP)
     parent=0
-    if isTheShapeComputed()
-        if OVERWRITE
-            rm(DIR, recursive=true)
-        else
-            error("file already exists")
-        end
-    end
     mkpath(DIR)
     mkpath(DIR*"/nurbs")
     mkpath(DIR*"/strain")

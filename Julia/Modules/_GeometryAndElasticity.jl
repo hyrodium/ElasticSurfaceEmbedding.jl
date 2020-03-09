@@ -63,7 +63,7 @@ function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=nothing, k₊::Un
 
     _, M=loadEM(index=parent)
 
-    comment="refinement with "*string(p₊)*", "*string(k₊)
+    comment="Refinement with p₊:"*string(p₊)*", k₊:"*string(k₊)
 
     M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
     Export(M,parent,comment=comment)
