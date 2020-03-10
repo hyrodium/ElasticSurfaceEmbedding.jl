@@ -13,8 +13,13 @@ This is the meaning of "Elastic Surface Embedding".
 ## Overview: How to make a surface model
 ### step 1 : Define a shape of surface (and split into strips)
 The definition must consists of parametric mapping and its domain.
+For example, a paraboloid can be parametrized as below.
 
 ![](img/Paraboloid-parametricmapping.png)
+
+D=...
+
+The domain D will be split into D_i.
 
 ![](img/Paraboloid-domain.png)
 
@@ -22,6 +27,7 @@ The definition must consists of parametric mapping and its domain.
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
 For more information, read [this document](/Julia/HowToRunJuliaCode.md).
+The image below is a result for the domain D_1.
 
 <img src="img/NurbsStrain.png" width="800">
 
