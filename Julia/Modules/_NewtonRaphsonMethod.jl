@@ -1,7 +1,33 @@
 using Dates
 
+function DefaultOrientation(n₁,n₂)
+    return (
+        [(n₁+1)÷2,(n₂+1)÷2,1],
+        [(n₁+1)÷2,(n₂+1)÷2,2],
+        [(n₁+1)÷2,(n₂+1)÷2-1,1]
+    )
+end
+
+function FixThreePoints(n₁,n₂)
+    return (
+        [1,(n₂+1)÷2,1],
+        [1,(n₂+1)÷2,2],
+        [(n₁+1)÷2,(n₂+1)÷2,1],
+        [(n₁+1)÷2,(n₂+1)÷2,2],
+        [n₁,(n₂+1)÷2,1],
+        [n₁,(n₂+1)÷2,2]
+    )
+end
+
 export NewtonMethodIteration
-function NewtonMethodIteration(;fixed=((n₁,n₂)->([(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1])),parent=0,nip=NIP)
+function NewtonMethodIteration(;fixingmethod=:DefaultOrientation,parent=0,nip=NIP)
+    if fixingmethod == :DefaultOrientation
+        fixed = DefaultOrientation
+    elseif fixingmethod == :FixThreePoints
+        fixed = FixThreePoints
+    else
+        error("No method for $(fixingmethod)")
+    end
     parent=Parent(parent)
     M=loadM(index=parent)
 

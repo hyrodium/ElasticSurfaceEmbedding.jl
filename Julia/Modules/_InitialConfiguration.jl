@@ -8,6 +8,7 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
     mkpath(DIR*"/slack")
+    mkpath(DIR*"/output")
 
     D₁,D₂=D
     M=InitBs(D,n₁,nip=nip)

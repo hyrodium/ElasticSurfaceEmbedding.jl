@@ -18,12 +18,6 @@ struct Knots
     function Knots(vector)
         new(sort(vector))
     end
-    function Knots(i::Int)
-        if i ≠ 0
-            error("Knots(0) is only alllowed")
-        end
-        return Knots([])
-    end
 end
 
 Base.zero(::Type{Knots}) = Knots([])
