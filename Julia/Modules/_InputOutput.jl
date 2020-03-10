@@ -2,7 +2,8 @@ using ParametricDraw
 
 export @ParametricMapping
 macro ParametricMapping(ex)
-    global EXPR=ex
+    global EXPR=Meta.parse(string(ex))
+    println(EXPR)
     if startswith(repr(EXPR),":(function 𝒑₍₀₎(u)\n") || startswith(repr(EXPR),":(𝒑₍₀₎(u) =")
         return :(@everywhere $EXPR)
     else
@@ -130,6 +131,11 @@ function loadM(;index=0)
         error("Result file doesn't exists")
     end
     dict=LoadResultDict()
+    if EXPR ≠ Meta.parse(dict["Expr"])
+        println(EXPR)
+        println(Meta.parse(dict["Expr"]))
+        error("The definition of 𝒑₍₀₎(u) has been changed")
+    end
     index=Parent(index)
     M=JSONtoBSplineManifold(dict["Result"][string(index)]["bsplinemanifold"])
     return M
