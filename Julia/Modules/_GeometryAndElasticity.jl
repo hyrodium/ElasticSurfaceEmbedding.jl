@@ -201,7 +201,7 @@ function ShowMaximumStrain(D;index=0)
 
     if isTheShapeComputed()
         minE,maxE=ComputeMaximumStrain(index=index)
-        println("isTheShapeComputed: (min: ",minE,", max: ",maxE,")")
+        println("Computed: (min: ",minE,", max: ",maxE,")")
     end
 
     return nothing
