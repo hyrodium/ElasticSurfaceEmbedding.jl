@@ -2,11 +2,10 @@ using ParametricDraw
 
 export @ParametricMapping
 macro ParametricMapping(ex)
-    expr=Meta.parse(string(ex))
+    expr=toJSON(ex)
     println(expr)
-    if startswith(repr(expr),":(function 𝒑₍₀₎(u)\n") || startswith(repr(expr),":(𝒑₍₀₎(u) =")
+    if startswith(expr,"function 𝒑₍₀₎(u)\n") || startswith(expr,"𝒑₍₀₎(u) =")
         global EXPR=expr
-        # return :(@everywhere $expr)
     else
         error("Symbol of parametric mapping must be 𝒑₍₀₎(u)")
     end
@@ -26,17 +25,17 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     global MAXIMUMSTRAIN=maximumstrain
     if isTheShapeComputed()
         dict=LoadResultDict()
-        # println(TreeString(dict["Result"]))
+        println(TreeString(dict["Result"]))
         global EXPR=dict["Expr"]
-        eval(:(@everywhere $EXPR))
-    elseif @isdefined EXPR
-        eval(:(@everywhere $EXPR))
+    elseif !(@isdefined EXPR)
+        error("Use @ParametricMapping or choose computed name before Settings.")
     end
+    eval(:(@everywhere $(Meta.parse(EXPR))))
     return nothing
 end
 
 function toJSON(ex::Expr) ::String
-    return replace(repr(ex), r"#=.*=#\n" => s"")
+    return replace(string(ex), r"#=.*=#\n" => s"")
 end
 function toJSON(k::Knots)
     return k.vector
