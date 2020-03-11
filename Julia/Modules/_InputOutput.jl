@@ -3,7 +3,6 @@ using ParametricDraw
 export @ParametricMapping
 macro ParametricMapping(ex)
     expr=toJSON(ex)
-    println(expr)
     if startswith(expr,"function 𝒑₍₀₎(u)\n") || startswith(expr,"𝒑₍₀₎(u) =")
         global EXPR=expr
     else
