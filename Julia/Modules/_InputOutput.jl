@@ -6,7 +6,7 @@ macro ParametricMapping(ex)
     if startswith(expr,"function 𝒑₍₀₎(u)\n") || startswith(expr,"𝒑₍₀₎(u) =")
         global EXPR=expr
     else
-        error("Symbol of parametric mapping must be 𝒑₍₀₎(u)")
+        error("symbol of parametric mapping must be 𝒑₍₀₎(u)")
     end
 end
 
