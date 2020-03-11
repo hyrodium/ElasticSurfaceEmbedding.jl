@@ -28,7 +28,7 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
         println(TreeString(dict["Result"]))
         global EXPR=dict["Expr"]
     elseif !(@isdefined EXPR)
-        error("Use @ParametricMapping or choose computed name before Settings.")
+        error("use @ParametricMapping or input name of computed shape")
     end
     eval(:(@everywhere $(Meta.parse(EXPR))))
     return nothing
