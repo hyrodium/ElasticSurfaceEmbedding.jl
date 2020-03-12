@@ -165,6 +165,7 @@ function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMS
     dict["Result"][string(index)]=Dict{String,Any}("parent" => string(parent))
     dict["Result"][string(index)]["bsplinemanifold"]=toJSON(M)
     dict["Result"][string(index)]["comment"]=comment
+    mkpath(DIR)
     open(DIR*"/"*NAME*".json","w") do f
         JSON.print(f, dict,4)
     end
@@ -187,6 +188,12 @@ function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMS
 end
 
 function ExportFiles(M::BSplineManifold,MaximumStrain,index;Name=NAME,Dir=DIR,Up=UP,Down=DOWN,Right=RIGHT,Left=LEFT,Mesh=MESH,Unit=UNIT,Slack=SLACK)
+    mkpath(DIR*"/nurbs")
+    mkpath(DIR*"/strain")
+    mkpath(DIR*"/colorbar")
+    mkpath(DIR*"/slack")
+    mkpath(DIR*"/output")
+
     dict=LoadResultDict()
     BSplineSvg(M,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
     𝒂 = M.controlpoints
@@ -249,7 +256,8 @@ function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
     return nothing
 end
 
-export ReDraw
-function ReDraw()
-    return nothing
-end
+# TODO
+# export ReDraw
+# function ReDraw()
+#     return nothing
+# end
