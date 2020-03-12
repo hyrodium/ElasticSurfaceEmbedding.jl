@@ -21,10 +21,11 @@ struct Knots
 end
 
 Base.zero(::Type{Knots}) = Knots([])
+Base. ==(k₁::Knots, k₂::Knots) = (k₁.vector==k₂.vector)
 Base.:+(k₁::Knots, k₂::Knots) = Knots(sort([k₁.vector...,k₂.vector...]))
 Base.:*(p₊::Int, k::Knots) = (
         if p₊==0
-            Knots([])
+            zero(Knots)
         elseif p₊>0
             sum(k for _ ∈ 1:p₊)
         else

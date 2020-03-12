@@ -15,24 +15,15 @@ using ElasticSurfaceEmbedding
 
 # %%
 @ParametricMapping 𝒑₍₀₎(u)=[u...,u'*u]
-n=10
-id=1
+D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
 
 # %%
-@ParametricMapping 𝒑₍₀₎(u)=[u...,u[1]*u[2]]
-n=10
-id=1
-
-# %%
-id=2
-D=(-1.0..1.0, (id-1)/n..id/n)
-Settings("Q011",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
-Settings("Q012",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
-InitialConfiguration(D)
-fixed(n₁,n₂)=[[1,(n₂+1)÷2,1],[1,(n₂+1)÷2,2],[n₁,(n₂+1)÷2,1],[n₁,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2,1],[(n₁+1)÷2,(n₂+1)÷2,2],[(n₁+1)÷2,(n₂+1)÷2-1,1]]
-NewtonMethodIteration(fixed=fixed)
-NewtonMethodIteration(parent=14)
-Refinement(p₊=[0,1],k₊=[Knots([]),Knots([(id-1/2)/10])],parent=2)
+Settings("XXX018",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
+InitialConfiguration(D(1,10))
+NewtonMethodIteration(fixingmethod=:FixThreePoints)
+# NewtonMethodIteration(parent=14)
+Refinement(p₊=[0,1],k₊=[Knots([]),Knots([(1-1/2)/10])],parent=1)
+Refinement(p₊=[0,1],k₊=[Knots([]),Knots([(3-1/2)/10])],parent=1)
 NewtonMethodIteration(parent=1)
 NewtonMethodIteration()
 NewtonMethodIteration()
@@ -40,4 +31,40 @@ NewtonMethodIteration()
 NewtonMethodIteration()
 NewtonMethodIteration()
 
-ShowMaximumStrain(D)
+ShowMaximumStrain(D(1,10))
+
+# %%
+@ParametricMapping 𝒑₍₀₎(u)=[u...,u[1]*u[2]]
+D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
+
+# %%
+Settings("XXX004",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
+
+Knots([]) ≠ Knots([])
+
+Knots([]) == Knots([])
+
+
+
+[] ≠ []
+
+
+Base. ==(k₁::Knots, k₂::Knots) = (k₁.vector==k₂.vector)
+
+
+
+Base.isequal(k₁::Knots, k₂::Knots) = (k₁.vector==k₂.vector)
+
+==(k₁)
+
+@less [1,2]==[1,2]
+
+[1,2]===[1,2]
+
+[1,2]===[1,2]
+
+isequal(Knots([1,2]),Knots([1,2]))
+
+
+
+Knots([1,2])

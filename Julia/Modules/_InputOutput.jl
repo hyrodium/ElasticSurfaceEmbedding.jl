@@ -2,11 +2,11 @@ using ParametricDraw
 
 export @ParametricMapping
 macro ParametricMapping(ex)
-    global EXPR=ex
-    if startswith(repr(EXPR),":(function 𝒑₍₀₎(u)\n") || startswith(repr(EXPR),":(𝒑₍₀₎(u) =")
-        return :(@everywhere $EXPR)
+    expr=toJSON(ex)
+    if startswith(expr,"function 𝒑₍₀₎(u)\n") || startswith(expr,"𝒑₍₀₎(u) =")
+        global EXPR=expr
     else
-        error("Symbol of parametric mapping must be 𝒑₍₀₎(u)")
+        error("symbol of parametric mapping must be 𝒑₍₀₎(u)")
     end
 end
 
@@ -25,12 +25,17 @@ function Settings(name;up=5,down=-5,right=5,left=-5,mesh=(10,1),unit=100,slack=t
     if isTheShapeComputed()
         dict=LoadResultDict()
         println(TreeString(dict["Result"]))
-        global EXPR=Meta.parse(dict["Expr"])
-        eval(:(@everywhere $EXPR))
+        global EXPR=dict["Expr"]
+    elseif !(@isdefined EXPR)
+        error("use @ParametricMapping or input name of computed shape")
     end
+    eval(:(@everywhere $(Meta.parse(EXPR))))
     return nothing
 end
 
+function toJSON(ex::Expr) ::String
+    return replace(string(ex), r"#=.*=#\n" => s"")
+end
 function toJSON(k::Knots)
     return k.vector
 end
@@ -130,6 +135,11 @@ function loadM(;index=0)
         error("Result file doesn't exists")
     end
     dict=LoadResultDict()
+    if EXPR ≠ dict["Expr"]
+        println(EXPR)
+        println(dict["Expr"])
+        # error("The definition of 𝒑₍₀₎(u) has been changed")
+    end
     index=Parent(index)
     M=JSONtoBSplineManifold(dict["Result"][string(index)]["bsplinemanifold"])
     return M
@@ -147,7 +157,7 @@ function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMS
         dict=LoadResultDict()
         index=Parent(0)+1
     else
-        dict=Dict{String,Any}("Expr" => string(EXPR))
+        dict=Dict{String,Any}("Expr" => EXPR)
         dict["Result"]=Dict{String,Any}()
         index=1
     end
@@ -155,6 +165,7 @@ function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMS
     dict["Result"][string(index)]=Dict{String,Any}("parent" => string(parent))
     dict["Result"][string(index)]["bsplinemanifold"]=toJSON(M)
     dict["Result"][string(index)]["comment"]=comment
+    mkpath(DIR)
     open(DIR*"/"*NAME*".json","w") do f
         JSON.print(f, dict,4)
     end
@@ -177,6 +188,12 @@ function Export(M::BSplineManifold,parent::Int;comment="",maximumstrain=MAXIMUMS
 end
 
 function ExportFiles(M::BSplineManifold,MaximumStrain,index;Name=NAME,Dir=DIR,Up=UP,Down=DOWN,Right=RIGHT,Left=LEFT,Mesh=MESH,Unit=UNIT,Slack=SLACK)
+    mkpath(DIR*"/nurbs")
+    mkpath(DIR*"/strain")
+    mkpath(DIR*"/colorbar")
+    mkpath(DIR*"/slack")
+    mkpath(DIR*"/output")
+
     dict=LoadResultDict()
     BSplineSvg(M,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
     𝒂 = M.controlpoints
@@ -239,7 +256,8 @@ function FinalOutput(;index=0,unitlength=(10,"mm"),cutout=(0.1,5),mesh=60)
     return nothing
 end
 
-export ReDraw
-function ReDraw()
-    return nothing
-end
+# TODO
+# export ReDraw
+# function ReDraw()
+#     return nothing
+# end
