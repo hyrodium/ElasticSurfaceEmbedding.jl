@@ -6,7 +6,7 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
 
     D₁,D₂=D
     M=InitBs(D,n₁,nip=nip)
-    comment="Initial Configuration with a domain "*repr([endpoints(D₁)...])*"×"*repr([endpoints(D₂)...])
+    comment="Initial Configuration - domain: "*repr([endpoints(D₁)...])*"×"*repr([endpoints(D₂)...])
 
     Export(M,parent,comment=comment)
 end

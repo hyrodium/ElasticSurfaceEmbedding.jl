@@ -57,8 +57,8 @@ function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置�
     return BSplineManifold(𝒫s,𝒂′)
 end
 
-export Refinement
-function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=[0,0], k₊::Union{Nothing,Array{Knots,1}}=[Knots([]),Knots([])], parent=0)
+export SplineRefinement
+function SplineRefinement(;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knots([]),Knots([])], parent=0)
     parent=Parent(parent)
     M=loadM(index=parent)
 
@@ -78,7 +78,7 @@ function BSpline.Refinement(;p₊::Union{Nothing,Array{Int,1}}=[0,0], k₊::Unio
         error("given additional knots for refinement are out of range")
     end
 
-    comment="Refinement with p₊:"*string(p₊)*", k₊:"*string(k₊)
+    comment="Refinement - p₊:"*string(p₊)*", k₊:"*string(k₊)
     M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
     Export(M,parent,comment=comment)
 end
