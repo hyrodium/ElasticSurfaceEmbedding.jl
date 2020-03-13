@@ -19,6 +19,20 @@ function FixThreePoints(n₁,n₂)
     )
 end
 
+AbbStr(t::Week) = string(t.value)*"w "
+AbbStr(t::Day) = string(t.value)*"d "
+AbbStr(t::Hour) = string(t.value)*"h "
+AbbStr(t::Minute) = string(t.value)*"m "
+AbbStr(t::Second) = string(t.value)*"s "
+AbbStr(t::Millisecond) = string(t.value)*"ms "
+AbbStr(t::Vector{Period}) = *(AbbStr.(t)...)[1:end-1]
+
+function SecondsToString(Δt::Float64)
+    prds=Dates.canonicalize(Dates.CompoundPeriod(Dates.Millisecond(floor(1000Δt)))).periods
+    println(prds)
+    return AbbStr(prds)
+end
+
 export NewtonMethodIteration
 function NewtonMethodIteration(;fixingmethod=:DefaultOrientation,parent=0,nip=NIP)
     if fixingmethod == :DefaultOrientation
@@ -37,7 +51,7 @@ function NewtonMethodIteration(;fixingmethod=:DefaultOrientation,parent=0,nip=NI
     end
     M=Positioning(M)
     M,F,Ǧ,Δt=NewtonIteration(M,fixed,nip=nip)
-    comment="Newton Iteration - residual norm: "*(@sprintf("%.5e",norm(F)))*", Δa norm: "*(@sprintf("%.5e",norm(Ǧ)))*", computation time: "*string(Dates.canonicalize(Dates.CompoundPeriod(Dates.Millisecond(1000Δt÷1))))
+    comment="Newton Iteration - residual norm: "*(@sprintf("%.4e",norm(F)))*", Δa norm: "*(@sprintf("%.4e",norm(Ǧ)))*", computation time: "*SecondsToString(Δt)
     Export(M,parent,comment=comment)
 end
 
