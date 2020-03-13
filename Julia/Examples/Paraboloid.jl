@@ -18,13 +18,13 @@ using ElasticSurfaceEmbedding
 D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
 
 # %%
-Settings("XXX018",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
+Settings("XXX019",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
 InitialConfiguration(D(1,10))
 NewtonMethodIteration(fixingmethod=:FixThreePoints)
 # NewtonMethodIteration(parent=14)
-Refinement(p₊=[0,1],k₊=[Knots([]),Knots([(1-1/2)/10])],parent=1)
-Refinement(p₊=[0,1],k₊=[Knots([]),Knots([(3-1/2)/10])],parent=1)
-NewtonMethodIteration(parent=1)
+SplineRefinement(p₊=[0,1],k₊=[Knots([]),Knots([(1-1/2)/10])],parent=1)
+SplineRefinement(p₊=[0,1],k₊=[Knots([]),Knots([(3-1/2)/10])],parent=1)
+NewtonMethodIteration(parent=2)
 NewtonMethodIteration()
 NewtonMethodIteration()
 NewtonMethodIteration()
@@ -39,32 +39,3 @@ D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
 
 # %%
 Settings("XXX004",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
-
-Knots([]) ≠ Knots([])
-
-Knots([]) == Knots([])
-
-
-
-[] ≠ []
-
-
-Base. ==(k₁::Knots, k₂::Knots) = (k₁.vector==k₂.vector)
-
-
-
-Base.isequal(k₁::Knots, k₂::Knots) = (k₁.vector==k₂.vector)
-
-==(k₁)
-
-@less [1,2]==[1,2]
-
-[1,2]===[1,2]
-
-[1,2]===[1,2]
-
-isequal(Knots([1,2]),Knots([1,2]))
-
-
-
-Knots([1,2])
