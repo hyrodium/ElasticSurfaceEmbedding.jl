@@ -58,7 +58,7 @@ function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置�
 end
 
 export SplineRefinement
-function SplineRefinement(;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knots([]),Knots([])], parent=0)
+function SplineRefinement(;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knots([]),Knots([])], parent::Int=0)
     parent=Parent(parent)
     M=loadM(index=parent)
 

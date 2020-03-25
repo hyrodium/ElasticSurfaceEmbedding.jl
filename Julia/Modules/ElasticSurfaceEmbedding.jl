@@ -15,5 +15,6 @@ include("_GeometryAndElasticity.jl")
 include("_InputOutput.jl")
 include("_InitialConfiguration.jl")
 include("_NewtonRaphsonMethod.jl")
+include("_Pin.jl")
 
 end # module
