@@ -33,7 +33,9 @@ NewtonMethodIteration()
 
 PinState(parent=3,tag="paraboloid-"*repr(1))
 
-PinState(parent=3)
+PinState(parent=7)
+
+RemovePin(4)
 
 ExportPinnedStates(unitlength=(100,"mm"))
 
