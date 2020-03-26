@@ -12,9 +12,10 @@ function PinState(; parent::Int=0, tag::String="")
     M = loadM(index=parent)
     comment = "📌 - tag: "*tag
     Export(M,parent,comment=comment)
+    return nothing
 end
 
-function TagExists(tag, dict::Union{Dict,Nothing}=nothing)
+function TagExists(tag, dict::Union{Dict,Nothing}=nothing)::Bool
     if dict isa Nothing
         dict = LoadResultDict()
     end
@@ -28,7 +29,7 @@ function TagExists(tag, dict::Union{Dict,Nothing}=nothing)
     return false
 end
 
-function GetTag(index; dict::Union{Dict,Nothing}=nothing)
+function GetTag(index; dict::Union{Dict,Nothing}=nothing)::String
     if dict isa Nothing
         dict = LoadResultDict()
     end
@@ -40,7 +41,18 @@ function GetTag(index; dict::Union{Dict,Nothing}=nothing)
     end
 end
 
-function FindPinnedStates(; dict::Union{Dict,Nothing}=nothing)
+export RemovePin
+function RemovePin(index)::Nothing
+    dict = LoadResultDict()
+    tag=GetTag(index)
+    comment = dict["Result"][repr(index)]["comment"]
+    comment = replace(comment, "📌" => "💨")
+    dict["Result"][repr(index)]["comment"] = comment
+    SaveResultDict(dict)
+    return nothing
+end
+
+function FindPinnedStates(; dict::Union{Dict,Nothing}=nothing)::Array{String}
     if dict isa Nothing
         dict = LoadResultDict()
     end
