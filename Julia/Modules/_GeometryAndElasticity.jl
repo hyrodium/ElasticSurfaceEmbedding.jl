@@ -58,7 +58,7 @@ function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置�
 end
 
 export SplineRefinement
-function SplineRefinement(;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knots([]),Knots([])], parent::Int=0)
+function SplineRefinement( ;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knots([]),Knots([])], parent::Int=0)
     parent=Parent(parent)
     M=loadM(index=parent)
 
@@ -84,7 +84,7 @@ function SplineRefinement(;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knots
 end
 
 export ShowKnots
-function ShowKnots(;index=0)
+function ShowKnots( ;index=0)
     M=loadM(index=index)
 
     P₁,P₂=M.bsplinespaces
@@ -180,7 +180,7 @@ function Ẽ⁽⁰⁾₁₁(M::BSplineManifold,u)
     return Ẽ⁽⁰⁾₁₁(D₂,u)
 end
 
-function ComputeMaximumStrain(;index=0,mesh=tuple(20*[MESH...]...))
+function ComputeMaximumStrain( ;index=0,mesh=tuple(20*[MESH...]...))
     M=loadM(index=index)
     𝒂=M.controlpoints
     P₁,P₂=P=M.bsplinespaces

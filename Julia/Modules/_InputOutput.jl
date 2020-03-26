@@ -138,7 +138,7 @@ function Parent(index::Int)
     end
 end
 
-function loadM(;index=0)
+function loadM(; index=0)
     if !isTheShapeComputed()
         error("Result file doesn't exists")
     end
