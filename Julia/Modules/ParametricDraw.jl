@@ -146,7 +146,7 @@ function ParametricColor(𝒑,D;rgb=(u->[0.5,0.5,0.5]),filename="ParametricColor
     return nothing
 end
 
-function ColorBar(;max=1.234,filename="ColorBar.png",width=100)
+function ColorBar(; max=1.234,filename="ColorBar.png",width=100)
     up=4
     down=-4
     right=4.6

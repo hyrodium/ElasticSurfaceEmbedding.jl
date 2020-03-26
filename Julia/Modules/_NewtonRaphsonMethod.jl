@@ -34,7 +34,7 @@ function SecondsToString(Δt::Float64)
 end
 
 export NewtonMethodIteration
-function NewtonMethodIteration(;fixingmethod=:DefaultOrientation,parent=0,nip=NIP)
+function NewtonMethodIteration(; fixingmethod=:DefaultOrientation, parent::Int=0, nip=NIP)
     if fixingmethod == :DefaultOrientation
         fixed = DefaultOrientation
     elseif fixingmethod == :FixThreePoints
