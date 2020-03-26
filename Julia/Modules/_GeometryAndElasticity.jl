@@ -1,7 +1,7 @@
 using ForwardDiff
 
 # BSpline
-function FittingBSpline(f, P::BSplineSpace; nip=NIP) # 1-dimensional
+function FittingBSpline(f, P::BSplineSpace; nip=NIP)::Array{Float64} # 1-dimensional
     p=P.degree
     k=P.knots
     D=k[1+p]..k[end-p]
@@ -19,7 +19,7 @@ function FittingBSpline(f, P::BSplineSpace; nip=NIP) # 1-dimensional
     return inv(A)*b
 end
 
-function N′(P₁::BSplineSpace,P₂::BSplineSpace,I₁,I₂,i,u)
+function N′(P₁::BSplineSpace,P₂::BSplineSpace,I₁,I₂,i,u)::Float64
     if i==1
         return BSplineBasis′(I₁,P₁,u[1])*BSplineBasis(I₂,P₂,u[2])
     else
@@ -78,9 +78,10 @@ function SplineRefinement( ;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knot
         error("given additional knots for refinement are out of range")
     end
 
-    comment="Refinement - p₊:"*string(p₊)*", k₊:"*string(k₊)
+    comment="Refinement - p₊:"*string(p₊)*", k₊:"*string([k₊₁.vector, k₊₂.vector])
     M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
     Export(M,parent,comment=comment)
+    return nothing
 end
 
 export ShowKnots
@@ -90,14 +91,13 @@ function ShowKnots( ;index=0)
     P₁,P₂=M.bsplinespaces
     p₁,p₂=P₁.degree,P₂.degree
     k₁,k₂=P₁.knots,P₂.knots
-    println("k₁: ",k₁)
-    println("k₂: ",k₂)
+    println("k₁: ",k₁.vector)
+    println("k₂: ",k₂.vector)
     println("Suggestion:")
     k₁′=unique(k₁)
     k₂′=unique(k₂)
     println("k₁₊: ",[(k₁′[i]+k₁′[i+1])/2 for i ∈ 1:(length(k₁′)-1)])
     println("k₂₊: ",[(k₂′[i]+k₂′[i+1])/2 for i ∈ 1:(length(k₂′)-1)])
-
     return nothing
 end
 

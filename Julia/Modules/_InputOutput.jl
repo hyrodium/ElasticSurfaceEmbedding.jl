@@ -153,11 +153,26 @@ function loadM(; index=0)
     return M
 end
 
-function LoadResultDict()
+function LoadResultDict() :: Dict
     f=open(DIR*"/"*NAME*".json","r")
     dict=JSON.parse(f)
     close(f)
     return dict
+end
+
+function SaveResultDict(dict::Dict)
+    mkpath(DIR)
+    open(DIR*"/"*NAME*".json","w") do f
+        JSON.print(f, dict, 4)
+    end
+    PrintResultDict(dict)
+    return nothing
+end
+
+function PrintResultDict(dict::Dict)
+    treestring = TreeString(dict["Result"])
+    println(treestring)
+    SlackString("```\n"*treestring*"```")
 end
 
 function Export(M::BSplineManifold, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
@@ -173,11 +188,8 @@ function Export(M::BSplineManifold, parent::Int; comment="", maximumstrain=MAXIM
     dict["Result"][string(index)]=Dict{String,Any}("parent" => string(parent))
     dict["Result"][string(index)]["bsplinemanifold"]=toJSON(M)
     dict["Result"][string(index)]["comment"]=comment
-    mkpath(DIR)
-    open(DIR*"/"*NAME*".json","w") do f
-        JSON.print(f, dict,4)
-    end
-    println(TreeString(dict["Result"]))
+
+    SaveResultDict(dict)
 
     if maximumstrain==0.0
         MS=ComputeMaximumStrain(index=index)
@@ -235,7 +247,6 @@ function ExportFiles(M::BSplineManifold,MaximumStrain,index;Name=NAME,Dir=DIR,Up
         # append png imgs
         run(pipeline(`convert +append $(Dir*"/slack/"*Name*"-"*string(index)*"_Bspline.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_strain.png") $(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")`, stdout=devnull, stderr=devnull))
 
-        SlackString("```\n"*TreeString(dict["Result"])*"```")
         SlackFile(Dir*"/slack/"*Name*"-"*string(index)*"_append.png")
     end
 end
