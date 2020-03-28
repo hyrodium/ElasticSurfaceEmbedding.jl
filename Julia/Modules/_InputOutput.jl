@@ -129,16 +129,26 @@ function isTheShapeComputed()
     return isfile(DIR*"/"*NAME*".json")
 end
 
-function Parent(index::Int)
+function NewestIndex(; dict::Union{Dict,Nothing}=nothing)
+    if dict isa Nothing
+        dict=LoadResultDict()
+    end
+    result_nums = [parse(Int, i) for i in keys(dict["Result"])]
+    return maximum(result_nums)
+end
+
+function Parent(index::Union{Int,Nothing})
     dict=LoadResultDict()
     if index==0
-        return length(keys(dict["Result"]))
+        return NewestIndex()
+    elseif index==nothing
+        return NewestIndex()
     else
         return index
     end
 end
 
-function loadM(; index=0)
+function loadM(; index=0, dict::Union{Dict,Nothing}=nothing)
     if !isTheShapeComputed()
         error("Result file doesn't exists")
     end
@@ -176,16 +186,18 @@ function SaveResultDict(dict::Dict)
     return nothing
 end
 
-function PrintResultDict(dict::Dict)
+function PrintResultDict(dict::Dict; slack=SLACK)
     treestring = TreeString(dict["Result"])
     println(treestring)
-    SlackString("```\n"*treestring*"```")
+    if slack
+        SlackString("```\n"*treestring*"```")
+    end
 end
 
 function Export(M::BSplineManifold, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
     if isTheShapeComputed()
         dict = LoadResultDict()
-        index = Parent(0)+1
+        index = NewestIndex(dict=dict) +1
     else
         dict=Dict{String,Any}("Expr" => EXPR, "Version" => ESE_VERSION)
         dict["Result"] = Dict{String,Any}()

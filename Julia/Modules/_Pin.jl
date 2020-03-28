@@ -1,17 +1,24 @@
 export PinState
 function PinState(; parent::Int=0, tag::String="")
-    if tag==""
-        tag=Dates.format(now(),"yyyy-mm-dd_H-M-S")
+    if tag == ""
+        tag = Dates.format(now(),"yyyy-mm-dd_H-M-S")
     end
     CheckAsFineName(tag)
     if TagExists(tag)
         error("The tag $(tag) is already exists.")
     end
-
+    dict = LoadResultDict()
     parent = Parent(parent)
-    M = loadM(index=parent)
+    M = loadM(index=parent, dict=dict)
+
+    index = NewestIndex(dict=dict)+1
+    dict["Result"][string(index)] = Dict{String,Any}("parent" => string(parent))
+    dict["Result"][string(index)]["bsplinemanifold"] = toJSON(M)
+
     comment = "📌 - tag: "*tag
-    Export(M,parent,comment=comment)
+    dict["Result"][string(index)]["comment"] = comment
+
+    SaveResultDict(dict)
     return nothing
 end
 
@@ -44,7 +51,7 @@ end
 export RemovePin
 function RemovePin(index)::Nothing
     dict = LoadResultDict()
-    tag=GetTag(index)
+    tag = GetTag(index)
     comment = dict["Result"][repr(index)]["comment"]
     comment = replace(comment, "📌" => "💨")
     dict["Result"][repr(index)]["comment"] = comment

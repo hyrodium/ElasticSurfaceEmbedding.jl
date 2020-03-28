@@ -27,19 +27,22 @@ function N′(P₁::BSplineSpace,P₂::BSplineSpace,I₁,I₂,i,u)::Float64
     end
 end
 
+"""
+Affine transform of control points.
+"""
 function affine(𝒂::Array{Float64,3},A::Array{Float64,2},b::Array{Float64,1})::Array{Float64,3}
     #x'=Ax+b
-    n₁,n₂,_=size(𝒂)
+    n₁, n₂, d = size(𝒂)
     return [(A*𝒂[I₁,I₂,:]+b)[i] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
 end
 
 function Positioning(𝒂::Array{Float64,3})::Array{Float64,3} # 制御点の位置調整
-    n₁,n₂,_=size(𝒂)
-    ind0=[(n₁+1)÷2,(n₂+1)÷2]
-    ind1=ind0-[0,1]
-    v=𝒂[ind1...,:]-𝒂[ind0...,:]
-    R=-[v[2] -v[1];v[1] v[2]]/norm(v)
-    return 𝒂=affine(𝒂,R,-R*𝒂[ind0...,:])
+    n₁, n₂, _ = size(𝒂)
+    ind0 = [(n₁+1)÷2,(n₂+1)÷2]
+    ind1 = ind0-[0,1]
+    v = 𝒂[ind1...,:]-𝒂[ind0...,:]
+    R = -[v[2] -v[1];v[1] v[2]]/norm(v)
+    return affine(𝒂,R,-R*𝒂[ind0...,:])
 end
 
 function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置調整
@@ -49,11 +52,11 @@ function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置�
         error("dimension does not match")
     end
 
-    p¹,p²=p=[M.bsplinespaces[i].degree for i ∈ 1:2]
-    k¹,k²=k=[M.bsplinespaces[i].knots for i ∈ 1:2]
+    p¹, p² = p = [M.bsplinespaces[i].degree for i ∈ 1:d]
+    k¹, k² = k = [M.bsplinespaces[i].knots for i ∈ 1:d]
 
-    n₁,n₂,_=size(𝒂)
-    𝒂′=Positioning(𝒂)
+    n₁, n₂, _ = size(𝒂)
+    𝒂′ = Positioning(𝒂)
     return BSplineManifold(𝒫s,𝒂′)
 end
 
@@ -138,19 +141,19 @@ B̃(D₂,t)=dot(e⁽⁰⁾₂(c(D₂,t)),𝒑₂₍₀₎(c(D₂,t)))*width(D₂
 function 𝒑′₍ₜ₎(M::BSplineManifold,u)
     P₁,P₂=M.bsplinespaces
     𝒂=M.controlpoints
-    n₁,n₂,_=size(𝒂)
+    n₁, n₂, _ = size(𝒂)
     return [sum(N′(P₁,P₂,I₁,I₂,j,u)*𝒂[I₁,I₂,i] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:d, j ∈ 1:d]
 end
 function 𝒑₁₍ₜ₎(M::BSplineManifold,u)
     P₁,P₂=M.bsplinespaces
     𝒂=M.controlpoints
-    n₁,n₂,_=size(𝒂)
+    n₁, n₂, _ = size(𝒂)
     return sum(N′(P₁,P₂,I₁,I₂,1,u)*𝒂[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
 end
 function 𝒑₂₍ₜ₎(M::BSplineManifold,u)
     P₁,P₂=M.bsplinespaces
     𝒂=M.controlpoints
-    n₁,n₂,_=size(𝒂)
+    n₁, n₂, _ = size(𝒂)
     return sum(N′(P₁,P₂,I₁,I₂,2,u)*𝒂[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
 end
 g₍ₜ₎(M,u)=𝒑′₍ₜ₎(M,u)'𝒑′₍ₜ₎(M,u) # 第1基本量
