@@ -1,7 +1,7 @@
 using ForwardDiff
 
 # BSpline
-function FittingBSpline(f, P::BSplineSpace; nip=NIP)::Array{Float64} # 1-dimensional
+function FittingBSpline(f, P::BSplineSpace; nip=NIP) # 1-dimensional
     p=P.degree
     k=P.knots
     D=k[1+p]..k[end-p]
