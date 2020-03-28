@@ -252,6 +252,18 @@ function ExportFiles(M::BSplineManifold,MaximumStrain,index;Name=NAME,Dir=DIR,Up
 end
 
 
+export ComputedShapes
+"""
+    ComputedShapes()
+
+show and return the computed shapes.
+"""
+function ComputedShapes()
+    shapes = Base.Filesystem.readdir(ElasticSurfaceEmbedding.OUT_DIR)
+    println(shapes)
+    return shapes
+end
+
 
 # TODO
 # export ReDraw

@@ -50,7 +50,7 @@ end
 function SvgCurve(𝒑,I::ClosedInterval;filename="BCA.svg",up=5,down=-5,right=5,left=-5,thickness=1,mesh=50,unitlength=(100,"pt"))
     k=collect(range(endpoints(I)...,length=mesh+1))
     n=length(k)-1
-    step, unit=(unitlength[1],unitlength[2])
+    step, unit = unitlength[1], unitlength[2]
     Drawing((right-left)*step,(up-down)*step,filename)
 
     Luxor.origin(-left*step,up*step)

@@ -45,3 +45,5 @@ D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
 
 # %%
 Settings("XXX004",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
+
+ComputedShapes()
