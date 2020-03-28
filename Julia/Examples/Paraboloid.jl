@@ -18,8 +18,8 @@ using ElasticSurfaceEmbedding
 D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
 
 # %%
-Settings("X004",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
-InitialConfiguration(D(1,10))
+Settings("Paraboloid_a",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
+InitialConfiguration(D(2,10))
 NewtonMethodIteration(fixingmethod=:FixThreePoints)
 NewtonMethodIteration()
 SplineRefinement(p₊=[0,1],k₊=[Knots([]),Knots([(1-1/2)/10])],parent=1)
@@ -43,6 +43,7 @@ ExportPinnedStates(unitlength=(100,"mm"))
 @ParametricMapping 𝒑₍₀₎(u)=[u...,u[1]*u[2]]
 D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
 
+𝒑₍₀₎(u)=[u...,u[1]*u[2]] # This is prohibited action.
 # %%
 Settings("XXX004",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
 

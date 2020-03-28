@@ -154,10 +154,17 @@ function loadM(; index=0)
 end
 
 function LoadResultDict() :: Dict
-    f=open(DIR*"/"*NAME*".json","r")
-    dict=JSON.parse(f)
+    f = open(DIR*"/"*NAME*".json","r")
+    dict = JSON.parse(f)
     close(f)
-    return dict
+    v = dict["Version"]
+    JSON_VERSION = VersionNumber(v["major"],v["minor"],v["patch"])
+
+    if JSON_VERSION.major == ESE_VERSION.major
+        return dict
+    else
+        error("The version of computed shape is not supported.")
+    end
 end
 
 function SaveResultDict(dict::Dict)
@@ -177,37 +184,37 @@ end
 
 function Export(M::BSplineManifold, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
     if isTheShapeComputed()
-        dict=LoadResultDict()
-        index=Parent(0)+1
+        dict = LoadResultDict()
+        index = Parent(0)+1
     else
-        dict=Dict{String,Any}("Expr" => EXPR)
-        dict["Result"]=Dict{String,Any}()
-        index=1
+        dict=Dict{String,Any}("Expr" => EXPR, "Version" => ESE_VERSION)
+        dict["Result"] = Dict{String,Any}()
+        index = 1
     end
 
-    dict["Result"][string(index)]=Dict{String,Any}("parent" => string(parent))
-    dict["Result"][string(index)]["bsplinemanifold"]=toJSON(M)
-    dict["Result"][string(index)]["comment"]=comment
+    dict["Result"][string(index)] = Dict{String,Any}("parent" => string(parent))
+    dict["Result"][string(index)]["bsplinemanifold"] = toJSON(M)
+    dict["Result"][string(index)]["comment"] = comment
 
     SaveResultDict(dict)
 
-    if maximumstrain==0.0
-        MS=ComputeMaximumStrain(index=index)
-        MaximumStrain=max(-MS[1],MS[2])
+    if maximumstrain == 0.0
+        MS = ComputeMaximumStrain(index=index)
+        MaximumStrain = max(-MS[1],MS[2])
     else
-        MaximumStrain=maximumstrain
+        MaximumStrain = maximumstrain
     end
 
     if distributed
-        @spawnat 1 ExportFiles(M,MaximumStrain,index)
+        @spawnat 1 ExportFiles(M, MaximumStrain, index)
     else
-        ExportFiles(M,MaximumStrain,index)
+        ExportFiles(M, MaximumStrain, index)
     end
 
     return nothing
 end
 
-function ExportFiles(M::BSplineManifold,MaximumStrain,index;Name=NAME,Dir=DIR,Up=UP,Down=DOWN,Right=RIGHT,Left=LEFT,Mesh=MESH,Unit=UNIT,Slack=SLACK)
+function ExportFiles(M::BSplineManifold, MaximumStrain, index; Name=NAME, Dir=DIR, Up=UP, Down=DOWN, Right=RIGHT, Left=LEFT, Mesh=MESH, Unit=UNIT, Slack=SLACK)
     mkpath(DIR*"/nurbs")
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
@@ -215,15 +222,15 @@ function ExportFiles(M::BSplineManifold,MaximumStrain,index;Name=NAME,Dir=DIR,Up
     dict=LoadResultDict()
     BSplineSvg(M,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
     𝒂 = M.controlpoints
-    P₁,P₂=P=M.bsplinespaces
-    p₁,p₂=p=P₁.degree,P₂.degree
-    k₁,k₂=k=P₁.knots,P₂.knots
-    D₁,D₂=D=k₁[1+p₁]..k₁[end-p₁],k₂[1+p₂]..k₂[end-p₂]
+    P₁,P₂ = P = M.bsplinespaces
+    p₁,p₂ = p = P₁.degree,P₂.degree
+    k₁,k₂ = k = P₁.knots,P₂.knots
+    D₁,D₂ = D = k₁[1+p₁]..k₁[end-p₁],k₂[1+p₂]..k₂[end-p₂]
 
-    Width=(Right-Left)*Unit[1]
-    Height=(Up-Down)*Unit[1]
+    Width = (Right-Left)*Unit[1]
+    Height = (Up-Down)*Unit[1]
 
-    rgb(u)=E⁽⁰⁾₁₁(M,u)*[1,-1,-1]/(2*MaximumStrain) .+0.5
+    rgb(u) = E⁽⁰⁾₁₁(M,u)*[1,-1,-1]/(2*MaximumStrain) .+0.5
     # draw strain distribution (6000x6000)
     ParametricColor(u->𝒑₍ₜ₎(M,u),D,rgb=rgb,filename=Dir*"/strain/"*Name*"-"*string(index)*"_strain.png",up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=5*Unit[1])
     ColorBar(max=MaximumStrain,filename=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png",width=Width)
