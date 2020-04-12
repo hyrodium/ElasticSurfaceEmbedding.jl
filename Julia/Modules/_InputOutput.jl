@@ -218,7 +218,8 @@ function Export(M::BSplineManifold, parent::Int; comment="", maximumstrain=MAXIM
     end
 
     if distributed
-        @spawnat 1 ExportFiles(M, MaximumStrain, index)
+        # @spawnat 1 ExportFiles(M, MaximumStrain, index)
+        ExportFiles(M, MaximumStrain, index)
     else
         ExportFiles(M, MaximumStrain, index)
     end
@@ -232,7 +233,7 @@ function ExportFiles(M::BSplineManifold, MaximumStrain, index; Name=NAME, Dir=DI
     mkpath(DIR*"/colorbar")
 
     dict=LoadResultDict()
-    BSplineSvg(M,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
+    BSplineSvg2(M,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
     𝒂 = M.controlpoints
     P₁,P₂ = P = M.bsplinespaces
     p₁,p₂ = p = P₁.degree,P₂.degree
