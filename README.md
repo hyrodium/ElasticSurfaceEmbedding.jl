@@ -1,4 +1,4 @@
-# Elastic Surface Embedding
+# Elastic Surface Embedding; Weaving Parer Strips
 
 ## TL;DR
 You can make a *holdable* smooth surface model with this repository.
