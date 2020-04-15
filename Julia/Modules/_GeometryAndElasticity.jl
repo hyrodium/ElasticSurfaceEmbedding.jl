@@ -1,7 +1,5 @@
 using ForwardDiff
 
-
-
 # Reference State
 𝒑′₍₀₎(u) = ForwardDiff.jacobian(Main.𝒑₍₀₎,u) # Tangent vector
 𝒑₁₍₀₎(u) = ForwardDiff.derivative(u₁->Main.𝒑₍₀₎([u₁,u[2]]),u[1])
