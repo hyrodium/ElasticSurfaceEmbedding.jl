@@ -5,7 +5,6 @@
 * parametric mapping
 * its domain
 
-
 ### Output
 * Slack export
 * (Result directory)
@@ -25,6 +24,8 @@ In this repository, Julia is for numerical analysis of surface embedding.
     * DifferentialEquations
     * FastGaussQuadrature
     * JSON
+	* Images
+	* ImageMagick (for linux)
 * Slack (optional)
     * Incoming webhook URL
     * OAuth access token
