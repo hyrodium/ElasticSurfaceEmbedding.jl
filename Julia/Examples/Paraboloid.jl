@@ -1,6 +1,6 @@
 # %% if use Distibuted
 using Distributed
-addprocs(13);
+addprocs(10);
 @everywhere push!(LOAD_PATH, "Julia/Modules")
 
 # %% if do not use Distibuted
@@ -18,11 +18,11 @@ using ElasticSurfaceEmbedding
 D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
 
 # %%
-Settings("Paraboloid_a",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
+Settings("Paraboloid_m",up=2,down=-2,right=2,left=-2,mesh=(20,1),unit=200,slack=true)
 InitialConfiguration(D(1,10))
 NewtonMethodIteration(fixingmethod=:FixThreePoints)
 NewtonMethodIteration()
-SplineRefinement(p₊=[0,1],k₊=[Knots([]),Knots([(1-1/2)/10])],parent=1)
+SplineRefinement(p₊=[0,1],k₊=[Knots([]),Knots([(1-1/2)/10])])
 SplineRefinement(p₊=[0,1],k₊=[Knots([]),Knots([(3-1/2)/10])],parent=1)
 NewtonMethodIteration(parent=2)
 NewtonMethodIteration()
@@ -50,3 +50,11 @@ D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
 Settings("XXX004",up=3,down=-3,right=3,left=-3,mesh=(20,1),unit=200,slack=true)
 
 ComputedShapes()
+
+ElasticSurfaceEmbedding.SlackFile("/home/hyrodium/Git/julia-training/003_Images/img.png")
+ElasticSurfaceEmbedding.SlackFile("/home/hyrodium/Downloads/7colors_square.png")
+ElasticSurfaceEmbedding.SlackString("https://imgur.com/j4LDwVM")
+
+ElasticSurfaceEmbedding.SlackString("Hello World!")
+
+exit()

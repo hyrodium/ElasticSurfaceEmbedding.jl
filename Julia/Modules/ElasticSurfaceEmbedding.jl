@@ -10,6 +10,7 @@ using BSpline
 
 include("_Constants.jl")
 include("_NumericalIntegral.jl")
+include("_Images.jl")
 include("_Slack.jl")
 include("_BSpline.jl")
 include("_GeometryAndElasticity.jl")
