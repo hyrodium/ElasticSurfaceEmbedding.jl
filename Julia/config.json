@@ -3,8 +3,8 @@
 	"Default Number of Integration Points": 10,
 	"Output Directory": "~/ElasticSurfaceEmbedding-Result/",
 	"Slack":{
-		"Incoming Webhook Url": "https://hooks.slack.com/services/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",
-		"OAuth Access Token": "xoxp-587883028310-587883028694-622674491761-a37533ee7606e19d2216a6a88f185641",
-		"Channel ID": "CJK5ALKJS"
+		"Incoming Webhook Url": "https://hooks.slack.com/services/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",
+		"OAuth Access Token": "xoxb-1018669471475-1056240006178-dMLt4osKWMZ8QbQCirODnqtT",
+		"Channel ID": "C010HSTF9LJ"
 	}
 }

@@ -3,7 +3,7 @@ function PinState(; parent::Int=0, tag::String="")
     if tag == ""
         tag = Dates.format(now(),"yyyy-mm-dd_H-M-S")
     end
-    CheckAsFineName(tag)
+    CheckAsFileName(tag)
     if TagExists(tag)
         error("The tag $(tag) is already exists.")
     end
