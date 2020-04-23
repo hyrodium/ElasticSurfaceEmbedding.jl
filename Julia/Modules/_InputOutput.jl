@@ -261,54 +261,30 @@ function ExportFiles(M::BSplineManifold, MaximumStrain::Real, index; Name::Strin
     ParametricColor(u->𝒑₍ₜ₎(M,u),D,rgb=rgb,filename=path_png_strain,up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=aa*Unit[1])
     ColorBar(max=MaximumStrain,filename=path_png_colorbar,width=aa*cb*Width)
 
-    if true
-        img_nurbs = load(path_png_nurbs)
-        img_strain = load(path_png_strain)
-        img_colorbar = load(path_png_colorbar)
+    img_nurbs = load(path_png_nurbs)
+    img_strain = load(path_png_strain)
+    img_colorbar = load(path_png_colorbar)
 
-        img_nurbs = convert(Array{RGB{Float64},2},img_nurbs)
-        img_strain = convert(Array{RGBA{Float64},2},img_strain)
-        img_colorbar = convert(Array{RGBA{Float64},2},img_colorbar)
+    img_nurbs = convert(Array{RGB{Float64},2},img_nurbs)
+    img_strain = convert(Array{RGBA{Float64},2},img_strain)
+    img_colorbar = convert(Array{RGBA{Float64},2},img_colorbar)
 
-        size_nurbs = size(img_nurbs)
-        size_strain = size(img_strain)
-        size_colorbar = size(img_colorbar)
+    size_nurbs = size(img_nurbs)
+    size_strain = size(img_strain)
+    size_colorbar = size(img_colorbar)
 
-        img_strain_white_background = img_strain ./ RGB(1,1,1)
-        Δ = collect(size_strain) - collect(size_colorbar)
+    img_strain_white_background = img_strain ./ RGB(1,1,1)
+    Δ = collect(size_strain) - collect(size_colorbar)
 
-        img_offset_colorbar = OffsetArray(img_colorbar, Δ...)
-        img_strain_with_colorbar = copy(img_strain_white_background)
-        img_strain_with_colorbar[axes(img_offset_colorbar)...] = img_offset_colorbar ./ img_strain_with_colorbar[axes(img_offset_colorbar)...]
-        img_strain_with_colorbar = [RGB(mean(img_strain_with_colorbar[5i-4:5i,5j-4:5j])) for i in 1:800, j in 1:800]
-        # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but previous one is better for anti-alias
-        img_append = hcat(img_nurbs, img_strain_with_colorbar)
+    img_offset_colorbar = OffsetArray(img_colorbar, Δ...)
+    img_strain_with_colorbar = copy(img_strain_white_background)
+    img_strain_with_colorbar[axes(img_offset_colorbar)...] = img_offset_colorbar ./ img_strain_with_colorbar[axes(img_offset_colorbar)...]
+    img_strain_with_colorbar = [RGB(mean(img_strain_with_colorbar[5i-4:5i,5j-4:5j])) for i in 1:800, j in 1:800]
+    # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but previous one is better for anti-alias
+    img_append = hcat(img_nurbs, img_strain_with_colorbar)
 
-        isfile(path_png_append)
-        save(path_png_append, img_append)
-
-    else # run imagemagick command
-        path_png_nurbs=Dir*"/nurbs/"*Name*"-"*string(index)*"_BsplineImageMagick.png"
-        path_strain_with_colorbar=Dir*"/strain/"*Name*"-"*string(index)*"_swc.png"
-        path_append_bspline=Dir*"/append/"*Name*"-"*string(index)*"_Bspline.png"
-        path_append_strain=Dir*"/append/"*Name*"-"*string(index)*"_strain.png"
-
-        # 1200x1200
-        # svg to png (1600x1600)
-        run(pipeline(`convert $(path_svg_nurbs) $(path_png_nurbs)`, stdout=devnull, stderr=devnull))
-        # add colorbar to strain distribution figure (6000x6000)
-        run(pipeline(`convert $(path_png_strain) $(path_png_strain) -gravity southeast -compose over -composite $(path_strain_with_colorbar)`, stdout=devnull, stderr=devnull))
-
-        # resize png
-        # (1200x1200)
-        run(pipeline(`convert -resize $(Width)x$(Height) -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(path_png_nurbs) $(path_append_bspline)`, stdout=devnull, stderr=devnull))
-        # (1200x1200)
-        run(pipeline(`convert -resize $(Width)x$(Height) -unsharp 2x1.4+0.5+0 -quality 100 -verbose $(path_strain_with_colorbar) $(path_append_strain)`, stdout=devnull, stderr=devnull))
-        # ()
-        run(pipeline(`convert $(path_append_strain)  \( +clone -alpha opaque -fill white -colorize 100% \) +swap -geometry +0+0 -compose Over -composite -alpha off $(path_append_strain)`, stdout=devnull, stderr=devnull))
-        # append png imgs
-        run(pipeline(`convert +append $(path_append_bspline) $(path_append_strain) $(path_png_append)`, stdout=devnull, stderr=devnull))
-    end
+    isfile(path_png_append)
+    save(path_png_append, img_append)
 
     if Slack
         SlackFile(path_png_append, comment=Name*"-"*string(index))
