@@ -18,7 +18,7 @@ function CheckAsFileName(name::String)
 end
 
 export Settings
-function Settings(name::String; up::Real=5, down::Real=-5, right::Real=5, left::Real=-5, mesh::Tuple{Int,Int}=(10,1), unit::Real=100, slack::Bool=true, maximumstrain::Real=0.0)
+function Settings(name::String; up::Real=5, down::Real=-5, right::Real=5, left::Real=-5, mesh::Tuple{Int,Int}=(10,1), unit::Real=100, slack::Bool=true, maximumstrain::Real=0.0, colorbarsize::Float64=0.2)
     CheckAsFileName(name)
     global NAME=name
     global DIR=OUT_DIR*NAME
@@ -30,6 +30,7 @@ function Settings(name::String; up::Real=5, down::Real=-5, right::Real=5, left::
     global UNIT=(unit,"pt")
     global SLACK=slack
     global MAXIMUMSTRAIN=maximumstrain
+    global COLORBARSIZE=colorbarsize
     if isTheShapeComputed()
         dict=LoadResultDict()
         println(TreeString(dict["Result"]))
@@ -227,7 +228,7 @@ function Export(M::BSplineManifold, parent::Int; comment="", maximumstrain=MAXIM
     return nothing
 end
 
-function ExportFiles(M::BSplineManifold, MaximumStrain::Real, index; Name::String=NAME, Dir=DIR, Up=UP, Down=DOWN, Right=RIGHT, Left=LEFT, Mesh=MESH, Unit=UNIT, Slack::Bool=SLACK)
+function ExportFiles(M::BSplineManifold, MaximumStrain::Real, index; Name::String=NAME, Dir=DIR, Up=UP, Down=DOWN, Right=RIGHT, Left=LEFT, Mesh=MESH, Unit=UNIT, Slack::Bool=SLACK, Colorbarsize=COLORBARSIZE)
     mkpath(DIR*"/nurbs")
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
@@ -244,11 +245,9 @@ function ExportFiles(M::BSplineManifold, MaximumStrain::Real, index; Name::Strin
     Width = (Right-Left)*Unit[1]
     Height = (Up-Down)*Unit[1]
 
-    rgb(u) = E⁽⁰⁾₁₁(M,u)*[1,-1,-1]/(2*MaximumStrain) .+0.5
-    # draw strain distribution (6000x6000)
+    rgb(u) = E⁽⁰⁾₁₁(M,u)*[1,-1,-1]/(2*MaximumStrain) .+0.5 # Red to Cyan
 
     aa = 5 # magnification parameter for antialias
-    cb = 0.2 # colorbar size
 
     path_svg_nurbs=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg"
     path_png_nurbs=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png"
@@ -256,10 +255,10 @@ function ExportFiles(M::BSplineManifold, MaximumStrain::Real, index; Name::Strin
     path_png_colorbar=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png"
     path_png_append=Dir*"/append/"*Name*"-"*string(index)*"_append.png"
 
-    DrawBSpline(M,filename=path_svg_nurbs,up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Int(Unit[1]))
-    DrawBSpline(M,filename=path_png_nurbs,up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Int(Unit[1]))
-    ParametricColor(u->𝒑₍ₜ₎(M,u),D,rgb=rgb,filename=path_png_strain,up=Up,down=Down,right=Right,left=Left,mesh=tuple(10*[Mesh...]...),unit=aa*Unit[1])
-    ColorBar(max=MaximumStrain,filename=path_png_colorbar,width=aa*cb*Width)
+    DrawBSpline(M, filename=path_svg_nurbs, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
+    DrawBSpline(M, filename=path_png_nurbs, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
+    ParametricColor(u->𝒑₍ₜ₎(M,u), D, rgb=rgb,  filename=path_png_strain, up=Up, down=Down, right=Right, left=Left, mesh=tuple(10*[Mesh...]...), unit=aa*Unit[1])
+    ColorBar(max=MaximumStrain, filename=path_png_colorbar, width=aa*Colorbarsize*Width)
 
     img_nurbs = load(path_png_nurbs)
     img_strain = load(path_png_strain)
@@ -283,7 +282,6 @@ function ExportFiles(M::BSplineManifold, MaximumStrain::Real, index; Name::Strin
     # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but previous one is better for anti-alias
     img_append = hcat(img_nurbs, img_strain_with_colorbar)
 
-    isfile(path_png_append)
     save(path_png_append, img_append)
 
     if Slack
