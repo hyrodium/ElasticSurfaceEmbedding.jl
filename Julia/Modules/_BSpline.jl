@@ -30,60 +30,6 @@ function N′(P₁::BSplineSpace,P₂::BSplineSpace,I₁,I₂,i,u)::Float64
     end
 end
 
-
-function BSplineSvg2(M::BSplineManifold; filename="Bspline.svg", up=5, down=-5, right=5, left=-5, zoom=1, mesh=(10,10), unitlength=(100,"pt"), points=true)
-    step, unit = (unitlength[1]*zoom,unitlength[2])
-    Drawing(step*(right-left),step*(up-down),filename)
-
-    Luxor.origin(-step*left,step*up)
-    setline(zoom)
-    background("white")
-
-    p¹,p² = p = [M.bsplinespaces[i].degree for i ∈ 1:2]
-    k¹,k² = k = [M.bsplinespaces[i].knots for i ∈ 1:2]
-    𝒂 = M.controlpoints
-
-    n¹,n² = n = length.(k)-p.-1
-    𝒑(u) = Mapping(M,u)
-
-    K¹,K² = K = [unique(k[i][1+p[i]:end-p[i]]) for i ∈ 1:2]
-    N¹,N² = length.(K).-1
-    m¹,m² = mesh
-
-    sethue(1,.5,.5)
-    drawbezierpath(BezierPath(vcat(
-        [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u¹->𝒑([u¹,K²[1]]),K¹[i],K¹[i+1]))...) for i ∈ 1:N¹],
-        [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u²->𝒑([K¹[end],u²]),K²[i],K²[i+1]))...) for i ∈ 1:N²],
-        [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u¹->𝒑([u¹,K²[end]]),K¹[end-i+1],K¹[end-i]))...) for i ∈ 1:N¹],
-        [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u²->𝒑([K¹[1],u²]),K²[end-i+1],K²[end-i]))...) for i ∈ 1:N²]
-    )),:fill,close=true)
-
-    sethue("red")
-    for u¹ ∈ range(K¹[1],stop=K¹[end],length=m¹+1)
-        drawbezierpath(BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(u²->𝒑([u¹,u²]),K²[i],K²[i+1]))...) for i ∈ 1:N²]),:stroke)
-    end
-    for u² ∈ range(K²[1],stop=K²[end],length=m²+1)
-        drawbezierpath(BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(u¹->𝒑([u¹,u²]),K¹[i],K¹[i+1]))...) for i ∈ 1:N¹]),:stroke)
-    end
-
-    if points
-        sethue("black")
-        setline(zoom)
-        CtrlPts = [LxrPt(𝒂[i,j,:],step) for i ∈ 1:size(𝒂)[1], j ∈ 1:size(𝒂)[2]]
-        map(p->circle(p,3*zoom,:fill), CtrlPts)
-        for i ∈ 1:n¹
-            poly(CtrlPts[i,:], :stroke)
-        end
-        for j ∈ 1:n²
-            poly(CtrlPts[:,j], :stroke)
-        end
-    end
-
-    finish()
-    ChangeUnit(filename,"pt",unit)
-    return nothing
-end
-
 function DrawBSpline(M::BSplineManifold; filename="Bspline.svg", up=5, down=-5, right=5, left=-5, zoom=1, mesh=(10,10), unitlength=100, points=true)
     step = unitlength
     p¹,p² = p = [M.bsplinespaces[i].degree for i ∈ 1:2]
@@ -191,7 +137,7 @@ function SplineRefinement( ;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knot
     end
 
     comment="Refinement - p₊:"*string(p₊)*", k₊:"*string([k₊₁.vector, k₊₂.vector])
-    M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
+    M=Refinement(M,p₊=p₊,k₊=k₊)
     Export(M,parent,comment=comment)
     return nothing
 end

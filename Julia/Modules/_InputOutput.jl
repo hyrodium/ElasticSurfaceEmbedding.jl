@@ -235,7 +235,6 @@ function ExportFiles(M::BSplineManifold, MaximumStrain::Real, index; Name::Strin
     mkpath(DIR*"/append")
 
     dict=LoadResultDict()
-    # BSplineSvg2(M,filename=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg",up=Up,down=Down,right=Right,left=Left,mesh=Mesh,unitlength=Unit)
     𝒂 = M.controlpoints
     P₁,P₂ = P = M.bsplinespaces
     p₁,p₂ = p = P₁.degree,P₂.degree
