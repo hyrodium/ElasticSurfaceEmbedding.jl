@@ -191,7 +191,7 @@ function SplineRefinement( ;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knot
     end
 
     comment="Refinement - p₊:"*string(p₊)*", k₊:"*string([k₊₁.vector, k₊₂.vector])
-    M=BSpline.Refinement(M,p₊=p₊,k₊=k₊)
+    M=Refinement(M,p₊=p₊,k₊=k₊)
     Export(M,parent,comment=comment)
     return nothing
 end

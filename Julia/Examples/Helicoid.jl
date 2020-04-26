@@ -3,7 +3,7 @@ addprocs(1);
 @everywhere push!(LOAD_PATH, "Modules")
 using IntervalSets
 using Printf
-using BSpline
+using BasicBSpline
 using ElasticSurfaceEmbedding
 
 @ParametricMapping 𝒑₍₀₎(u)=[cos(u[2])*sinh(u[1]),sin(u[2])*sinh(u[1]),u[2]]

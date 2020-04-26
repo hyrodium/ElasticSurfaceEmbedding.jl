@@ -6,7 +6,7 @@ using IntervalSets
 using JSON
 using Distributed
 
-using BSpline
+using BasicBSpline
 
 include("_Constants.jl")
 include("_NumericalIntegral.jl")
