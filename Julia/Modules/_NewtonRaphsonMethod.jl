@@ -29,7 +29,6 @@ AbbStr(t::Vector{Period}) = *(AbbStr.(t)...)[1:end-1]
 
 function SecondsToString(Δt::Float64)
     prds=Dates.canonicalize(Dates.CompoundPeriod(Dates.Millisecond(floor(1000Δt)))).periods
-    println(prds)
     return AbbStr(prds)
 end
 

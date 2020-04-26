@@ -3,7 +3,7 @@ addprocs(1);
 @everywhere push!(LOAD_PATH, "Modules")
 using IntervalSets
 using Printf
-using BSpline
+using BasicBSpline
 using ElasticSurfaceEmbedding
 @everywhere using LinearAlgebra
 

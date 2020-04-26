@@ -41,6 +41,6 @@ function InitBs(D,n₁;nip=NIP)::BSplineManifold
     P₂=BSplineSpace(p₂,k₂)
     𝒂=[[a1[I₁][i],a2[I₁][i]][I₂] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂, i ∈ 1:d]
     M=BSplineManifold([P₁,P₂],𝒂)
-    M′=BSpline.Refinement(M,p₊=[0,1])
+    M′=Refinement(M,p₊=[0,1])
     return Positioning(M′)
 end
