@@ -1,5 +1,8 @@
 using FastGaussQuadrature
 
+"""
+Numerical Integrate in 2-dimension.
+"""
 function GaussianQuadrature(f,D₁,D₂;nip=NIP)
     nodes, weights = gausslegendre(nip)
     return sum(
@@ -10,6 +13,9 @@ function GaussianQuadrature(f,D₁,D₂;nip=NIP)
     ])*width(D₁)*width(D₂)/4
 end
 
+"""
+Numerical Integrate in 1-dimension.
+"""
 function GaussianQuadrature(f,D;nip=NIP)
     nodes, weights = gausslegendre(nip)
     return sum(

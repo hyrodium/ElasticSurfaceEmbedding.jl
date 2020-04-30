@@ -1,3 +1,6 @@
+# The Package ColorBlendModes might work better than the code below, I guess.
+# https://github.com/kimikage/ColorBlendModes.jl
+
 import Images
 import Images.load
 import Images.save
