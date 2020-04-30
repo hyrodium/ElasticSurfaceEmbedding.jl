@@ -1,9 +1,9 @@
 using FastGaussQuadrature
 
 """
-Numerical Integrate in 2-dimension.
+Numerical integral in 2-dimension.
 """
-function GaussianQuadrature(f,D₁,D₂;nip=NIP)
+function GaussianQuadrature(f::Function, D₁::ClosedInterval, D₂::ClosedInterval ;nip=NIP)
     nodes, weights = gausslegendre(nip)
     return sum(
     (weights*weights').*
@@ -14,9 +14,9 @@ function GaussianQuadrature(f,D₁,D₂;nip=NIP)
 end
 
 """
-Numerical Integrate in 1-dimension.
+Numerical integral in 1-dimension.
 """
-function GaussianQuadrature(f,D;nip=NIP)
+function GaussianQuadrature(f::Function, D::ClosedInterval; nip=NIP)
     nodes, weights = gausslegendre(nip)
     return sum(
     weights.*
