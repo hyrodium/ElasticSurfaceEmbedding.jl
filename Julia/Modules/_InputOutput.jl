@@ -48,21 +48,21 @@ end
 function toJSON(k::Knots)
     return k.vector
 end
-function toJSON(P::BSplineSpace)
-    return Dict("degree"=>P.degree, "knots"=>toJSON(P.knots))
+function toJSON(P::FastBSplineSpace)
+    return Dict("degree"=>degree(P), "knots"=>toJSON(knots(P)))
 end
-function toJSON(P::Array{BSplineSpace,1})
+function toJSON(P::Array{P,1} where P <: FastBSplineSpace)
     return convert(Array{Any,1}, toJSON.(P))
 end
 function toJSON(𝒂::Array{Float64})
     return convert(Array{Any,1}, 𝒂[:])
 end
-function toJSON(M::BSplineManifold)
+function toJSON(M::FastBSplineManifold)
     return Dict("bsplinespaces"=>toJSON(M.bsplinespaces), "controlpoints"=>toJSON(M.controlpoints))
 end
 
 function JSONtoBSplineSpace(jP::Dict)
-    return BSplineSpace(jP["degree"],Knots(jP["knots"]))
+    return FastBSplineSpace(jP["degree"],Knots(jP["knots"]))
 end
 function JSONtoBSplineSpaces(jPs::Array)
     return [JSONtoBSplineSpace(jP) for jP ∈ jPs]
@@ -72,11 +72,11 @@ function JSONtoControlPoints(j𝒂, dims)
     d = length(j𝒂) ÷ n
     return reshape(convert(Array{Float64},j𝒂),dims...,d)
 end
-function JSONtoBSplineManifold(dict::Dict)
+function JSONtoFastBSplineManifold(dict::Dict)
     P = JSONtoBSplineSpaces(dict["bsplinespaces"])
     dims = dim.(P)
     𝒂 = JSONtoControlPoints(dict["controlpoints"], dims)
-    return BSplineManifold(P,𝒂)
+    return FastBSplineManifold(P,𝒂)
 end
 
 function NodeSeries(tree::Dict,node)
@@ -160,7 +160,7 @@ function loadM(; index=0, dict::Union{Dict,Nothing}=nothing)
         # error("The definition of 𝒑₍₀₎(u) has been changed")
     end
     index=Parent(index)
-    M=JSONtoBSplineManifold(dict["Result"][string(index)]["bsplinemanifold"])
+    M=JSONtoFastBSplineManifold(dict["Result"][string(index)]["FastBSplineManifold"])
     return M
 end
 
@@ -195,7 +195,7 @@ function PrintResultDict(dict::Dict; slack=SLACK)
     end
 end
 
-function Export(M::BSplineManifold, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
+function Export(M::FastBSplineManifold, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
     if isTheShapeComputed()
         dict = LoadResultDict()
         index = NewestIndex(dict=dict) +1
@@ -206,7 +206,7 @@ function Export(M::BSplineManifold, parent::Int; comment="", maximumstrain=MAXIM
     end
 
     dict["Result"][string(index)] = Dict{String,Any}("parent" => string(parent))
-    dict["Result"][string(index)]["bsplinemanifold"] = toJSON(M)
+    dict["Result"][string(index)]["FastBSplineManifold"] = toJSON(M)
     dict["Result"][string(index)]["comment"] = comment
 
     SaveResultDict(dict)
@@ -228,7 +228,7 @@ function Export(M::BSplineManifold, parent::Int; comment="", maximumstrain=MAXIM
     return nothing
 end
 
-function ExportFiles(M::BSplineManifold, MaximumStrain::Real, index; Name::String=NAME, Dir=DIR, Up=UP, Down=DOWN, Right=RIGHT, Left=LEFT, Mesh=MESH, Unit=UNIT, Slack::Bool=SLACK, Colorbarsize=COLORBARSIZE)
+function ExportFiles(M::FastBSplineManifold, MaximumStrain::Real, index; Name::String=NAME, Dir=DIR, Up=UP, Down=DOWN, Right=RIGHT, Left=LEFT, Mesh=MESH, Unit=UNIT, Slack::Bool=SLACK, Colorbarsize=COLORBARSIZE)
     mkpath(DIR*"/nurbs")
     mkpath(DIR*"/strain")
     mkpath(DIR*"/colorbar")
@@ -237,8 +237,8 @@ function ExportFiles(M::BSplineManifold, MaximumStrain::Real, index; Name::Strin
     dict=LoadResultDict()
     𝒂 = M.controlpoints
     P₁,P₂ = P = M.bsplinespaces
-    p₁,p₂ = p = P₁.degree,P₂.degree
-    k₁,k₂ = k = P₁.knots,P₂.knots
+    p₁,p₂ = p = degree.(P)
+    k₁,k₂ = k = knots.(P)
     D₁,D₂ = D = k₁[1+p₁]..k₁[end-p₁],k₂[1+p₂]..k₂[end-p₂]
 
     Width = (Right-Left)*Unit[1]

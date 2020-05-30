@@ -11,7 +11,7 @@ function InitialConfiguration(D;n₁=15,nip=NIP)
     Export(M,parent,comment=comment)
 end
 
-function InitBs(D,n₁;nip=NIP)::BSplineManifold
+function InitBs(D,n₁;nip=NIP)::FastBSplineManifold
     D₁,D₂ = D
 
     function ode(𝒄̇𝒄̈,𝒄𝒄̇,par,t)
@@ -29,7 +29,7 @@ function InitBs(D,n₁;nip=NIP)::BSplineManifold
     D₁₋, D₁₊ = extrema(D₁)
     p₁ = 3
     k₁ = Knots(range(D₁₋, D₁₊, length=n₁-p₁+1)) + p₁ * Knots(D₁₋, D₁₊)
-    P₁ = BSplineSpace(p₁,k₁)
+    P₁ = FastBSplineSpace(p₁,k₁)
 
     𝒎 = FittingBSpline(𝒄,P₁,nip=nip)
     𝒓 = FittingBSpline(𝒄₂,P₁,nip=nip)
@@ -39,10 +39,10 @@ function InitBs(D,n₁;nip=NIP)::BSplineManifold
     k₂ = Knots(repeat(collect(extrema(D₂)),inner=2))
     n₂ = length(k₂)-p₂-1
 
-    P₂ = BSplineSpace(p₂,k₂)
+    P₂ = FastBSplineSpace(p₂,k₂)
     𝒂 = hcat(a1,a2)
 
-    M = BSplineManifold([P₁,P₂],𝒂)
-    M′ = Refinement(M,p₊=[0,1])
+    M = FastBSplineManifold([P₁,P₂],𝒂)
+    M′ = refinement(M,p₊=[0,1])
     return Positioning(M′)
 end

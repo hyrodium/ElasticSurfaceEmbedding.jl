@@ -32,20 +32,21 @@ B̃(D₂,t)=dot(e⁽⁰⁾₂(c(D₂,t)),𝒑₂₍₀₎(c(D₂,t)))*width(D₂
 
 
 # Current State
-𝒑₍ₜ₎(M,u)=Mapping(M,u)
-function 𝒑′₍ₜ₎(M::BSplineManifold,u)
+𝒑₍ₜ₎(M,u)=mapping(M,u)
+function 𝒑′₍ₜ₎(M::FastBSplineManifold,u)
     P₁,P₂=M.bsplinespaces
     𝒂=M.controlpoints
     n₁, n₂, _ = size(𝒂)
     return [sum(N′(P₁,P₂,I₁,I₂,j,u)*𝒂[I₁,I₂,i] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂) for i ∈ 1:d, j ∈ 1:d]
 end
-function 𝒑₁₍ₜ₎(M::BSplineManifold,u)
+
+function 𝒑₁₍ₜ₎(M::FastBSplineManifold,u)
     P₁,P₂=M.bsplinespaces
     𝒂=M.controlpoints
     n₁, n₂, _ = size(𝒂)
     return sum(N′(P₁,P₂,I₁,I₂,1,u)*𝒂[I₁,I₂,:] for I₁ ∈ 1:n₁, I₂ ∈ 1:n₂)
 end
-function 𝒑₂₍ₜ₎(M::BSplineManifold,u)
+function 𝒑₂₍ₜ₎(M::FastBSplineManifold,u)
     P₁,P₂=M.bsplinespaces
     𝒂=M.controlpoints
     n₁, n₂, _ = size(𝒂)
