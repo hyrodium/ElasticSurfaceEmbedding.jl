@@ -124,8 +124,8 @@ function ParametricColor(𝒑,D;rgb=(u->[0.5,0.5,0.5]),filename="ParametricColor
     Drawing((right-left)*unit,(up-down)*unit,filename)
     Luxor.origin(-left*unit,up*unit)
 
-    k₁=range(leftendpoint(D[1]),stop=rightendpoint(D[1]),length=mesh[1]+1)
-    k₂=range(leftendpoint(D[2]),stop=rightendpoint(D[2]),length=mesh[2]+1)
+    k₁=range(leftendpoint(D[1])+0.0001,stop=rightendpoint(D[1])-0.0001,length=mesh[1]+1)
+    k₂=range(leftendpoint(D[2])+0.0001,stop=rightendpoint(D[2])-0.0001,length=mesh[2]+1)
 
     for I₁ ∈ 1:mesh[1], I₂ ∈ 1:mesh[2]
         BézPth=BezierPath([

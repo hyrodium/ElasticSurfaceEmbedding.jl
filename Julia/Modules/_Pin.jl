@@ -13,7 +13,7 @@ function PinState(; parent::Int=0, tag::String="")
 
     index = NewestIndex(dict=dict)+1
     dict["Result"][string(index)] = Dict{String,Any}("parent" => string(parent))
-    dict["Result"][string(index)]["bsplinemanifold"] = toJSON(M)
+    dict["Result"][string(index)]["FastBSplineManifold"] = toJSON(M)
 
     comment = "📌 - tag: "*tag
     dict["Result"][string(index)]["comment"] = comment
@@ -83,11 +83,11 @@ function ExportPinnedStates(; unitlength=(10,"mm"),cutout=(0.1,5),mesh::Int=60)
         index = parse(Int, i_key)
 
         M = loadM(index=index)
-        BSplineSvg(M,filename=DIR*"/pinned/"*GetTag(index,dict=dict)*".svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength,points=false)
+        DrawBSpline(M,filename=DIR*"/pinned/"*GetTag(index,dict=dict)*".svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength[1],points=false)
 
         P₁,P₂ = P = M.bsplinespaces
-        p₁,p₂ = p = P₁.degree,P₂.degree
-        k₁,k₂ = k = P₁.knots,P₂.knots
+        p₁,p₂ = p = degree.(P)
+        k₁,k₂ = k = knots.(P)
         D₁,D₂ = D = k₁[1+p₁]..k₁[end-p₁],k₂[1+p₂]..k₂[end-p₂]
         n₁,n₂ = n = dim.(P)
 
