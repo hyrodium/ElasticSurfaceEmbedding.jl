@@ -18,7 +18,7 @@ using ElasticSurfaceEmbedding
 D(i,n)=(-1.0..1.0, (i-1)/n..i/n)
 
 ##
-Settings("Paraboloid_bacdxy",up=2,down=-2,right=2,left=-2,mesh=(20,1),unit=200,slack=true,colorbarsize=0.3)
+Settings("Paraboloid_A",up=2,down=-2,right=2,left=-2,mesh=(20,1),unit=200,slack=true,colorbarsize=0.3)
 
 i=1
 ShowMaximumStrain(D(i,10))

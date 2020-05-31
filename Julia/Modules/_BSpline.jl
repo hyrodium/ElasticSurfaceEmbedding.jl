@@ -5,8 +5,7 @@ import ParametricDraw.LxrPt
 
 # BSpline
 function FittingBSpline(f, P::FastBSplineSpace{p}; nip=NIP) where p # 1-dimensional
-    # p=P.degree
-    k=P.vector
+    k=knots(P)
     D=k[1+p]..k[end-p]
     function a(i,j)
         D′=(max(k[i],k[j])..min(k[i+p+1],k[j+p+1])) ∩ D
@@ -22,34 +21,16 @@ function FittingBSpline(f, P::FastBSplineSpace{p}; nip=NIP) where p # 1-dimensio
     return inv(A)*b
 end
 
-function N′(P₁::BSplineSpace,P₂::BSplineSpace,I₁,I₂,i,u)::Float64
+function N′(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u)::Float64
     if i==1
         return bsplinebasis′(I₁,P₁,u[1])*bsplinebasis(I₂,P₂,u[2])
     else
         return bsplinebasis(I₁,P₁,u[1])*bsplinebasis′(I₂,P₂,u[2])
     end
 end
-
-function N′(P₁::FastBSplineSpace{p₁} where p₁, P₂::FastBSplineSpace{p₂} where p₂, I₁, I₂, i, u)::Float64
-    if i==1
-        return bsplinebasis′(I₁,P₁,u[1])*bsplinebasis(I₂,P₂,u[2])
-    else
-        return bsplinebasis(I₁,P₁,u[1])*bsplinebasis′(I₂,P₂,u[2])
-    end
-end
-
-# function N′(P₁::FastBSplineSpace{3},P₂::FastBSplineSpace{2},I₁,I₂,i,u)::Float64
-#     if i==1
-#         return bsplinebasis′(I₁,P₁,u[1])*bsplinebasis(I₂,P₂,u[2])
-#     else
-#         return bsplinebasis(I₁,P₁,u[1])*bsplinebasis′(I₂,P₂,u[2])
-#     end
-# end
 
 function DrawBSpline(M::FastBSplineManifold; filename="Bspline.svg", up=5, down=-5, right=5, left=-5, zoom=1, mesh=(10,10), unitlength=100, points=true)
     step = unitlength
-    # p¹,p² = p = [M.bsplinespaces[i].degree for i ∈ 1:2]
-    # k¹,k² = k = [M.bsplinespaces[i].knots for i ∈ 1:2]
     p¹,p² = p = degree.(M.bsplinespaces)
     k¹,k² = k = knots.(M.bsplinespaces)
     𝒂 = M.controlpoints
