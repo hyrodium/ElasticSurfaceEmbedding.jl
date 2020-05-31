@@ -4,39 +4,38 @@ import ParametricDraw.BézPts
 import ParametricDraw.LxrPt
 
 # BSpline
-function FittingBSpline(f, P::BSplineSpace; nip=NIP) # 1-dimensional
-    p=P.degree
-    k=P.knots
+function FittingBSpline(f, P::FastBSplineSpace{p}; nip=NIP) where p # 1-dimensional
+    k=knots(P)
     D=k[1+p]..k[end-p]
     function a(i,j)
         D′=(max(k[i],k[j])..min(k[i+p+1],k[j+p+1])) ∩ D
         if width(D′)==0
-            return 0
+            return 0.0
         else
-            return GaussianQuadrature(t->BSplineBasis(i,P,t)*BSplineBasis(j,P,t), D′)
+            return GaussianQuadrature(t->bsplinebasis(i,P,t)*bsplinebasis(j,P,t), D′)
         end
     end
     n=dim(P)
     A=[a(i,j) for i ∈ 1:n, j ∈ 1:n]
-    b=[GaussianQuadrature(t->BSplineBasis(i,P,t)*f(t), ((k[i]..k[i+p+1]) ∩ D)) for i ∈ 1:n]
+    b=[GaussianQuadrature(t->bsplinebasis(i,P,t)*f(t), ((k[i]..k[i+p+1]) ∩ D)) for i ∈ 1:n]
     return inv(A)*b
 end
 
-function N′(P₁::BSplineSpace,P₂::BSplineSpace,I₁,I₂,i,u)::Float64
+function N′(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u)::Float64
     if i==1
-        return BSplineBasis′(I₁,P₁,u[1])*BSplineBasis(I₂,P₂,u[2])
+        return bsplinebasis′(I₁,P₁,u[1])*bsplinebasis(I₂,P₂,u[2])
     else
-        return BSplineBasis(I₁,P₁,u[1])*BSplineBasis′(I₂,P₂,u[2])
+        return bsplinebasis(I₁,P₁,u[1])*bsplinebasis′(I₂,P₂,u[2])
     end
 end
 
-function DrawBSpline(M::BSplineManifold; filename="Bspline.svg", up=5, down=-5, right=5, left=-5, zoom=1, mesh=(10,10), unitlength=100, points=true)
+function DrawBSpline(M::FastBSplineManifold; filename="Bspline.svg", up=5, down=-5, right=5, left=-5, zoom=1, mesh=(10,10), unitlength=100, points=true)
     step = unitlength
-    p¹,p² = p = [M.bsplinespaces[i].degree for i ∈ 1:2]
-    k¹,k² = k = [M.bsplinespaces[i].knots for i ∈ 1:2]
+    p¹,p² = p = degree.(M.bsplinespaces)
+    k¹,k² = k = knots.(M.bsplinespaces)
     𝒂 = M.controlpoints
     n¹,n² = n = length.(k)-p.-1
-    𝒑(u) = Mapping(M,u)
+    𝒑(u) = mapping(M,u)
 
     K¹,K² = K = [unique(k[i][1+p[i]:end-p[i]]) for i ∈ 1:2]
     N¹,N² = length.(K).-1
@@ -100,19 +99,19 @@ function Positioning(𝒂::Array{Float64,3})::Array{Float64,3} # 制御点の位
     return affine(𝒂,R,-R*𝒂[ind0...,:])
 end
 
-function Positioning(M::BSplineManifold)::BSplineManifold # 制御点の位置調整
+function Positioning(M::FastBSplineManifold)::FastBSplineManifold # 制御点の位置調整
     𝒫s = M.bsplinespaces
     𝒂 = M.controlpoints
     if length(𝒫s) ≠ d
         error("dimension does not match")
     end
 
-    p¹, p² = p = [M.bsplinespaces[i].degree for i ∈ 1:d]
-    k¹, k² = k = [M.bsplinespaces[i].knots for i ∈ 1:d]
+    p¹, p² = p = [degree(M.bsplinespaces[i]) for i ∈ 1:d]
+    k¹, k² = k = [knots(M.bsplinespaces[i]) for i ∈ 1:d]
 
     n₁, n₂, _ = size(𝒂)
     𝒂′ = Positioning(𝒂)
-    return BSplineManifold(𝒫s,𝒂′)
+    return FastBSplineManifold(𝒫s,𝒂′)
 end
 
 export SplineRefinement
@@ -121,8 +120,8 @@ function SplineRefinement( ;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knot
     M=loadM(index=parent)
 
     P₁,P₂=P=M.bsplinespaces
-    p₁,p₂=p=P₁.degree,P₂.degree
-    k₁,k₂=k=P₁.knots,P₂.knots
+    p₁,p₂=p=degree.(P)
+    k₁,k₂=k=knots.(P)
     D₁,D₂=D=k₁[1+p₁]..k₁[end-p₁],k₂[1+p₂]..k₂[end-p₂]
     n₁,n₂=n=dim.(P)
 
@@ -137,7 +136,7 @@ function SplineRefinement( ;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knot
     end
 
     comment="Refinement - p₊:"*string(p₊)*", k₊:"*string([k₊₁.vector, k₊₂.vector])
-    M=Refinement(M,p₊=p₊,k₊=k₊)
+    M=refinement(M,p₊=p₊,k₊=k₊)
     Export(M,parent,comment=comment)
     return nothing
 end
@@ -146,9 +145,9 @@ export ShowKnots
 function ShowKnots( ;index=0)
     M=loadM(index=index)
 
-    P₁,P₂=M.bsplinespaces
-    p₁,p₂=P₁.degree,P₂.degree
-    k₁,k₂=P₁.knots,P₂.knots
+    P₁,P₂=P=M.bsplinespaces
+    p₁,p₂=degree.(P)
+    k₁,k₂=knots.(P)
     println("k₁: ",k₁.vector)
     println("k₂: ",k₂.vector)
     println("Suggestion:")
