@@ -7,6 +7,7 @@ using JSON
 using Distributed
 
 using BasicBSpline
+using ExportNURBS
 
 include("_Constants.jl")
 include("_NumericalIntegral.jl")

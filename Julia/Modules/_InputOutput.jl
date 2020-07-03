@@ -254,8 +254,8 @@ function ExportFiles(M::FastBSplineManifold, MaximumStrain::Real, index; Name::S
     path_png_colorbar=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png"
     path_png_append=Dir*"/append/"*Name*"-"*string(index)*"_append.png"
 
-    DrawBSpline(M, filename=path_svg_nurbs, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
-    DrawBSpline(M, filename=path_png_nurbs, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
+    save_svg(path_svg_nurbs, M, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
+    save_png(path_png_nurbs, M, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
     ParametricColor(u->𝒑₍ₜ₎(M,u), D, rgb=rgb,  filename=path_png_strain, up=Up, down=Down, right=Right, left=Left, mesh=tuple(10*[Mesh...]...), unit=aa*Unit[1])
     ColorBar(max=MaximumStrain, filename=path_png_colorbar, width=aa*Colorbarsize*Width)
 

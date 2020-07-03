@@ -83,7 +83,8 @@ function ExportPinnedStates(; unitlength=(10,"mm"),cutout=(0.1,5),mesh::Int=60)
         index = parse(Int, i_key)
 
         M = loadM(index=index)
-        DrawBSpline(M,filename=DIR*"/pinned/"*GetTag(index,dict=dict)*".svg",up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength[1],points=false)
+        filename = DIR*"/pinned/"*GetTag(index,dict=dict)*".svg"
+        save_svg(filename, M, up=UP,down=DOWN,right=RIGHT,left=LEFT,mesh=MESH,unitlength=unitlength[1],points=false)
 
         P₁,P₂ = P = M.bsplinespaces
         p₁,p₂ = p = degree.(P)
