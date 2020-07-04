@@ -4,23 +4,6 @@ import ParametricDraw.BézPts
 import ParametricDraw.LxrPt
 
 # BSpline
-function FittingBSpline(f, P::FastBSplineSpace{p}; nip=NIP) where p # 1-dimensional
-    k=knots(P)
-    D=k[1+p]..k[end-p]
-    function a(i,j)
-        D′=(max(k[i],k[j])..min(k[i+p+1],k[j+p+1])) ∩ D
-        if width(D′)==0
-            return 0.0
-        else
-            return GaussianQuadrature(t->bsplinebasis(i,P,t)*bsplinebasis(j,P,t), D′)
-        end
-    end
-    n=dim(P)
-    A=[a(i,j) for i ∈ 1:n, j ∈ 1:n]
-    b=[GaussianQuadrature(t->bsplinebasis(i,P,t)*f(t), ((k[i]..k[i+p+1]) ∩ D)) for i ∈ 1:n]
-    return inv(A)*b
-end
-
 function N′(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u)::Float64
     if i==1
         return bsplinebasis′(I₁,P₁,u[1])*bsplinebasis(I₂,P₂,u[2])
