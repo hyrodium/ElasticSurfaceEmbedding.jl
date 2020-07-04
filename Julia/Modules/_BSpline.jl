@@ -4,81 +4,12 @@ import ParametricDraw.BézPts
 import ParametricDraw.LxrPt
 
 # BSpline
-function FittingBSpline(f, P::FastBSplineSpace{p}; nip=NIP) where p # 1-dimensional
-    k=knots(P)
-    D=k[1+p]..k[end-p]
-    function a(i,j)
-        D′=(max(k[i],k[j])..min(k[i+p+1],k[j+p+1])) ∩ D
-        if width(D′)==0
-            return 0.0
-        else
-            return GaussianQuadrature(t->bsplinebasis(i,P,t)*bsplinebasis(j,P,t), D′)
-        end
-    end
-    n=dim(P)
-    A=[a(i,j) for i ∈ 1:n, j ∈ 1:n]
-    b=[GaussianQuadrature(t->bsplinebasis(i,P,t)*f(t), ((k[i]..k[i+p+1]) ∩ D)) for i ∈ 1:n]
-    return inv(A)*b
-end
-
 function N′(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u)::Float64
     if i==1
         return bsplinebasis′(I₁,P₁,u[1])*bsplinebasis(I₂,P₂,u[2])
     else
         return bsplinebasis(I₁,P₁,u[1])*bsplinebasis′(I₂,P₂,u[2])
     end
-end
-
-function DrawBSpline(M::FastBSplineManifold; filename="Bspline.svg", up=5, down=-5, right=5, left=-5, zoom=1, mesh=(10,10), unitlength=100, points=true)
-    step = unitlength
-    p¹,p² = p = degree.(M.bsplinespaces)
-    k¹,k² = k = knots.(M.bsplinespaces)
-    𝒂 = M.controlpoints
-    n¹,n² = n = length.(k)-p.-1
-    𝒑(u) = mapping(M,u)
-
-    K¹,K² = K = [unique(k[i][1+p[i]:end-p[i]]) for i ∈ 1:2]
-    N¹,N² = length.(K).-1
-    m¹,m² = mesh
-
-    Drawing(step*(right-left),step*(up-down),filename)
-    Luxor.origin(-step*left,step*up)
-    setline(zoom)
-    background("white")
-
-    sethue(1,.5,.5) # Pale Red
-    drawbezierpath(BezierPath(vcat(
-        [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u¹->𝒑([u¹,K²[1]]),K¹[i],K¹[i+1]))...) for i ∈ 1:N¹],
-        [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u²->𝒑([K¹[end],u²]),K²[i],K²[i+1]))...) for i ∈ 1:N²],
-        [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u¹->𝒑([u¹,K²[end]]),K¹[end-i+1],K¹[end-i]))...) for i ∈ 1:N¹],
-        [BezierPathSegment(map(p->LxrPt(p,step),BézPts(u²->𝒑([K¹[1],u²]),K²[end-i+1],K²[end-i]))...) for i ∈ 1:N²]
-    )),:fill,close=true)
-
-    sethue("red") # Red
-    for u¹ ∈ range(K¹[1],stop=K¹[end],length=m¹+1)
-        drawbezierpath(BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(u²->𝒑([u¹,u²]),K²[i],K²[i+1]))...) for i ∈ 1:N²]),:stroke)
-    end
-    for u² ∈ range(K²[1],stop=K²[end],length=m²+1)
-        drawbezierpath(BezierPath([BezierPathSegment(map(p->LxrPt(p,step),BézPts(u¹->𝒑([u¹,u²]),K¹[i],K¹[i+1]))...) for i ∈ 1:N¹]),:stroke)
-    end
-
-    if points
-        sethue(.1,.1,.1) # Dark Gray
-        setline(zoom)
-        CtrlPts = [LxrPt(𝒂[i,j,:],step) for i ∈ 1:size(𝒂)[1], j ∈ 1:size(𝒂)[2]]
-        map(p->circle(p,3*zoom,:fill), CtrlPts)
-
-        sethue(.3,.3,.3) # Light Gray
-        for i ∈ 1:n¹
-            poly(CtrlPts[i,:], :stroke)
-        end
-        for j ∈ 1:n²
-            poly(CtrlPts[:,j], :stroke)
-        end
-    end
-    finish()
-
-    return nothing
 end
 
 """
@@ -100,9 +31,9 @@ function Positioning(𝒂::Array{Float64,3})::Array{Float64,3} # 制御点の位
 end
 
 function Positioning(M::FastBSplineManifold)::FastBSplineManifold # 制御点の位置調整
-    𝒫s = M.bsplinespaces
+    Ps = M.bsplinespaces
     𝒂 = M.controlpoints
-    if length(𝒫s) ≠ d
+    if length(Ps) ≠ d
         error("dimension does not match")
     end
 
@@ -111,11 +42,11 @@ function Positioning(M::FastBSplineManifold)::FastBSplineManifold # 制御点の
 
     n₁, n₂, _ = size(𝒂)
     𝒂′ = Positioning(𝒂)
-    return FastBSplineManifold(𝒫s,𝒂′)
+    return FastBSplineManifold(Ps,𝒂′)
 end
 
 export SplineRefinement
-function SplineRefinement( ;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knots([]),Knots([])], parent::Int=0)
+function SplineRefinement(; p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knots([]),Knots([])], parent::Int=0)
     parent=Parent(parent)
     M=loadM(index=parent)
 
@@ -142,7 +73,7 @@ function SplineRefinement( ;p₊::Array{Int,1}=[0,0], k₊::Array{Knots,1}=[Knot
 end
 
 export ShowKnots
-function ShowKnots( ;index=0)
+function ShowKnots(; index=0)
     M=loadM(index=index)
 
     P₁,P₂=P=M.bsplinespaces

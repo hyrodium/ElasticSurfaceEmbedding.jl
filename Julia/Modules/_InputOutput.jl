@@ -1,4 +1,5 @@
 using ParametricDraw
+using Colors
 
 export @ParametricMapping
 macro ParametricMapping(ex)
@@ -32,7 +33,7 @@ function Settings(name::String; up::Real=5, down::Real=-5, right::Real=5, left::
     global MAXIMUMSTRAIN=maximumstrain
     global COLORBARSIZE=colorbarsize
     if isTheShapeComputed()
-        dict=LoadResultDict()
+        dict = LoadResultDict()
         println(TreeString(dict["Result"]))
         global EXPR=dict["Expr"]
     elseif !(@isdefined EXPR)
@@ -88,29 +89,29 @@ function NodeSeries(tree::Dict,node)
 end
 
 function TreeString(tree::Dict)
-    serieses=Array{Int,1}[]
+    serieses = Array{Int,1}[]
     for key in keys(tree)
         push!(serieses,(s->parse(Int,s)).(reverse(NodeSeries(tree,key))))
     end
     sort!(serieses)
-    lowstrings=String[]
+    lowstrings = String[]
     n = length(serieses)
     for i in 1:n
-        l=length(serieses[i])
-        key=string(serieses[i][end])
-        comment=tree[key]["comment"]
+        l = length(serieses[i])
+        key = string(serieses[i][end])
+        comment = tree[key]["comment"]
         if l == 2
-            lowstring=key*": "*comment
+            lowstring = key*": "*comment
             push!(lowstrings,lowstring)
         elseif l ≥ 3
-            lowstring="  "^(l-3)*"└─"*key*": "*comment
+            lowstring = "  "^(l-3)*"└─"*key*": "*comment
             push!(lowstrings,lowstring)
             for j in 1:(i-1)
-                chars=collect(lowstrings[end-j])
-                if chars[2(l-3)+1]==' '
-                    lowstrings[end-j]=join(chars[1:2(l-3)])*"│"*join(chars[2(l-3)+2:end])
-                elseif chars[2(l-3)+1]=='└'
-                    lowstrings[end-j]=join(chars[1:2(l-3)])*"├"*join(chars[2(l-3)+2:end])
+                chars = collect(lowstrings[end-j])
+                if chars[2(l-3)+1] == ' '
+                    lowstrings[end-j] = join(chars[1:2(l-3)])*"│"*join(chars[2(l-3)+2:end])
+                elseif chars[2(l-3)+1] == '└'
+                    lowstrings[end-j] = join(chars[1:2(l-3)])*"├"*join(chars[2(l-3)+2:end])
                     break
                 else
                     break
@@ -118,9 +119,9 @@ function TreeString(tree::Dict)
             end
         end
     end
-    outsting=""
+    outsting = ""
     for s in lowstrings
-        outsting=outsting*s*"\n"
+        outsting = outsting*s*"\n"
     end
     return outsting
 end
@@ -132,17 +133,17 @@ end
 
 function NewestIndex(; dict::Union{Dict,Nothing}=nothing)
     if dict isa Nothing
-        dict=LoadResultDict()
+        dict = LoadResultDict()
     end
     result_nums = [parse(Int, i) for i in keys(dict["Result"])]
     return maximum(result_nums)
 end
 
 function Parent(index::Union{Int,Nothing})
-    dict=LoadResultDict()
-    if index==0
+    dict = LoadResultDict()
+    if index == 0
         return NewestIndex()
-    elseif index==nothing
+    elseif index isa Nothing
         return NewestIndex()
     else
         return index
@@ -153,14 +154,14 @@ function loadM(; index=0, dict::Union{Dict,Nothing}=nothing)
     if !isTheShapeComputed()
         error("Result file doesn't exists")
     end
-    dict=LoadResultDict()
+    dict = LoadResultDict()
     if EXPR ≠ dict["Expr"]
         println(EXPR)
         println(dict["Expr"])
         # error("The definition of 𝒑₍₀₎(u) has been changed")
     end
-    index=Parent(index)
-    M=JSONtoFastBSplineManifold(dict["Result"][string(index)]["FastBSplineManifold"])
+    index = Parent(index)
+    M = JSONtoFastBSplineManifold(dict["Result"][string(index)]["FastBSplineManifold"])
     return M
 end
 
@@ -234,7 +235,7 @@ function ExportFiles(M::FastBSplineManifold, MaximumStrain::Real, index; Name::S
     mkpath(DIR*"/colorbar")
     mkpath(DIR*"/append")
 
-    dict=LoadResultDict()
+    dict = LoadResultDict()
     𝒂 = M.controlpoints
     P₁,P₂ = P = M.bsplinespaces
     p₁,p₂ = p = degree.(P)
@@ -244,26 +245,28 @@ function ExportFiles(M::FastBSplineManifold, MaximumStrain::Real, index; Name::S
     Width = (Right-Left)*Unit[1]
     Height = (Up-Down)*Unit[1]
 
-    rgb(u) = E⁽⁰⁾₁₁(M,u)*[1,-1,-1]/(2*MaximumStrain) .+0.5 # Red to Cyan
+    normalized_strain(u) = E⁽⁰⁾₁₁(M,u)/MaximumStrain # bounded in -1 to 1
 
     aa = 5 # magnification parameter for antialias
 
-    path_svg_nurbs=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg"
-    path_png_nurbs=Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png"
-    path_png_strain=Dir*"/strain/"*Name*"-"*string(index)*"_strain.png"
-    path_png_colorbar=Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png"
-    path_png_append=Dir*"/append/"*Name*"-"*string(index)*"_append.png"
+    path_svg_nurbs = Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg"
+    path_png_nurbs = Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png"
+    path_png_strain = Dir*"/strain/"*Name*"-"*string(index)*"_strain.png"
+    path_png_colorbar = Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png"
+    path_png_append = Dir*"/append/"*Name*"-"*string(index)*"_append.png"
 
-    DrawBSpline(M, filename=path_svg_nurbs, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
-    DrawBSpline(M, filename=path_png_nurbs, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
-    ParametricColor(u->𝒑₍ₜ₎(M,u), D, rgb=rgb,  filename=path_png_strain, up=Up, down=Down, right=Right, left=Left, mesh=tuple(10*[Mesh...]...), unit=aa*Unit[1])
+    colors = FittingControlPoints(normalized_strain, M.bsplinespaces) .* RGB(0.5,-0.5,-0.5) .+ RGB(0.5,0.5,0.5) # red to cyan
+
+    save_svg(path_svg_nurbs, M, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
+    save_png(path_png_nurbs, M, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
+    save_png(path_png_strain, M, colors, up=Up, down=Down, right=Right, left=Left, unitlength=Int(aa*Unit[1]))
     ColorBar(max=MaximumStrain, filename=path_png_colorbar, width=aa*Colorbarsize*Width)
 
     img_nurbs = load(path_png_nurbs)
     img_strain = load(path_png_strain)
     img_colorbar = load(path_png_colorbar)
 
-    img_nurbs = convert(Array{RGB{Float64},2},img_nurbs)
+    img_nurbs = convert(Array{RGBA{Float64},2},img_nurbs)
     img_strain = convert(Array{RGBA{Float64},2},img_strain)
     img_colorbar = convert(Array{RGBA{Float64},2},img_colorbar)
 
@@ -271,6 +274,7 @@ function ExportFiles(M::FastBSplineManifold, MaximumStrain::Real, index; Name::S
     size_strain = size(img_strain)
     size_colorbar = size(img_colorbar)
 
+    img_nurbs_white_background = img_nurbs ./ RGB(1,1,1)
     img_strain_white_background = img_strain ./ RGB(1,1,1)
     Δ = collect(size_strain) - collect(size_colorbar)
 
@@ -279,7 +283,7 @@ function ExportFiles(M::FastBSplineManifold, MaximumStrain::Real, index; Name::S
     img_strain_with_colorbar[axes(img_offset_colorbar)...] = img_offset_colorbar ./ img_strain_with_colorbar[axes(img_offset_colorbar)...]
     img_strain_with_colorbar = [RGB(mean(img_strain_with_colorbar[5i-4:5i,5j-4:5j])) for i in 1:800, j in 1:800]
     # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but previous one is better for anti-alias
-    img_append = hcat(img_nurbs, img_strain_with_colorbar)
+    img_append = hcat(img_nurbs_white_background, img_strain_with_colorbar)
 
     save(path_png_append, img_append)
 
