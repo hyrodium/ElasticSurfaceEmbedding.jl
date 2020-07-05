@@ -4,6 +4,8 @@ using ForwardDiff
 E(M,u) = (g₍ₜ₎(M,u)-g₍₀₎(u))/2
 E₁₁(M::FastBSplineManifold,u) = (g₍ₜ₎₁₁(M,u)-g₍₀₎₁₁(u))/2
 E⁽⁰⁾₁₁(M::FastBSplineManifold,u) = E₁₁(M,u)/g₍₀₎₁₁(u)
+E₁₁_cont(M::FastBSplineManifold,u) = (g₍ₜ₎₁₁_cont(M,u)-g₍₀₎₁₁(u))/2
+E⁽⁰⁾₁₁_cont(M::FastBSplineManifold,u) = E₁₁_cont(M,u)/g₍₀₎₁₁(u)
 
 function Ẽ⁽⁰⁾₁₁(D₂::ClosedInterval,u)
     b = width(D₂)/2

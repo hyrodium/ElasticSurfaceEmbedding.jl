@@ -1,11 +1,14 @@
-using Luxor
-import ParametricDraw.ChangeUnit
-import ParametricDraw.BézPts
-import ParametricDraw.LxrPt
-
 # BSpline
 function N′(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u)::Float64
-    if i==1
+    if i == 1
+        return bsplinebasis′₊₀(I₁,P₁,u[1])*bsplinebasis(I₂,P₂,u[2])
+    else
+        return bsplinebasis(I₁,P₁,u[1])*bsplinebasis′₊₀(I₂,P₂,u[2])
+    end
+end
+
+function N′_cont(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u)::Float64
+    if i == 1
         return bsplinebasis′(I₁,P₁,u[1])*bsplinebasis(I₂,P₂,u[2])
     else
         return bsplinebasis(I₁,P₁,u[1])*bsplinebasis′(I₂,P₂,u[2])

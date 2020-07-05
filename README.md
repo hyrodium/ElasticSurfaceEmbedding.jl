@@ -26,7 +26,7 @@ The domain D will be split into D_i.
 ### step 2 : Numerical analysis
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
-For more information, read [this document](/Julia/HowToRunJuliaCode.md).
+For more information, read [this document](/Julia).
 The image below is a result for the domain D_1.
 
 <img src="img/NurbsStrain.png" width="800">
@@ -46,11 +46,11 @@ Cut papers into strips, and weave the paper strips.
 
 ## Directions: If you like..
 ### ..making crafts:scissors:
-| <img src="img/craft.png" align="top" height="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Example/HowToMakePaperModel.md). <br> Laser cutting machine is useful, but it's not necessary. |
+| <img src="img/craft.png" align="top" height="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Craft). <br> Laser cutting machine is useful, but it's not necessary. |
 | --- | :-- |
 
 ### ..computing:octocat:
-| <img src="img/juliawolfram.png" align="top" height="150"> | Clone this repository, and run the [Julia code](/Julia/HowToRunJuliaCode.md) or [Wolfram code](/Wolfram/HowToRunWolframCode.md)! <br> Any issues and pull requests are welcomed. |
+| <img src="img/juliawolfram.png" align="top" height="150"> | Clone this repository, and run the [Julia code](/Julia) or [Wolfram code](/Wolfram)! <br> Any issues and pull requests are welcomed. |
 | --- | :-- |
 
 ### ..mathematics or physics:globe_with_meridians:
