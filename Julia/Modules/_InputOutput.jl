@@ -1,6 +1,3 @@
-using ParametricDraw
-using Colors
-
 export @ParametricMapping
 macro ParametricMapping(ex)
     expr=toJSON(ex)
@@ -245,7 +242,7 @@ function ExportFiles(M::FastBSplineManifold, MaximumStrain::Real, index; Name::S
     Width = (Right-Left)*Unit[1]
     Height = (Up-Down)*Unit[1]
 
-    normalized_strain(u) = E⁽⁰⁾₁₁(M,u)/MaximumStrain # bounded in -1 to 1
+    normalized_strain(u) = E⁽⁰⁾₁₁_cont(M,u)/MaximumStrain # bounded in -1 to 1
 
     aa = 5 # magnification parameter for antialias
 
@@ -255,11 +252,11 @@ function ExportFiles(M::FastBSplineManifold, MaximumStrain::Real, index; Name::S
     path_png_colorbar = Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png"
     path_png_append = Dir*"/append/"*Name*"-"*string(index)*"_append.png"
 
-    colors = FittingControlPoints(normalized_strain, M.bsplinespaces) .* RGB(0.5,-0.5,-0.5) .+ RGB(0.5,0.5,0.5) # red to cyan
+    colorfunc(u) = normalized_strain(u) * RGB(0.5,-0.5,-0.5) + RGB(0.5,0.5,0.5) # red to cyan
 
     save_svg(path_svg_nurbs, M, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
     save_png(path_png_nurbs, M, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
-    save_png(path_png_strain, M, colors, up=Up, down=Down, right=Right, left=Left, unitlength=Int(aa*Unit[1]))
+    save_png(path_png_strain, M, colorfunc, up=Up, down=Down, right=Right, left=Left, unitlength=Int(aa*Unit[1]))
     ColorBar(max=MaximumStrain, filename=path_png_colorbar, width=aa*Colorbarsize*Width)
 
     img_nurbs = load(path_png_nurbs)
@@ -294,10 +291,9 @@ end
 
 
 export ComputedShapes
-"""
-    ComputedShapes()
 
-show and return the computed shapes.
+"""
+Show and return the names of computed shapes.
 """
 function ComputedShapes()
     shapes = Base.Filesystem.readdir(ElasticSurfaceEmbedding.OUT_DIR)
