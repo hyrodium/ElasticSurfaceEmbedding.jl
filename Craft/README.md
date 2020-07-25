@@ -1,6 +1,9 @@
-# Julia code for Elastic Surface Embedding
+# Craft direction for Elastic Surface Embedding
 
-## 1. Download
+## 1. Get the computed shape
+First, download the paraboloid example from [here](paraboloid.pdf).
+
+![](../img/Paraboloid3.png)
 
 ## 2. Print & Cut
 
