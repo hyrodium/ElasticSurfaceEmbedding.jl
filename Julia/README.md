@@ -61,7 +61,7 @@ The computation process proceeds like this flowchart:
 * Split the surface into strips
 * Check the strain prediction
 * Initial configuration
-* Newton-Raphson method itteration
+* Newton-Raphson method iteration
 * Refinement B-spline manifold
 * Finish Computation
 
@@ -82,13 +82,14 @@ Through this document, we treat a paraboloid as an example.
 Define a domain of the strip with symbol `D`.
 
 ```
-D = [0..1,0..1]
+D(i,n) = (-1.0..1.0, (i-1)/n..i/n)
 ```
 
 ### Check the strain prediction
 
 ```
-ShowStrain(D)
+i = 1
+ShowMaximumStrain(D(i,10))
 ```
 
 Negative number means compression, and positive number means tension.
@@ -98,31 +99,48 @@ The absolute value of these numbers should be less than 0.01.
 If you finished checking the strain prediction, the next step is determine the initial configuration.
 
 ```
-InitialConfiguration(D)
+ShowMaximumStrain(D(i,10))
 ```
 
 
-### Newton-Raphson method itteration
+### Newton-Raphson method iteration
 
 ```
-NewtonMethod(D)
+NewtonMethodIteration(fixingmethod=:FixThreePoints)
 ```
 
-You can choose the fixing method:
-* hoge (default)
-* fuga
-* FixThreePoints
-
+You can choose the fixing method from below:
+* `:DefaultOrientation` (default)
+* `:FixThreePoints`
 
 ### Refinement B-spline manifold
 
 
 ```
-Refinement()
+SplineRefinement(p₊=[0,1],k₊=[Knots([]),Knots([(i-1/2)/10])])
+```
+
+### Pin the state
+
+```
+PinState(tag="paraboloid-"*string(i+1))
 ```
 
 ### Finish
 
 ```
 FinishComputation()
+```
+
+### Utilities
+
+
+```
+RemovePin(16)
+```
+```
+ComputedShapes()
+```
+```
+ShowKnots()
 ```
