@@ -1,6 +1,6 @@
 ## If use Distibuted
 using Distributed
-addprocs(14);
+addprocs(7);
 @everywhere push!(LOAD_PATH, "Julia/Modules")
 
 ## If not use Distibuted
@@ -16,7 +16,7 @@ using ElasticSurfaceEmbedding
 ## Set Parametric mapping
 @ParametricMapping 𝒑₍₀₎(u) = [u...,u'*u]
 D(i,n) = (-1.0..1.0, (i-1)/n..i/n)
-Settings("Paraboloid_B",up=2,down=-2,right=2,left=-2,mesh=(20,1),unit=200,slack=true,colorbarsize=0.3)
+Settings("Paraboloid_A",up=2,down=-2,right=2,left=-2,mesh=(20,1),unit=200,slack=true,colorbarsize=0.3)
 
 ## Numrcical Computation
 
