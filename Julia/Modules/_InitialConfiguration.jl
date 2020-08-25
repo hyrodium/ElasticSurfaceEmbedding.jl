@@ -31,8 +31,8 @@ function InitBs(D,n₁;nip=NIP)::FastBSplineManifold
     k₁ = Knots(range(D₁₋, D₁₊, length=n₁-p₁+1)) + p₁ * Knots(D₁₋, D₁₊)
     P₁ = FastBSplineSpace(p₁,k₁)
 
-    𝒎 = FittingControlPoints(t->𝒄(t[1]),[P₁])
-    𝒓 = FittingControlPoints(t->𝒄₂(t[1]),[P₁])
+    𝒎 = fittingcontrolpoints(t->𝒄(t[1]),[P₁])
+    𝒓 = fittingcontrolpoints(t->𝒄₂(t[1]),[P₁])
     a1 = 𝒎-width(D₂)*𝒓/2
     a2 = 𝒎+width(D₂)*𝒓/2
     p₂ = 1
