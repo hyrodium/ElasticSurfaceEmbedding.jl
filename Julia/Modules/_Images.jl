@@ -78,7 +78,7 @@ function SvgCurve(
 
     finish()
     ChangeUnit(filename, "pt", unit)
-    return nothing
+    return
 end
 function ColorBar(; max = 1.234, filename = "ColorBar.png", width = 100)
     up = 4
@@ -108,5 +108,5 @@ function ColorBar(; max = 1.234, filename = "ColorBar.png", width = 100)
     line(ExportNURBS.LxrPt([0.5, Length], unit), ExportNURBS.LxrPt([1.2, Length], unit), :stroke)
 
     finish()
-    return nothing
+    return
 end

@@ -3,7 +3,7 @@ function SlackString(str::String)
     cmd = `curl -X POST -H 'Content-type: application/json' --data $str2 $IWhU`
     # println(cmd)
     run(cmd; wait = false)
-    return nothing
+    return
 end
 
 function SlackDict(dic::Dict)
@@ -15,12 +15,12 @@ function SlackDict(dic::Dict)
     cmd = `curl -X POST -H 'Content-type: application/json' --data $DIC $IWhU`
     # println(cmd)
     run(cmd; wait = false)
-    return nothing
+    return
 end
 
 function SlackFile(filename; comment = "")
     cmd = `curl -F file=@$filename -F "initial_comment=$comment" -F channels=$ChID -H "Authorization: Bearer $OAAT" https://slack.com/api/files.upload`
     # println(cmd)
     run(cmd; wait = false)
-    return nothing
+    return
 end

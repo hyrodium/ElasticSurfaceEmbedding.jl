@@ -60,7 +60,7 @@ function ShowMaximumStrain(D; index = 0)
         println("Computed: (min: ", minE, ", max: ", maxE, ")")
     end
 
-    return nothing
+    return
 end
 
 

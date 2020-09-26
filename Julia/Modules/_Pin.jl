@@ -19,11 +19,11 @@ function PinState(; parent::Int = 0, tag::String = "")
     dict["Result"][string(index)]["comment"] = comment
 
     SaveResultDict(dict)
-    return nothing
+    return
 end
 
 function TagExists(tag, dict::Union{Dict,Nothing} = nothing)::Bool
-    if dict isa Nothing
+    if isnothing(dict)
         dict = LoadResultDict()
     end
     PinnedStates = FindPinnedStates()
@@ -37,7 +37,7 @@ function TagExists(tag, dict::Union{Dict,Nothing} = nothing)::Bool
 end
 
 function GetTag(index; dict::Union{Dict,Nothing} = nothing)::String
-    if dict isa Nothing
+    if isnothing(dict)
         dict = LoadResultDict()
     end
     comment = dict["Result"][repr(index)]["comment"]
@@ -56,11 +56,11 @@ function RemovePin(index)::Nothing
     comment = replace(comment, "📌" => "💨")
     dict["Result"][repr(index)]["comment"] = comment
     SaveResultDict(dict)
-    return nothing
+    return
 end
 
 function FindPinnedStates(; dict::Union{Dict,Nothing} = nothing)::Array{String}
-    if dict isa Nothing
+    if isnothing(dict)
         dict = LoadResultDict()
     end
     PinnedStates = String[]
@@ -110,5 +110,5 @@ function ExportPinnedStates(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::
         )
     end
 
-    return nothing
+    return
 end

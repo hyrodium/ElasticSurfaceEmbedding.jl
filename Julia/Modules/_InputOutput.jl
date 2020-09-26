@@ -48,7 +48,7 @@ function Settings(
         error("use @ParametricMapping or input name of computed shape")
     end
     eval(:(@everywhere $(Meta.parse(EXPR))))
-    return nothing
+    return
 end
 
 function toJSON(ex::Expr)::String
@@ -140,7 +140,7 @@ function isTheShapeComputed()
 end
 
 function NewestIndex(; dict::Union{Dict,Nothing} = nothing)
-    if dict isa Nothing
+    if isnothing(dict)
         dict = LoadResultDict()
     end
     result_nums = [parse(Int, i) for i in keys(dict["Result"])]
@@ -151,7 +151,7 @@ function Parent(index::Union{Int,Nothing})
     dict = LoadResultDict()
     if index == 0
         return NewestIndex()
-    elseif index isa Nothing
+    elseif isnothing(index)
         return NewestIndex()
     else
         return index
@@ -193,7 +193,7 @@ function SaveResultDict(dict::Dict)
         JSON.print(f, dict, 4)
     end
     PrintResultDict(dict)
-    return nothing
+    return
 end
 
 function PrintResultDict(dict::Dict; slack = SLACK)
@@ -234,7 +234,7 @@ function Export(M::AbstractBSplineManifold, parent::Int; comment = "", maximumst
         ExportFiles(M, MaximumStrain, index)
     end
 
-    return nothing
+    return
 end
 
 function ExportFiles(
@@ -330,5 +330,5 @@ end
 # TODO
 # export ReDraw
 # function ReDraw()
-#     return nothing
+#     return
 # end

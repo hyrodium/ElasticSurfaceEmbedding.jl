@@ -72,7 +72,7 @@ function SplineRefinement(; p₊::Array{Int,1} = [0, 0], k₊::Array{Knots,1} = 
     comment = "Refinement - p₊:" * string(p₊) * ", k₊:" * string([k₊₁.vector, k₊₂.vector])
     M = refinement(M, p₊ = p₊, k₊ = k₊)
     Export(M, parent, comment = comment)
-    return nothing
+    return
 end
 
 export ShowKnots
@@ -89,5 +89,5 @@ function ShowKnots(; index = 0)
     k₂′ = unique(k₂)
     println("k₁₊: ", [(k₁′[i] + k₁′[i+1]) / 2 for i in 1:(length(k₁′)-1)])
     println("k₂₊: ", [(k₂′[i] + k₂′[i+1]) / 2 for i in 1:(length(k₂′)-1)])
-    return nothing
+    return
 end
