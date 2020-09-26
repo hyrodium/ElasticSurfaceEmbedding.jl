@@ -1,84 +1,95 @@
 export @ParametricMapping
 macro ParametricMapping(ex)
-    expr=toJSON(ex)
-    if startswith(expr,"function 𝒑₍₀₎(u)\n") || startswith(expr,"𝒑₍₀₎(u) =")
-        global EXPR=expr
+    expr = toJSON(ex)
+    if startswith(expr, "function 𝒑₍₀₎(u)\n") || startswith(expr, "𝒑₍₀₎(u) =")
+        global EXPR = expr
     else
         error("symbol of parametric mapping must be 𝒑₍₀₎(u)")
     end
 end
 
 function CheckAsFileName(name::String)
-    invalidcharacters=[' ', '&', '\\', '/', '.', '<', '>', '|', ':', ';', '*', '?', '=', '%', '$', '"', '~']
+    invalidcharacters = [' ', '&', '\\', '/', '.', '<', '>', '|', ':', ';', '*', '?', '=', '%', '$', '"', '~']
     if length(invalidcharacters ∩ name) ≠ 0
         error("The name[$(name)] must not consists of following chars: ", invalidcharacters)
     end
 end
 
 export Settings
-function Settings(name::String; up::Real=5, down::Real=-5, right::Real=5, left::Real=-5, mesh::Tuple{Int,Int}=(10,1), unit::Real=100, slack::Bool=true, maximumstrain::Real=0.0, colorbarsize::Float64=0.2)
+function Settings(
+    name::String;
+    up::Real = 5,
+    down::Real = -5,
+    right::Real = 5,
+    left::Real = -5,
+    mesh::Tuple{Int,Int} = (10, 1),
+    unit::Real = 100,
+    slack::Bool = true,
+    maximumstrain::Real = 0.0,
+    colorbarsize::Float64 = 0.2,
+)
     CheckAsFileName(name)
-    global NAME=name
-    global DIR=OUT_DIR*NAME
-    global UP=up
-    global DOWN=down
-    global RIGHT=right
-    global LEFT=left
-    global MESH=mesh
-    global UNIT=(unit,"pt")
-    global SLACK=slack
-    global MAXIMUMSTRAIN=maximumstrain
-    global COLORBARSIZE=colorbarsize
+    global NAME = name
+    global DIR = OUT_DIR * NAME
+    global UP = up
+    global DOWN = down
+    global RIGHT = right
+    global LEFT = left
+    global MESH = mesh
+    global UNIT = (unit, "pt")
+    global SLACK = slack
+    global MAXIMUMSTRAIN = maximumstrain
+    global COLORBARSIZE = colorbarsize
     if isTheShapeComputed()
         dict = LoadResultDict()
         println(TreeString(dict["Result"]))
-        global EXPR=dict["Expr"]
+        global EXPR = dict["Expr"]
     elseif !(@isdefined EXPR)
         error("use @ParametricMapping or input name of computed shape")
     end
     eval(:(@everywhere $(Meta.parse(EXPR))))
-    return nothing
+    return
 end
 
-function toJSON(ex::Expr) ::String
+function toJSON(ex::Expr)::String
     return replace(string(ex), r"#=.*=#\n" => s"")
 end
 function toJSON(k::Knots)
     return k.vector
 end
 function toJSON(P::FastBSplineSpace)
-    return Dict("degree"=>degree(P), "knots"=>toJSON(knots(P)))
+    return Dict("degree" => degree(P), "knots" => toJSON(knots(P)))
 end
-function toJSON(P::Array{P,1} where P <: FastBSplineSpace)
+function toJSON(P::Array{P,1} where {P<:FastBSplineSpace})
     return convert(Array{Any,1}, toJSON.(P))
 end
 function toJSON(𝒂::Array{Float64})
     return convert(Array{Any,1}, 𝒂[:])
 end
-function toJSON(M::FastBSplineManifold)
-    return Dict("bsplinespaces"=>toJSON(M.bsplinespaces), "controlpoints"=>toJSON(M.controlpoints))
+function toJSON(M::AbstractBSplineManifold)
+    return Dict("bsplinespaces" => toJSON(bsplinespaces(M)), "controlpoints" => toJSON(controlpoints(M)))
 end
 
 function JSONtoBSplineSpace(jP::Dict)
-    return FastBSplineSpace(jP["degree"],Knots(jP["knots"]))
+    return FastBSplineSpace(jP["degree"], Knots(jP["knots"]))
 end
 function JSONtoBSplineSpaces(jPs::Array)
-    return [JSONtoBSplineSpace(jP) for jP ∈ jPs]
+    return [JSONtoBSplineSpace(jP) for jP in jPs]
 end
 function JSONtoControlPoints(j𝒂, dims)
     n = prod(dims)
     d = length(j𝒂) ÷ n
-    return reshape(convert(Array{Float64},j𝒂),dims...,d)
+    return reshape(convert(Array{Float64}, j𝒂), dims..., d)
 end
-function JSONtoFastBSplineManifold(dict::Dict)
+function JSONtoBSplineSurface(dict::Dict)
     P = JSONtoBSplineSpaces(dict["bsplinespaces"])
     dims = dim.(P)
     𝒂 = JSONtoControlPoints(dict["controlpoints"], dims)
-    return FastBSplineManifold(P,𝒂)
+    return BSplineSurface(P, 𝒂)
 end
 
-function NodeSeries(tree::Dict,node)
-    Nodes=[node]
+function NodeSeries(tree::Dict, node)
+    Nodes = [node]
     while Nodes[end] ≠ "0"
         push!(Nodes, tree[Nodes[end]]["parent"])
     end
@@ -88,7 +99,7 @@ end
 function TreeString(tree::Dict)
     serieses = Array{Int,1}[]
     for key in keys(tree)
-        push!(serieses,(s->parse(Int,s)).(reverse(NodeSeries(tree,key))))
+        push!(serieses, (s -> parse(Int, s)).(reverse(NodeSeries(tree, key))))
     end
     sort!(serieses)
     lowstrings = String[]
@@ -98,17 +109,17 @@ function TreeString(tree::Dict)
         key = string(serieses[i][end])
         comment = tree[key]["comment"]
         if l == 2
-            lowstring = key*": "*comment
-            push!(lowstrings,lowstring)
+            lowstring = key * ": " * comment
+            push!(lowstrings, lowstring)
         elseif l ≥ 3
-            lowstring = "  "^(l-3)*"└─"*key*": "*comment
-            push!(lowstrings,lowstring)
+            lowstring = "  "^(l - 3) * "└─" * key * ": " * comment
+            push!(lowstrings, lowstring)
             for j in 1:(i-1)
                 chars = collect(lowstrings[end-j])
                 if chars[2(l-3)+1] == ' '
-                    lowstrings[end-j] = join(chars[1:2(l-3)])*"│"*join(chars[2(l-3)+2:end])
+                    lowstrings[end-j] = join(chars[1:2(l-3)]) * "│" * join(chars[2(l-3)+2:end])
                 elseif chars[2(l-3)+1] == '└'
-                    lowstrings[end-j] = join(chars[1:2(l-3)])*"├"*join(chars[2(l-3)+2:end])
+                    lowstrings[end-j] = join(chars[1:2(l-3)]) * "├" * join(chars[2(l-3)+2:end])
                     break
                 else
                     break
@@ -118,18 +129,18 @@ function TreeString(tree::Dict)
     end
     outsting = ""
     for s in lowstrings
-        outsting = outsting*s*"\n"
+        outsting = outsting * s * "\n"
     end
     return outsting
 end
 
 
 function isTheShapeComputed()
-    return isfile(DIR*"/"*NAME*".json")
+    return isfile(DIR * "/" * NAME * ".json")
 end
 
-function NewestIndex(; dict::Union{Dict,Nothing}=nothing)
-    if dict isa Nothing
+function NewestIndex(; dict::Union{Dict,Nothing} = nothing)
+    if isnothing(dict)
         dict = LoadResultDict()
     end
     result_nums = [parse(Int, i) for i in keys(dict["Result"])]
@@ -140,14 +151,14 @@ function Parent(index::Union{Int,Nothing})
     dict = LoadResultDict()
     if index == 0
         return NewestIndex()
-    elseif index isa Nothing
+    elseif isnothing(index)
         return NewestIndex()
     else
         return index
     end
 end
 
-function loadM(; index=0, dict::Union{Dict,Nothing}=nothing)
+function loadM(; index = 0, dict::Union{Dict,Nothing} = nothing)
     if !isTheShapeComputed()
         error("Result file doesn't exists")
     end
@@ -158,16 +169,16 @@ function loadM(; index=0, dict::Union{Dict,Nothing}=nothing)
         # error("The definition of 𝒑₍₀₎(u) has been changed")
     end
     index = Parent(index)
-    M = JSONtoFastBSplineManifold(dict["Result"][string(index)]["FastBSplineManifold"])
+    M = JSONtoBSplineSurface(dict["Result"][string(index)]["BSplineManifold"])
     return M
 end
 
-function LoadResultDict() :: Dict
-    f = open(DIR*"/"*NAME*".json","r")
+function LoadResultDict()::Dict
+    f = open(DIR * "/" * NAME * ".json", "r")
     dict = JSON.parse(f)
     close(f)
     v = dict["Version"]
-    JSON_VERSION = VersionNumber(v["major"],v["minor"],v["patch"])
+    JSON_VERSION = VersionNumber(v["major"], v["minor"], v["patch"])
 
     if JSON_VERSION.major == ESE_VERSION.major
         return dict
@@ -178,40 +189,40 @@ end
 
 function SaveResultDict(dict::Dict)
     mkpath(DIR)
-    open(DIR*"/"*NAME*".json","w") do f
+    open(DIR * "/" * NAME * ".json", "w") do f
         JSON.print(f, dict, 4)
     end
     PrintResultDict(dict)
-    return nothing
+    return
 end
 
-function PrintResultDict(dict::Dict; slack=SLACK)
+function PrintResultDict(dict::Dict; slack = SLACK)
     treestring = TreeString(dict["Result"])
     println(treestring)
     if slack
-        SlackString("```\n"*treestring*"```")
+        SlackString("```\n" * treestring * "```")
     end
 end
 
-function Export(M::FastBSplineManifold, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
+function Export(M::AbstractBSplineManifold, parent::Int; comment = "", maximumstrain = MAXIMUMSTRAIN)
     if isTheShapeComputed()
         dict = LoadResultDict()
-        index = NewestIndex(dict=dict) +1
+        index = NewestIndex(dict = dict) + 1
     else
-        dict=Dict{String,Any}("Expr" => EXPR, "Version" => ESE_VERSION)
+        dict = Dict{String,Any}("Expr" => EXPR, "Version" => ESE_VERSION)
         dict["Result"] = Dict{String,Any}()
         index = 1
     end
 
     dict["Result"][string(index)] = Dict{String,Any}("parent" => string(parent))
-    dict["Result"][string(index)]["FastBSplineManifold"] = toJSON(M)
+    dict["Result"][string(index)]["BSplineManifold"] = toJSON(M)
     dict["Result"][string(index)]["comment"] = comment
 
     SaveResultDict(dict)
 
     if maximumstrain == 0.0
-        MS = ComputeMaximumStrain(index=index)
-        MaximumStrain = max(-MS[1],MS[2])
+        MS = ComputeMaximumStrain(index = index)
+        MaximumStrain = max(-MS[1], MS[2])
     else
         MaximumStrain = maximumstrain
     end
@@ -223,69 +234,83 @@ function Export(M::FastBSplineManifold, parent::Int; comment="", maximumstrain=M
         ExportFiles(M, MaximumStrain, index)
     end
 
-    return nothing
+    return
 end
 
-function ExportFiles(M::FastBSplineManifold, MaximumStrain::Real, index; Name::String=NAME, Dir=DIR, Up=UP, Down=DOWN, Right=RIGHT, Left=LEFT, Mesh=MESH, Unit=UNIT, Slack::Bool=SLACK, Colorbarsize=COLORBARSIZE)
-    mkpath(DIR*"/nurbs")
-    mkpath(DIR*"/strain")
-    mkpath(DIR*"/colorbar")
-    mkpath(DIR*"/append")
+function ExportFiles(
+    M::AbstractBSplineManifold,
+    MaximumStrain::Real,
+    index;
+    Name::String = NAME,
+    Dir = DIR,
+    Up = UP,
+    Down = DOWN,
+    Right = RIGHT,
+    Left = LEFT,
+    Mesh = MESH,
+    Unit = UNIT,
+    Slack::Bool = SLACK,
+    Colorbarsize = COLORBARSIZE,
+)
+    mkpath(DIR * "/nurbs")
+    mkpath(DIR * "/strain")
+    mkpath(DIR * "/colorbar")
+    mkpath(DIR * "/append")
 
     dict = LoadResultDict()
-    𝒂 = M.controlpoints
-    P₁,P₂ = P = M.bsplinespaces
-    p₁,p₂ = p = degree.(P)
-    k₁,k₂ = k = knots.(P)
-    D₁,D₂ = D = k₁[1+p₁]..k₁[end-p₁],k₂[1+p₂]..k₂[end-p₂]
+    𝒂 = controlpoints(M)
+    P₁, P₂ = P = bsplinespaces(M)
+    p₁, p₂ = p = degree.(P)
+    k₁, k₂ = k = knots.(P)
+    D₁, D₂ = D = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
 
-    Width = (Right-Left)*Unit[1]
-    Height = (Up-Down)*Unit[1]
+    Width = (Right - Left) * Unit[1]
+    Height = (Up - Down) * Unit[1]
 
-    normalized_strain(u) = E⁽⁰⁾₁₁_cont(M,u)/MaximumStrain # bounded in -1 to 1
+    normalized_strain(u) = E⁽⁰⁾₁₁_cont(M, u) / MaximumStrain # bounded in -1 to 1
 
     aa = 5 # magnification parameter for antialias
 
-    path_svg_nurbs = Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.svg"
-    path_png_nurbs = Dir*"/nurbs/"*Name*"-"*string(index)*"_Bspline.png"
-    path_png_strain = Dir*"/strain/"*Name*"-"*string(index)*"_strain.png"
-    path_png_colorbar = Dir*"/colorbar/"*Name*"-"*string(index)*"_colorbar.png"
-    path_png_append = Dir*"/append/"*Name*"-"*string(index)*"_append.png"
+    path_svg_nurbs = Dir * "/nurbs/" * Name * "-" * string(index) * "_Bspline.svg"
+    path_png_nurbs = Dir * "/nurbs/" * Name * "-" * string(index) * "_Bspline.png"
+    path_png_strain = Dir * "/strain/" * Name * "-" * string(index) * "_strain.png"
+    path_png_colorbar = Dir * "/colorbar/" * Name * "-" * string(index) * "_colorbar.png"
+    path_png_append = Dir * "/append/" * Name * "-" * string(index) * "_append.png"
 
-    colorfunc(u) = normalized_strain(u) * RGB(0.5,-0.5,-0.5) + RGB(0.5,0.5,0.5) # red to cyan
+    colorfunc(u) = normalized_strain(u) * RGB(0.5, -0.5, -0.5) + RGB(0.5, 0.5, 0.5) # red to cyan
 
-    save_svg(path_svg_nurbs, M, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
-    save_png(path_png_nurbs, M, up=Up, down=Down, right=Right, left=Left, mesh=Mesh, unitlength=Int(Unit[1]))
-    save_png(path_png_strain, M, colorfunc, up=Up, down=Down, right=Right, left=Left, unitlength=Int(aa*Unit[1]))
-    ColorBar(max=MaximumStrain, filename=path_png_colorbar, width=aa*Colorbarsize*Width)
+    save_svg(path_svg_nurbs, M, up = Up, down = Down, right = Right, left = Left, mesh = Mesh, unitlength = Int(Unit[1]))
+    save_png(path_png_nurbs, M, up = Up, down = Down, right = Right, left = Left, mesh = Mesh, unitlength = Int(Unit[1]))
+    save_png(path_png_strain, M, colorfunc, up = Up, down = Down, right = Right, left = Left, unitlength = Int(aa * Unit[1]))
+    ColorBar(max = MaximumStrain, filename = path_png_colorbar, width = aa * Colorbarsize * Width)
 
     img_nurbs = load(path_png_nurbs)
     img_strain = load(path_png_strain)
     img_colorbar = load(path_png_colorbar)
 
-    img_nurbs = convert(Array{RGBA{Float64},2},img_nurbs)
-    img_strain = convert(Array{RGBA{Float64},2},img_strain)
-    img_colorbar = convert(Array{RGBA{Float64},2},img_colorbar)
+    img_nurbs = convert(Array{RGBA{Float64},2}, img_nurbs)
+    img_strain = convert(Array{RGBA{Float64},2}, img_strain)
+    img_colorbar = convert(Array{RGBA{Float64},2}, img_colorbar)
 
     size_nurbs = size(img_nurbs)
     size_strain = size(img_strain)
     size_colorbar = size(img_colorbar)
 
-    img_nurbs_white_background = img_nurbs ./ RGB(1,1,1)
-    img_strain_white_background = img_strain ./ RGB(1,1,1)
+    img_nurbs_white_background = img_nurbs ./ RGB(1, 1, 1)
+    img_strain_white_background = img_strain ./ RGB(1, 1, 1)
     Δ = collect(size_strain) - collect(size_colorbar)
 
     img_offset_colorbar = OffsetArray(img_colorbar, Δ...)
     img_strain_with_colorbar = copy(img_strain_white_background)
     img_strain_with_colorbar[axes(img_offset_colorbar)...] = img_offset_colorbar ./ img_strain_with_colorbar[axes(img_offset_colorbar)...]
-    img_strain_with_colorbar = [RGB(mean(img_strain_with_colorbar[5i-4:5i,5j-4:5j])) for i in 1:800, j in 1:800]
+    img_strain_with_colorbar = [RGB(mean(img_strain_with_colorbar[5i-4:5i, 5j-4:5j])) for i in 1:800, j in 1:800]
     # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but previous one is better for anti-alias
     img_append = hcat(img_nurbs_white_background, img_strain_with_colorbar)
 
     save(path_png_append, img_append)
 
     if Slack
-        SlackFile(path_png_append, comment=Name*"-"*string(index))
+        SlackFile(path_png_append, comment = Name * "-" * string(index))
     end
 end
 
@@ -305,5 +330,5 @@ end
 # TODO
 # export ReDraw
 # function ReDraw()
-#     return nothing
+#     return
 # end
