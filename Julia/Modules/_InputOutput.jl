@@ -47,7 +47,7 @@ function Settings(
     elseif !(@isdefined EXPR)
         error("use @ParametricMapping or input name of computed shape")
     end
-    eval(:(@everywhere $(Meta.parse(EXPR))))
+    eval(:($(Meta.parse(EXPR))))
     return
 end
 
@@ -67,7 +67,7 @@ function toJSON(𝒂::Array{Float64})
     return convert(Array{Any,1}, 𝒂[:])
 end
 function toJSON(M::AbstractBSplineManifold)
-    return Dict("bsplinespaces" => toJSON(bsplinespaces(M)), "controlpoints" => toJSON(controlpoints(M)))
+    return Dict("bsplinespaces" => toJSON(collect(bsplinespaces(M))), "controlpoints" => toJSON(controlpoints(M)))
 end
 
 function JSONtoBSplineSpace(jP::Dict)
@@ -227,12 +227,7 @@ function Export(M::AbstractBSplineManifold, parent::Int; comment = "", maximumst
         MaximumStrain = maximumstrain
     end
 
-    if distributed
-        # @spawnat 1 ExportFiles(M, MaximumStrain, index)
-        ExportFiles(M, MaximumStrain, index)
-    else
-        ExportFiles(M, MaximumStrain, index)
-    end
+    ExportFiles(M, MaximumStrain, index)
 
     return
 end

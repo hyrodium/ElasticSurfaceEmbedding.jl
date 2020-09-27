@@ -1,11 +1,9 @@
-using Distributed
-addprocs(1);
-@everywhere push!(LOAD_PATH, "Modules")
+push!(LOAD_PATH, "Modules")
 using IntervalSets
 using Printf
 using BasicBSpline
 using ElasticSurfaceEmbedding
-@everywhere using LinearAlgebra
+using LinearAlgebra
 
 @ParametricMapping function 𝒑₍₀₎(u)
     s=(norm(u)-7.33/2)/(9.0-7.33/2)

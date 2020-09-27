@@ -34,14 +34,12 @@ function Positioning(𝒂::Array{Float64,3})::Array{Float64,3} # 制御点の位
 end
 
 function Positioning(M::AbstractBSplineManifold) # 制御点の位置調整
-    Ps = bsplinespaces(M)
+    Ps = collect(bsplinespaces(M))
     𝒂 = controlpoints(M)
-    if length(Ps) ≠ d
+    if length(Ps) ≠ 2
         error("dimension does not match")
     end
     P¹, P² = P = bsplinespaces(M)
-    p¹, p² = p = degree.(P)
-    k¹, k² = k = knots.(P)
 
     n₁, n₂, _ = size(𝒂)
     𝒂′ = Positioning(𝒂)
@@ -53,11 +51,11 @@ function SplineRefinement(; p₊::Array{Int,1} = [0, 0], k₊::Array{Knots,1} = 
     parent = Parent(parent)
     M = loadM(index = parent)
 
-    P₁, P₂ = P = bsplinespaces(M)
-    p₁, p₂ = p = degree.(P)
-    k₁, k₂ = k = knots.(P)
+    P₁, P₂ = P = collect(bsplinespaces(M))
+    p₁, p₂ = p = degree(P₁), degree(P₂)
+    k₁, k₂ = k = knots(P₁), knots(P₂)
+    n₁, n₂ = n = dim(P₁), dim(P₂)
     D₁, D₂ = D = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
-    n₁, n₂ = n = dim.(P)
 
     k₊₁, k₊₂ = k₊
 

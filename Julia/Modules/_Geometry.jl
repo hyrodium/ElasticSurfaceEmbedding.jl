@@ -1,9 +1,9 @@
 using ForwardDiff
 
 # Reference State
-𝒑′₍₀₎(u) = ForwardDiff.jacobian(Main.𝒑₍₀₎, u) # Tangent vector
-𝒑₁₍₀₎(u) = ForwardDiff.derivative(u₁ -> Main.𝒑₍₀₎([u₁, u[2]]), u[1])
-𝒑₂₍₀₎(u) = ForwardDiff.derivative(u₂ -> Main.𝒑₍₀₎([u[1], u₂]), u[2])
+𝒑′₍₀₎(u) = ForwardDiff.jacobian(𝒑₍₀₎, u) # Tangent vector
+𝒑₁₍₀₎(u) = ForwardDiff.derivative(u₁ -> 𝒑₍₀₎([u₁, u[2]]), u[1])
+𝒑₂₍₀₎(u) = ForwardDiff.derivative(u₂ -> 𝒑₍₀₎([u[1], u₂]), u[2])
 𝒑₁₁₍₀₎(u) = ForwardDiff.derivative(u₁ -> 𝒑₁₍₀₎([u₁, u[2]]), u[1])
 𝒑₁₂₍₀₎(u) = ForwardDiff.derivative(u₂ -> 𝒑₁₍₀₎([u[1], u₂]), u[2])
 𝒑₂₁₍₀₎(u) = ForwardDiff.derivative(u₁ -> 𝒑₂₍₀₎([u₁, u[2]]), u[1])

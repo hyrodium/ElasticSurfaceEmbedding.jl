@@ -4,7 +4,6 @@ using LinearAlgebra
 using Printf
 using IntervalSets
 using JSON
-using Distributed
 
 using BasicBSpline
 using ExportNURBS

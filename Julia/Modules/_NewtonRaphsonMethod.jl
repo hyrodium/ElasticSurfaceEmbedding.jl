@@ -58,36 +58,33 @@ end
 
 function NewtonIteration(M::AbstractBSplineManifold, fixed; nip = NIP)
     𝒂 = controlpoints(M)
-    P₁, P₂ = P = bsplinespaces(M)
+    P₁, P₂ = P = collect(bsplinespaces(M))
     p₁, p₂ = p = degree.(P)
     k₁, k₂ = k = knots.(P)
     D₁, D₂ = D = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
     n₁, n₂ = n = dim.(P)
-    function lineup(I₁::Int, I₂::Int, i::Int)::Int
-        return (i - 1) * n₁ * n₂ + (I₂ - 1) * n₁ + (I₁ - 1) + 1
-    end
+    lineup(I₁, I₂, i) = (i - 1) * n₁ * n₂ + (I₂ - 1) * n₁ + (I₁ - 1) + 1
 
     t₀ = time()
-    if distributed
-        f = Array{Union{Future,Nothing}}(nothing, n₁, n₂, d)
-        for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:d
-            f[I₁, I₂, i] = @spawn elm_F(M, I₁, I₂, i, nip = nip)
-        end
-        h = Array{Union{Future,Nothing}}(nothing, n₁, n₂, d, n₁, n₂, d)
-        for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:d, R₁ in 1:n₁, R₂ in 1:n₂, r in 1:d
+
+    H = zeros(n₁,n₂,2,n₁,n₂,2)
+    F = zeros(n₁,n₂,2)
+    Threads.@threads for I₁ in 1:n₁
+        for I₂ in 1:n₂, i in 1:2, R₁ in 1:n₁, R₂ in 1:n₂, r in 1:2
             if lineup(I₁, I₂, i) ≤ lineup(R₁, R₂, r)
-                h[I₁, I₂, i, R₁, R₂, r] = h[R₁, R₂, r, I₁, I₂, i] = @spawn elm_H(M, I₁, I₂, i, R₁, R₂, r, nip = nip)
+                H[I₁, I₂, i, R₁, R₂, r] = H[R₁, R₂, r, I₁, I₂, i] = elm_H(M, I₁, I₂, i, R₁, R₂, r, nip = nip)
             end
         end
-        F = fetch.(f)
-        H = fetch.(h)
-    else
-        H = [elm_H(M, I₁, I₂, i, R₁, R₂, r, nip = nip) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:d, R₁ in 1:n₁, R₂ in 1:n₂, r in 1:d]
-        F = [elm_F(M, I₁, I₂, i, nip = nip) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:d]
     end
+    Threads.@threads for I₁ in 1:n₁
+        for I₂ in 1:n₂, i in 1:2
+            F[I₁, I₂, i] = elm_F(M, I₁, I₂, i, nip = nip)
+        end
+    end
+
     t₁ = time()
 
-    𝕟 = n₁ * n₂ * d
+    𝕟 = n₁ * n₂ * 2
     Fixed = sort(collect((i -> lineup(i...)).(fixed(n₁, n₂))))
     Unfixed = deleteat!(collect(1:𝕟), Fixed)
 
@@ -102,9 +99,9 @@ function NewtonIteration(M::AbstractBSplineManifold, fixed; nip = NIP)
     for i in Fixed
         insert!(ǎ, i, aₒ[i])
     end
-    𝒂 = reshape(ǎ, n₁, n₂, d)
+    𝒂 = reshape(ǎ, n₁, n₂, 2)
     M = typeof(M)(P, 𝒂)
-    return (M, F, Ǧ, t₁ - t₀)
+    return M, F, Ǧ, t₁ - t₀
 end
 
 function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip = NIP)
@@ -114,11 +111,9 @@ function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip = N
     k₁, k₂ = k = knots.(P)
     n₁, n₂ = n = dim.(P)
 
-    P₁, P₂ = 𝒫(p₁, k₁), 𝒫(p₂, k₂)
-
     𝜹 = [1.0 0.0; 0.0 1.0]
-    Σ₁ = (maximum([I₁, R₁]):minimum([I₁, R₁])+p₁)
-    Σ₂ = (maximum([I₂, R₂]):minimum([I₂, R₂])+p₂)
+    Σ₁ = max(I₁, R₁):min(I₁, R₁)+p₁
+    Σ₂ = max(I₂, R₂):min(I₂, R₂)+p₂
 
     if length(Σ₁) == 0 || length(Σ₂) == 0
         return 0.0
@@ -139,10 +134,10 @@ function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip = N
                             for p in 1:d, q in 1:d, m in 1:d, n in 1:d
                         )
                     ) * 𝝊,
-                k₁[ι₁]..k₁[ι₁+1],
-                k₂[ι₂]..k₂[ι₂+1],
+                k₁[s₁]..k₁[s₁+1],
+                k₂[s₂]..k₂[s₂+1],
                 nip = nip,
-            ) for ι₁ in Σ₁, ι₂ in Σ₂
+            ) for s₁ in Σ₁, s₂ in Σ₂
         )
     end
 end
@@ -173,9 +168,9 @@ function elm_F(M::AbstractBSplineManifold, I₁, I₂, i; nip = NIP)
                         for m in 1:d, n in 1:d
                     )
                 ) * 𝝊,
-            k₁[ι₁]..k₁[ι₁+1],
-            k₂[ι₂]..k₂[ι₂+1],
+            k₁[s₁]..k₁[s₁+1],
+            k₂[s₂]..k₂[s₂+1],
             nip = nip,
-        ) for ι₁ in Σ₁, ι₂ in Σ₂
+        ) for s₁ in Σ₁, s₂ in Σ₂
     )
 end
