@@ -1,6 +1,4 @@
-using Distributed
-addprocs(1);
-@everywhere push!(LOAD_PATH, "Modules")
+push!(LOAD_PATH, "Modules")
 using IntervalSets
 using Printf
 using BSpline
