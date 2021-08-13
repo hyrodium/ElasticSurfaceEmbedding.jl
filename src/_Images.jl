@@ -1,15 +1,9 @@
 # The Package ColorBlendModes might work better than the code below, I guess.
 # https://github.com/kimikage/ColorBlendModes.jl
 
-import Images
-import Images.load
-import Images.save
-import Images.RGB
-import Images.RGBA
-import Images.AbstractRGB
-import Images.TransparentRGB
-import Images.weighted_color_mean
-import Images.OffsetArray
+import FileIO.load
+import FileIO.save
+using OffsetArrays
 import Statistics.mean
 using Colors
 using Luxor
