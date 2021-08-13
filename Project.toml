@@ -14,3 +14,6 @@ Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
 IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 Luxor = "ae8d54c2-7ccd-5906-9d76-62fc9837b5bc"
+
+[compat]
+BasicBSpline = "0.1.6"
