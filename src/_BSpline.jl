@@ -47,7 +47,7 @@ function Positioning(M::AbstractBSplineManifold) # 制御点の位置調整
 end
 
 export SplineRefinement
-function SplineRefinement(; p₊::Array{Int,1} = [0, 0], k₊::Array{Knots,1} = [Knots([]), Knots([])], parent::Int = 0)
+function SplineRefinement(; p₊::Array{Int,1} = [0, 0], k₊::Array{Knots,1} = [Knots(), Knots()], parent::Int = 0)
     parent = Parent(parent)
     M = loadM(index = parent)
 
@@ -59,11 +59,11 @@ function SplineRefinement(; p₊::Array{Int,1} = [0, 0], k₊::Array{Knots,1} = 
 
     k₊₁, k₊₂ = k₊
 
-    if (k₊₁ ≠ Knots([])) && !(k₁[1] < k₊₁[1] && k₊₁[end] < k₁[end])
+    if (k₊₁ ≠ Knots()) && !(k₁[1] < k₊₁[1] && k₊₁[end] < k₁[end])
         error("given additional knots for refinement are out of range")
     end
 
-    if (k₊₂ ≠ Knots([])) && !(k₂[1] < k₊₂[1] && k₊₂[end] < k₂[end])
+    if (k₊₂ ≠ Knots()) && !(k₂[1] < k₊₂[1] && k₊₂[end] < k₂[end])
         error("given additional knots for refinement are out of range")
     end
 
