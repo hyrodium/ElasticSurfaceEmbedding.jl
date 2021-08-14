@@ -39,9 +39,7 @@ function Positioning(M::AbstractBSplineManifold) # 制御点の位置調整
     if length(Ps) ≠ 2
         error("dimension does not match")
     end
-    P¹, P² = P = bsplinespaces(M)
 
-    n₁, n₂, _ = size(𝒂)
     𝒂′ = Positioning(𝒂)
     return typeof(M)(Ps, 𝒂′)
 end
@@ -77,15 +75,17 @@ export ShowKnots
 function ShowKnots(; index = 0)
     M = loadM(index = index)
 
-    P₁, P₂ = P = bsplinespaces(M)
-    p₁, p₂ = degree.(P)
+    P = bsplinespaces(M)
     k₁, k₂ = knots.(P)
-    println("k₁: ", k₁.vector)
-    println("k₂: ", k₂.vector)
-    println("Suggestion:")
     k₁′ = unique(k₁)
     k₂′ = unique(k₂)
-    println("k₁₊: ", [(k₁′[i] + k₁′[i+1]) / 2 for i in 1:(length(k₁′)-1)])
-    println("k₂₊: ", [(k₂′[i] + k₂′[i+1]) / 2 for i in 1:(length(k₂′)-1)])
+    msg = """
+    Current knots (k₁, k₂) and suggestions for knot insersion (k₁₊, k₂₊)
+    k₁: , $(k₁.vector)
+    k₂: , $(k₂.vector)
+    k₁₊: , $([(k₁′[i] + k₁′[i+1]) / 2 for i in 1:(length(k₁′)-1)])
+    k₂₊: , $([(k₂′[i] + k₂′[i+1]) / 2 for i in 1:(length(k₂′)-1)])
+    """
+    @info msg
     return
 end
