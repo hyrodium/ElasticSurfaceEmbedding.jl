@@ -32,7 +32,7 @@ B̃(D₂, t) = dot(e⁽⁰⁾₂(c(D₂, t)), 𝒑₂₍₀₎(c(D₂, t))) * wi
 
 
 # Current State
-𝒑₍ₜ₎(M, u) = mapping(M, u)
+𝒑₍ₜ₎(M, u) = M(u)
 function 𝒑′₍ₜ₎(M::AbstractBSplineManifold, u)
     P₁, P₂ = bsplinespaces(M)
     𝒂 = controlpoints(M)
