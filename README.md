@@ -33,9 +33,9 @@ The image below is a result for the domain D_1.
 
 ### step 3 : Edit on vector graphics editor
 The output files are svg format.
-You can print the graphics or cut papers by laser cutting machine, so this step is for preparation.
+After editing the svg files, you can print the graphics or cut papers by laser cutting machine.
 
-[Graphics here]
+<img src="docs/src/img/inkscape.png" width="800">
 
 ### step 4 : Craft a paper model
 This is the final step.
