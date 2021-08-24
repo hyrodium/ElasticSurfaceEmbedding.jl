@@ -39,9 +39,9 @@ After editing the svg files, you can print the graphics or cut papers by laser c
 
 ### step 4 : Craft a paper model
 This is the final step.
-Cut papers into strips, and weave the paper strips.
+Cut papers into strips, and weave them.
 
-[Graphics here]
+<img src="docs/src/img/assembling.png" width="800">
 
 
 ## Directions: If you like..
@@ -58,7 +58,7 @@ Cut papers into strips, and weave the paper strips.
 | --- | :-- |
 
 ### ..me!:bowtie:
-| <img src="docs/src/img/me.jpg" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/Profile). <br> Read my upcoming paper. |
+| <img src="docs/src/img/me.jpg" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/). <br> Read my upcoming paper. |
 | --- | :-- |
 
 
