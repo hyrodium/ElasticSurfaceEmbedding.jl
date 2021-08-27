@@ -1,4 +1,4 @@
-f = open("Julia/config.json", "r")
+f = open("config/config.json", "r")
 config_dict = JSON.parse(f)  # parse and transform data
 const NIP = config_dict["Default Number of Integration Points"]::Int
 const 𝝂 = config_dict["Poisson's Ratio"]::Float64
