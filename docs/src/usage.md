@@ -75,7 +75,7 @@ using IntervalSets
 Through this document, we treat a paraboloid as an example.
 
 ```
-@ParametricMapping ...
+@parametric_mapping ...
 ```
 
 ### Split the surface into strips
@@ -89,7 +89,7 @@ D(i,n) = (-1.0..1.0, (i-1)/n..i/n)
 
 ```
 i = 1
-ShowMaximumStrain(D(i,10))
+print_strain(D(i,10))
 ```
 
 Negative number means compression, and positive number means tension.
@@ -99,14 +99,14 @@ The absolute value of these numbers should be less than 0.01.
 If you finished checking the strain prediction, the next step is determine the initial configuration.
 
 ```
-ShowMaximumStrain(D(i,10))
+print_strain(D(i,10))
 ```
 
 
 ### Newton-Raphson method iteration
 
 ```
-NewtonMethodIteration(fixingmethod=:FixThreePoints)
+newton_onestep(fixingmethod=:FixThreePoints)
 ```
 
 You can choose the fixing method from below:
@@ -117,13 +117,13 @@ You can choose the fixing method from below:
 
 
 ```
-SplineRefinement(p₊=[0,1],k₊=[Knots([]),Knots([(i-1/2)/10])])
+spline_refinement(p₊=[0,1],k₊=[Knots([]),Knots([(i-1/2)/10])])
 ```
 
 ### Pin the state
 
 ```
-PinState(tag="paraboloid-"*string(i+1))
+pin_state(tag="paraboloid-"*string(i+1))
 ```
 
 ### Finish
@@ -139,8 +139,8 @@ FinishComputation()
 RemovePin(16)
 ```
 ```
-ComputedShapes()
+computed_shapes()
 ```
 ```
-ShowKnots()
+print_knots()
 ```

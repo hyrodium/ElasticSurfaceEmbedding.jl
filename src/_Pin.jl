@@ -1,5 +1,5 @@
-export PinState
-function PinState(; parent::Int = 0, tag::String = "")
+export pin_state
+function pin_state(; parent::Int = 0, tag::String = "")
     if tag == ""
         tag = Dates.format(now(), "yyyy-mm-dd_H-M-S")
     end
@@ -73,8 +73,8 @@ function FindPinnedStates(; dict::Union{Dict,Nothing} = nothing)::Array{String}
     return PinnedStates
 end
 
-export ExportPinnedStates
-function ExportPinnedStates(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
+export export_pinned_states
+function export_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
     mkpath(DIR * "/pinned")
     dict = LoadResultDict()
     PinnedStates = FindPinnedStates(dict = dict)
@@ -86,11 +86,10 @@ function ExportPinnedStates(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::
         filename = DIR * "/pinned/" * GetTag(index, dict = dict) * ".svg"
         save_svg(filename, M, up = UP, down = DOWN, right = RIGHT, left = LEFT, mesh = MESH, unitlength = unitlength[1], points = false)
 
-        P₁, P₂ = P = bsplinespaces(M)
-        p₁, p₂ = p = degree.(P)
-        k₁, k₂ = k = knots.(P)
-        D₁, D₂ = D = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
-        n₁, n₂ = n = dim.(P)
+        P = bsplinespaces(M)
+        p₁, p₂ = degree.(P)
+        k₁, k₂ = knots.(P)
+        D₁, D₂ = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
 
         𝒆⁽⁰⁾₁(u) = normalize(𝒑₁₍ₜ₎(M, u))
         𝒆⁽⁰⁾₂(u) = [0.0 -1.0; 1.0 0.0] * 𝒆⁽⁰⁾₁(u)

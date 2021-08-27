@@ -44,16 +44,13 @@ function Positioning(M::AbstractBSplineManifold) # 制御点の位置調整
     return typeof(M)(Ps, 𝒂′)
 end
 
-export SplineRefinement
-function SplineRefinement(; p₊::Array{Int,1} = [0, 0], k₊::Array{Knots,1} = [Knots(), Knots()], parent::Int = 0)
+export spline_refinement
+function spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{Knots,1}=[Knots(), Knots()], parent::Int=0)
     parent = Parent(parent)
     M = loadM(index = parent)
 
-    P₁, P₂ = P = collect(bsplinespaces(M))
-    p₁, p₂ = p = degree(P₁), degree(P₂)
-    k₁, k₂ = k = knots(P₁), knots(P₂)
-    n₁, n₂ = n = dim(P₁), dim(P₂)
-    D₁, D₂ = D = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
+    P₁, P₂ = collect(bsplinespaces(M))
+    k₁, k₂ = knots(P₁), knots(P₂)
 
     k₊₁, k₊₂ = k₊
 
@@ -71,8 +68,8 @@ function SplineRefinement(; p₊::Array{Int,1} = [0, 0], k₊::Array{Knots,1} = 
     return
 end
 
-export ShowKnots
-function ShowKnots(; index = 0)
+export print_knots
+function print_knots(; index = 0)
     M = loadM(index = index)
 
     P = bsplinespaces(M)
@@ -80,7 +77,7 @@ function ShowKnots(; index = 0)
     k₁′ = unique(k₁)
     k₂′ = unique(k₂)
     msg = """
-    Current knots (k₁, k₂) and suggestions for knot insersion (k₁₊, k₂₊)
+    Current knots (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
     k₁: , $(k₁.vector)
     k₂: , $(k₂.vector)
     k₁₊: , $([(k₁′[i] + k₁′[i+1]) / 2 for i in 1:(length(k₁′)-1)])

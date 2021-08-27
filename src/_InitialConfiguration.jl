@@ -1,5 +1,5 @@
-export InitialConfiguration
-function InitialConfiguration(D; n₁ = 15)
+export initial_configulation
+function initial_configulation(D; n₁ = 15)
     parent = 0
 
     D₁, D₂ = D

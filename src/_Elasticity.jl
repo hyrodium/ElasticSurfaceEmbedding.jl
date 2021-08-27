@@ -49,16 +49,19 @@ function PredictMaximumStrain(D; mesh = tuple(20 * [MESH...]...))
     return (minimum(E), maximum(E))
 end
 
-export ShowMaximumStrain
-function ShowMaximumStrain(D; index = 0)
+export print_strain
+function print_strain(D; index = 0)
     minE, maxE = PredictMaximumStrain(D)
 
-    println("Predicted: (min: ", minE, ", max: ", maxE, ")")
+    msg = "Strain\n"
+    msg *= "Predicted: (min: $(minE), max: $(maxE))\n"
 
     if isTheShapeComputed()
         minE, maxE = ComputeMaximumStrain(index = index)
-        println("Computed: (min: ", minE, ", max: ", maxE, ")")
+        msg *= "Computed: (min: $(minE), max: $(maxE))\n"
     end
+    
+    @info msg
 
     return
 end

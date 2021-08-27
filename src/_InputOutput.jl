@@ -1,5 +1,5 @@
-export @ParametricMapping
-macro ParametricMapping(ex)
+export @parametric_mapping
+macro parametric_mapping(ex)
     expr = toJSON(ex)
     if startswith(expr, "function 𝒑₍₀₎(u)\n") || startswith(expr, "𝒑₍₀₎(u) =")
         global EXPR = expr
@@ -15,8 +15,8 @@ function CheckAsFileName(name::String)
     end
 end
 
-export Settings
-function Settings(
+export settings
+function settings(
     name::String;
     up::Real = 5,
     down::Real = -5,
@@ -45,7 +45,7 @@ function Settings(
         println(TreeString(dict["Result"]))
         global EXPR = dict["Expr"]
     elseif !(@isdefined EXPR)
-        error("use @ParametricMapping or input name of computed shape")
+        error("use @parametric_mapping or input name of computed shape")
     end
     eval(:($(Meta.parse(EXPR))))
     return
@@ -310,12 +310,12 @@ function ExportFiles(
 end
 
 
-export ComputedShapes
+export computed_shapes
 
 """
 Show and return the names of computed shapes.
 """
-function ComputedShapes()
+function computed_shapes()
     shapes = Base.Filesystem.readdir(ElasticSurfaceEmbedding.OUT_DIR)
     println(shapes)
     return shapes

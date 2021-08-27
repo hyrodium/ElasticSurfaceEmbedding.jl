@@ -28,8 +28,8 @@ function SecondsToString(Δt::Float64)
     return AbbStr(prds)
 end
 
-export NewtonMethodIteration
-function NewtonMethodIteration(; fixingmethod = :DefaultOrientation, parent::Int = 0, nip = NIP)
+export newton_onestep
+function newton_onestep(; fixingmethod = :DefaultOrientation, parent::Int = 0, nip = NIP)
     if fixingmethod == :DefaultOrientation
         fixed = DefaultOrientation
     elseif fixingmethod == :FixThreePoints
