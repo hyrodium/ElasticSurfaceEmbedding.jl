@@ -6,7 +6,7 @@ function initial_configulation(D; n₁ = 15)
     M = _initialize(D, n₁)
     comment = "Initial Configuration - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
 
-    Export(M, parent, comment = comment)
+    _export(M, parent, comment = comment)
 end
 
 function _initialize(D, n₁)

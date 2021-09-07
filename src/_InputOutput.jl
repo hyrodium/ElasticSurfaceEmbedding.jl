@@ -8,7 +8,7 @@ macro parametric_mapping(ex)
     end
 end
 
-function CheckAsFileName(name::String)
+function _check_filename(name::String)
     invalidcharacters = [' ', '&', '\\', '/', '.', '<', '>', '|', ':', ';', '*', '?', '=', '%', '$', '"', '~']
     if length(invalidcharacters ∩ name) ≠ 0
         error("The name[$(name)] must not consists of following chars: ", invalidcharacters)
@@ -28,7 +28,7 @@ function settings(
     maximumstrain::Real = 0.0,
     colorbarsize::Float64 = 0.2,
 )
-    CheckAsFileName(name)
+    _check_filename(name)
     global NAME = name
     global DIR = OUT_DIR * NAME
     global UP = up
@@ -63,8 +63,8 @@ end
 function toJSON(P::Array{P,1} where {P<:FastBSplineSpace})
     return convert(Array{Any,1}, toJSON.(P))
 end
-function toJSON(𝒂::Array{Float64})
-    return convert(Array{Any,1}, 𝒂[:])
+function toJSON(a::Array{Float64})
+    return convert(Array{Any,1}, a[:])
 end
 function toJSON(M::AbstractBSplineManifold)
     return Dict("bsplinespaces" => toJSON(collect(bsplinespaces(M))), "controlpoints" => toJSON(controlpoints(M)))
@@ -76,16 +76,16 @@ end
 function JSONtoBSplineSpaces(jPs::Array)
     return [JSONtoBSplineSpace(jP) for jP in jPs]
 end
-function JSONtoControlPoints(j𝒂, dims)
+function JSONtoControlPoints(ja, dims)
     n = prod(dims)
-    d = length(j𝒂) ÷ n
-    return reshape(convert(Array{Float64}, j𝒂), dims..., d)
+    d = length(ja) ÷ n
+    return reshape(convert(Array{Float64}, ja), dims..., d)
 end
 function JSONtoBSplineSurface(dict::Dict)
     P = JSONtoBSplineSpaces(dict["bsplinespaces"])
     dims = dim.(P)
-    𝒂 = JSONtoControlPoints(dict["controlpoints"], dims)
-    return BSplineSurface(P, 𝒂)
+    a = JSONtoControlPoints(dict["controlpoints"], dims)
+    return BSplineSurface(P, a)
 end
 
 function NodeSeries(tree::Dict, node)
@@ -187,24 +187,7 @@ function LoadResultDict()::Dict
     end
 end
 
-function SaveResultDict(dict::Dict)
-    mkpath(DIR)
-    open(DIR * "/" * NAME * ".json", "w") do f
-        JSON.print(f, dict, 4)
-    end
-    PrintResultDict(dict)
-    return
-end
-
-function PrintResultDict(dict::Dict; slack = SLACK)
-    treestring = TreeString(dict["Result"])
-    println(treestring)
-    if slack
-        SlackString("```\n" * treestring * "```")
-    end
-end
-
-function Export(M::AbstractBSplineManifold, parent::Int; comment = "", maximumstrain = MAXIMUMSTRAIN)
+function _export(M::AbstractBSplineManifold, parent::Int; comment = "", maximumstrain = MAXIMUMSTRAIN)
     if isTheShapeComputed()
         dict = LoadResultDict()
         index = NewestIndex(dict = dict) + 1
@@ -218,8 +201,11 @@ function Export(M::AbstractBSplineManifold, parent::Int; comment = "", maximumst
     dict["Result"][string(index)]["BSplineManifold"] = toJSON(M)
     dict["Result"][string(index)]["comment"] = comment
 
-    SaveResultDict(dict)
+    # Save as json
+    mkpath(DIR)
+    write(joinpath(DIR, NAME*".json"), JSON.json(dict, 4))
 
+    # Compute maximum strain for graphics export
     if maximumstrain == 0.0
         MS = ComputeMaximumStrain(index = index)
         MaximumStrain = max(-MS[1], MS[2])
@@ -227,9 +213,16 @@ function Export(M::AbstractBSplineManifold, parent::Int; comment = "", maximumst
         MaximumStrain = maximumstrain
     end
 
+    # Save graphics
     ExportFiles(M, MaximumStrain, index)
 
-    return
+    # Send messages
+    path_png_append = DIR * "/append/" * NAME * "-" * string(index) * "_append.png"
+    message = TreeString(dict["Result"])
+    println(message)
+    if SLACK
+        _send_file_to_slack(path_png_append, comment = "```\n" * message * "```")
+    end
 end
 
 function ExportFiles(
@@ -244,20 +237,12 @@ function ExportFiles(
     Left = LEFT,
     Mesh = MESH,
     Unit = UNIT,
-    Slack::Bool = SLACK,
     Colorbarsize = COLORBARSIZE,
 )
     mkpath(DIR * "/nurbs")
     mkpath(DIR * "/strain")
     mkpath(DIR * "/colorbar")
     mkpath(DIR * "/append")
-
-    dict = LoadResultDict()
-    𝒂 = controlpoints(M)
-    P₁, P₂ = P = bsplinespaces(M)
-    p₁, p₂ = p = degree.(P)
-    k₁, k₂ = k = knots.(P)
-    D₁, D₂ = D = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
 
     Width = (Right - Left) * Unit[1]
     Height = (Up - Down) * Unit[1]
@@ -303,10 +288,6 @@ function ExportFiles(
     img_append = hcat(img_nurbs_white_background, img_strain_with_colorbar)
 
     save(path_png_append, img_append)
-
-    if Slack
-        SlackFile(path_png_append, comment = Name * "-" * string(index))
-    end
 end
 
 

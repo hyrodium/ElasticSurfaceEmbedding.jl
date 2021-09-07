@@ -53,7 +53,7 @@ function newton_onestep(; fixingmethod = :DefaultOrientation, parent::Int = 0, n
         (@sprintf("%.4e", norm(Ǧ))) *
         ", computation time: " *
         SecondsToString(Δt)
-    Export(M, parent, comment = comment)
+    _export(M, parent, comment = comment)
 end
 
 function NewtonIteration(M::AbstractBSplineManifold, fixed; nip = NIP)

@@ -64,7 +64,7 @@ function spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{Knots,1}=[Kn
 
     comment = "Refinement - p₊:" * string(p₊) * ", k₊:" * string([k₊₁.vector, k₊₂.vector])
     M = refinement(M, p₊ = p₊, k₊ = k₊)
-    Export(M, parent, comment = comment)
+    _export(M, parent, comment = comment)
     return
 end
 
