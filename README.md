@@ -3,7 +3,7 @@
 ## TL;DR
 You can make a *holdable* smooth surface model with this repository.
 
-<img src="docs/src/img/Paraboloid1.png" height="150"> <img src="docs/src/img/Paraboloid2.png" height="150"> <img src="docs/src/img/Paraboloid3.png" height="150"> <img src="docs/src/img/Paraboloid4.jpg" height="150"> <img src="docs/src/img/Paraboloid5.png" height="150">
+![](docs/src/img/overview.png)
 
 The main part of this project is how to determine a planer shape from a strip on curved surface.
 In mathematics, this mapping is called "embedding".
