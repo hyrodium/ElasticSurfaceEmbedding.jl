@@ -59,18 +59,29 @@ Cut papers into strips, and weave them.
 
 
 ## Directions: If you like..
-### ..making crafts✂️
-| <img src="img/craft.png" align="top" height="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Craft). <br> Laser cutting machine is useful, but it's not necessary. |
-| --- | :-- |
+### ..making crafts ✂️
+![](img/craft_thumbnail.png)
 
-### ..computing💻
-| <img src="img/juliawolfram.png" align="top" height="150"> | Clone this repository, and run the [Julia code](/Julia) or [Wolfram code](/Wolfram)! <br> Any issues and pull requests are welcomed. |
-| --- | :-- |
+Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Craft).
+Laser cutting machine is useful, but it's not necessary.
 
-### ..mathematics or physics🌐
-| <img src="img/math.png" align="top" height="150"> | Read my upcoming paper. Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
-| --- | :-- |
+### ..computing 💻
+![](img/juliawolfram_thumbnail.png)
 
-### ..me!:bowtie:
-| <img src="img/me.jpg" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/). <br> Read my upcoming paper. |
-| --- | :-- |
+Clone this repository, and run the [Julia code](/Julia) or [Wolfram code](/Wolfram)!
+Any issues and pull requests are welcomed.
+
+### ..mathematics or physics 🌐
+![](img/math_thumbnail.png)
+
+Read my upcoming paper. Here's our theoretical framework:
+* Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold)・
+* Geometric representation: [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline)
+* Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method)
+
+### ..me! 🐢
+![](img/me_thumbnail.jpg)
+
+Follow [my twitter account](https://twitter.com/Hyrodium).
+Visit [my website](https://hyrodium.github.io/).
+Read my upcoming paper.
