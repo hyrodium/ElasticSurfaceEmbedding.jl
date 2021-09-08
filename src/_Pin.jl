@@ -48,8 +48,8 @@ function GetTag(index; dict::Union{Dict,Nothing} = nothing)::String
     end
 end
 
-export RemovePin
-function RemovePin(index)::Nothing
+export remove_pin
+function remove_pin(index)::Nothing
     dict = LoadResultDict()
     tag = GetTag(index)
     comment = dict["Result"][repr(index)]["comment"]
