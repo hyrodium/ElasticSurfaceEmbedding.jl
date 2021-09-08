@@ -1,4 +1,4 @@
-# Julia code for Elastic Surface Embedding
+# Computing
 
 ## Overview
 ### Input
@@ -16,18 +16,7 @@
 In this repository, Julia is for numerical analysis of surface embedding.
 
 * [Julia](https://julialang.org/) (≥v1.0)
-* Packages
-    * IntervalSets
-    * Luxor
-    * Colors
-    * ForwardDiff
-    * DifferentialEquations
-    * FastGaussQuadrature
-    * JSON
-	* Images
-	* ImageMagick (for linux)
 * Slack (optional)
-    * Incoming webhook URL
     * OAuth access token
     * Channel ID
 
