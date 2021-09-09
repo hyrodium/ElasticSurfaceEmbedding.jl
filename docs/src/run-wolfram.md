@@ -1,4 +1,4 @@
-# Symbolic computation
+# [Symbolic computation](@id symbolic_computation)
 
 ## Overview
 The main topic of this page is to give a proof of the main theorem of our thesis.

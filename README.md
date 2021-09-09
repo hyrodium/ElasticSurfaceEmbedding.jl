@@ -39,7 +39,7 @@ After editing the svg files, you can print the graphics or cut papers by laser c
 
 ### step 4 : Craft a paper model
 This is the final step.
-Cut papers into strips, and weave them.
+Cut papers into strips, and weave them into surface.
 
 <img src="docs/src/img/assembling.png" width="800">
 
@@ -54,7 +54,7 @@ Cut papers into strips, and weave them.
 | --- | :-- |
 
 ### ..mathematics or physics:globe_with_meridians:
-| <img src="docs/src/img/math.png" align="top" height="150"> | Read our upcoming paper. Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
+| <img src="docs/src/img/math.png" align="top" height="150"> | Read our upcoming paper. Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [NURBS (esp. B-spline manifold)](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
 | --- | :-- |
 
 ### ..me!:bowtie:

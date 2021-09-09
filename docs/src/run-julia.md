@@ -1,6 +1,7 @@
-# Numerical computation
+# [Numerical computation](@id numerical_computation)
 
 ## Installation
+On Julia's package mode,
 ```julia-repl
 pkg> add IntervalSets
 pkg> add BasicBSpline
