@@ -1,3 +1,3 @@
-# Theory
+# Theoretical framework
 
 Read my paper!

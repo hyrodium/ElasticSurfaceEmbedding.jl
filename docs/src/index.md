@@ -41,12 +41,12 @@ D_i
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
 For more information, read [this document](/Julia).
-The image below is a result for the domain D_1.
+The image below is a result for the domain ``D_1``.
 
 ![](img/NurbsStrain.png)
 
 ### step 3 : Edit on vector graphics editor
-The output files are svg format.
+The output files are SVG format.
 After editing the svg files, you can print the graphics or cut papers by laser cutting machine.
 
 ![](img/inkscape.png)
@@ -60,28 +60,59 @@ Cut papers into strips, and weave them.
 
 ## Directions: If you like..
 ### ..making crafts ✂️
-![](img/craft_thumbnail.png)
-
-Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Craft).
-Laser cutting machine is useful, but it's not necessary.
+```@raw html
+<div style="display:table;  width:100%;">
+    <div style="display:table-cell; width:160px;">
+        <img src="img/craft_thumbnail.png">
+    </div>
+    <div style="display:table-cell; vertical-align:middle;">
+        Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Craft).
+        Laser cutting machine is useful, but it's not necessary.
+    </div>
+</div>
+```
 
 ### ..computing 💻
-![](img/juliawolfram_thumbnail.png)
-
-Clone this repository, and run the [Julia code](/Julia) or [Wolfram code](/Wolfram)!
-Any issues and pull requests are welcomed.
+```@raw html
+<div style="display:table;  width:100%;">
+    <div style="display:table-cell; width:160px;">
+        <img src="img/juliawolfram_thumbnail.png">
+    </div>
+    <div style="display:table-cell; vertical-align:middle;">
+        Clone this repository, and run the Julia script or Wolfram script!
+        Any issues and pull requests are welcomed.
+    </div>
+</div>
+```
 
 ### ..mathematics or physics 🌐
-![](img/math_thumbnail.png)
 
-Read my upcoming paper. Here's our theoretical framework:
-* Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold)・
-* Geometric representation: [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline)
-* Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method)
+```@raw html
+<div style="display:table;  width:100%;">
+    <div style="display:table-cell; width:160px;">
+        <img src="img/math_thumbnail.png">
+    </div>
+    <div style="display:table-cell; vertical-align:middle;">
+        Read my upcoming paper. Here's our theoretical framework:
+        <ul>
+            <li>Mathematical model: <a href="https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity">Nonlinear elasticity</a> on <a href="https://en.m.wikipedia.org/wiki/Riemannian_manifold">Riemannian manifold</a></li>
+            <li>Geometric representation: <a href="https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a></li>
+            <li>Numerical analysis: <a href="https://en.wikipedia.org/wiki/Galerkin_method">Galerkin method</a>, <a href="https://en.wikipedia.org/wiki/Newton%27s_method">Newton-Raphson method</a></li>
+        </ul>
+    </div>
+</div>
+```
 
 ### ..me! 🐢
-![](img/me_thumbnail.jpg)
-
-Follow [my twitter account](https://twitter.com/Hyrodium).
-Visit [my website](https://hyrodium.github.io/).
-Read my upcoming paper.
+```@raw html
+<div style="display:table;  width:100%;">
+    <div style="display:table-cell; width:160px;">
+        <img src="img/me_thumbnail.jpg">
+    </div>
+    <div style="display:table-cell; vertical-align:middle;">
+        Follow <a href="https://twitter.com/Hyrodium">my twitter account</a>.
+        Visit <a href="https://hyrodium.github.io/">my website</a>.
+        Read my upcoming paper.
+    </div>
+</div>
+```

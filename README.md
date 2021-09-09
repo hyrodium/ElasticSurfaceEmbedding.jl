@@ -32,7 +32,7 @@ The image below is a result for the domain D_1.
 <img src="docs/src/img/NurbsStrain.png" width="800">
 
 ### step 3 : Edit on vector graphics editor
-The output files are svg format.
+The output files are SVG format.
 After editing the svg files, you can print the graphics or cut papers by laser cutting machine.
 
 <img src="docs/src/img/inkscape.png" width="800">
@@ -54,7 +54,7 @@ Cut papers into strips, and weave them.
 | --- | :-- |
 
 ### ..mathematics or physics:globe_with_meridians:
-| <img src="docs/src/img/math.png" align="top" height="150"> | Read my upcoming paper. Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
+| <img src="docs/src/img/math.png" align="top" height="150"> | Read our upcoming paper. Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
 | --- | :-- |
 
 ### ..me!:bowtie:
@@ -66,6 +66,3 @@ Cut papers into strips, and weave them.
 <img src="docs/src/img/Paraboloid1.png" width="160"> <img src="docs/src/img/Paraboloid2.png" width="160"> <img src="docs/src/img/Paraboloid3.png" width="160"> <img src="docs/src/img/Paraboloid4.jpg" width="160"> <img src="docs/src/img/Paraboloid5.png" width="160">
 
 <img src="docs/src/img/CatenoidHelicoid.gif" width="400">
-
-**Notice**: If you made a surface with this repository, I'd like to add pictures of your work here!
-Feel free to contact me, thanks!
