@@ -50,7 +50,7 @@ end
 Compute a refinement of the B-spline manifold
 """
 function spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{Knots,1}=[Knots(), Knots()], parent::Int=0)
-    parent = Parent(parent)
+    parent = _realparent(parent)
     M = loadM(index = parent)
 
     P₁, P₂ = collect(bsplinespaces(M))

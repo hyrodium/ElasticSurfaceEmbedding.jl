@@ -14,7 +14,8 @@ OUT_DIR = joinpath(homedir(),"ElasticSurfaceEmbedding-Result")
 """
     config_dir(dir)
 
-Set output directory
+Set the output directory.
+The default is `~/ElasticSurfaceEmbedding-Result`.
 """
 function config_dir(dir)
     _dir = expanduser(dir)

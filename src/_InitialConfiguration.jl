@@ -1,7 +1,7 @@
 """
     initial_state(D; n₁ = 15)
 
-Compute the initial state, by solving a ODE.
+Compute the initial state, by solving a ODE of center curve.
 """
 function initial_state(D; n₁ = 15)
     parent = 0

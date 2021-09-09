@@ -27,19 +27,19 @@ function SecondsToString(Δt::Float64)
 end
 
 """
-    newton_onestep(; fixingmethod = :DefaultOrientation, parent::Int = 0, nip = NIP)
+    newton_onestep(; fixingmethod=:default, parent::Int=0, nip=NIP)
 
 Compute one step of Newton-Raphson method
 """
-function newton_onestep(; fixingmethod = :DefaultOrientation, parent::Int = 0, nip = NIP)
-    if fixingmethod == :DefaultOrientation
+function newton_onestep(; fixingmethod=:default, parent::Int=0, nip=NIP)
+    if fixingmethod == :default
         fixed = DefaultOrientation
-    elseif fixingmethod == :FixThreePoints
+    elseif fixingmethod == :fix3points
         fixed = FixThreePoints
     else
         error("No method for $(fixingmethod)")
     end
-    parent = Parent(parent)
+    parent = _realparent(parent)
     M = loadM(index = parent)
 
     n₁, n₂ = n = dim.(bsplinespaces(M))
