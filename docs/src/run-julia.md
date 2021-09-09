@@ -27,12 +27,36 @@ Through this section, we treat a paraboloid ``z=x^2+y^2`` as an example.
 
 ![](img/Paraboloid1.png)
 
-### Load packages
+### Load packages, and optional configuration
+Load packages with the following script.
 ```julia
 using IntervalSets
 using BasicBSpline
 using ElasticSurfaceEmbedding
 ```
+
+Set the output directory. *(optional)*
+```julia
+config_dir("~/ElasticSurfaceEmbedding-Result")
+```
+
+```@docs
+config_dir
+```
+
+Configure the slack bot. *(optional)*
+```julia
+config_slack(channel="xxxx", token="xxxx")
+```
+
+```@docs
+config_slack
+```
+
+!!! info "Slack bot"
+    If you would like to use this feature, the bot in the channel must have the following permissions.
+    * [`chat.post`](https://api.slack.com/methods/chat.postMessage)
+    * [`files.upload`](https://api.slack.com/methods/files.upload)
 
 ### Define the shape of surface
 ```julia
@@ -57,18 +81,15 @@ D
 ```
 
 ### Settings
-#### Output directory (optional)
-
-#### Name and graphics region
+Before the computation, we need to set the name of the surface, and output graphics region.
 ```julia
-settings(name,up=2,down=-2,right=2,left=-2,mesh=(20,1),unit=200,slack=true,colorbarsize=0.3)
+name = "Paraboloid"
+settings(name,up=2,down=-2,right=2,left=-2,mesh=(20,1),unit=200,colorbarsize=0.3)
 ```
 
 ```@docs
 settings
 ```
-
-#### Slack (optional)
 
 ### Split the surface into strips
 The domain ``D`` will be split into ``D_i``.
@@ -108,8 +129,9 @@ The output information will be like this:
 
 ![](img/example_strain-prediction.png)
 
-Positive number means tension, and negative number means compression.
-Empirically, it is better if the absolute value of strain is smaller than ``0.01``.
+!!! tip "Allowable strain"
+    Positive number means tension, and negative number means compression.
+    Empirically, it is better if the absolute value of strain is smaller than ``0.01``.
 
 ```@docs
 print_strain
@@ -118,24 +140,35 @@ print_strain
 ### Initial configuration
 If you finished checking the strain prediction, the next step is determine the initial configuration.
 
+From this section, the computing is done for each piece of the surface.
+First, let's calculate for ``i=1``.
 ```julia
-initial_configulation(D(i,n), n₁=19)
+i=1
 ```
 
+As a first step, let's compute the initial state.
+```julia
+initial_state(D(i,n), n₁=19)
+```
+
+If you've configured a slack bot, you'll get a message like this:
+
+![](img/initial_state.png)
+
 ```@docs
-initial_configulation
+initial_state
 ```
 
 ### Newton-Raphson method iteration
 
 ```julia
-newton_onestep(fixingmethod=:FixThreePoints)
+newton_onestep(fixingmethod=:fix3points)
 newton_onestep()
 ```
 
 You can choose the fixing method from below:
-* `:DefaultOrientation` (default)
-* `:FixThreePoints`
+* `:default` (default)
+* `:fix3points`
 
 ```@docs
 newton_onestep
@@ -160,7 +193,7 @@ If you finished computing for the strip, it's time to *pin* the state.
 This pin📌 will be used for the next final step.
 
 ```julia
-add_pin(tag="paraboloid-"*string(i))
+add_pin(tag="$(name)-$(i)")
 ```
 
 ```@docs
