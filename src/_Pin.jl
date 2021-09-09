@@ -16,14 +16,20 @@ function add_pin(; parent::Int = 0, tag::String = "")
     M = loadM(index = parent, dict = dict)
 
     index = NewestIndex(dict = dict) + 1
-    dict["Result"][string(index)] = Dict{String,Any}("parent" => string(parent))
-    dict["Result"][string(index)]["BSplineManifold"] = toJSON(M)
+    dict["result"][string(index)] = Dict{String,Any}("parent" => string(parent))
+    dict["result"][string(index)]["BSplineManifold"] = toJSON(M)
 
     comment = "📌 - tag: " * tag
-    dict["Result"][string(index)]["comment"] = comment
+    dict["result"][string(index)]["comment"] = comment
 
-    SaveResultDict(dict)
-    return
+    # Save as json
+    mkpath(DIR)
+    write(joinpath(DIR, NAME*".json"), JSON.json(dict, 4))
+
+    # Send messages
+    message = TreeString(dict["result"])
+    println(message)
+    _send_file_to_slack("", comment="```\n" * message * "```")
 end
 
 function _tag_exists(tag)
@@ -41,7 +47,7 @@ function GetTag(index; dict::Union{Dict,Nothing} = nothing)::String
     if isnothing(dict)
         dict = LoadResultDict()
     end
-    comment = dict["Result"][repr(index)]["comment"]
+    comment = dict["result"][repr(index)]["comment"]
     if startswith(comment, "📌 ")
         return replace(comment, "📌 - tag: " => "")
     else
@@ -56,19 +62,28 @@ remeve a pin 💨 for the given index
 """
 function remove_pin(index)
     dict = LoadResultDict()
-    comment = dict["Result"][repr(index)]["comment"]
+    comment = dict["result"][repr(index)]["comment"]
     comment = replace(comment, "📌" => "💨")
-    dict["Result"][repr(index)]["comment"] = comment
-    SaveResultDict(dict)
+    dict["result"][repr(index)]["comment"] = comment
+
+    # Save as json
+    mkpath(DIR)
+    write(joinpath(DIR, NAME*".json"), JSON.json(dict, 4))
+
+    # Send messages
+    message = TreeString(dict["result"])
+    println(message)
+    _send_file_to_slack("", comment="```\n" * message * "```")
 end
 
 function _find_all_pinned_states()
+    dict = LoadResultDict()
     if isnothing(dict)
         dict = LoadResultDict()
     end
     PinnedStates = String[]
-    for i_key in keys(dict["Result"])
-        comment = dict["Result"][i_key]["comment"]
+    for i_key in keys(dict["result"])
+        comment = dict["result"][i_key]["comment"]
         if startswith(comment, "📌 ")
             push!(PinnedStates, i_key)
         end
@@ -89,7 +104,7 @@ function export_all_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), 
         index = parse(Int, i_key)
 
         M = loadM(index = index)
-        filename = DIR * "/pinned/" * GetTag(index, dict = dict) * ".svg"
+        filename = DIR * "/pinned/" * GetTag(index) * ".svg"
         save_svg(filename, M, up = UP, down = DOWN, right = RIGHT, left = LEFT, mesh = MESH, unitlength = unitlength[1], points = false)
 
         P = bsplinespaces(M)
@@ -104,7 +119,7 @@ function export_all_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), 
         SvgCurve(
             [[t -> 𝒑a(i, t) for i in 0:cutout[2]]..., [t -> 𝒑b(i, t) for i in 0:cutout[2]]...],
             D₁,
-            filename = DIR * "/pinned/" * GetTag(index, dict = dict) * "-cutout.svg",
+            filename = DIR * "/pinned/" * GetTag(index) * "-cutout.svg",
             up = UP,
             down = DOWN,
             right = RIGHT,

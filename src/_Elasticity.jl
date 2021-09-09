@@ -1,5 +1,3 @@
-using ForwardDiff
-
 # Strain related functions
 E(M, u) = (g₍ₜ₎(M, u) - g₍₀₎(u)) / 2
 E₁₁(M::AbstractBSplineManifold, u) = (g₍ₜ₎₁₁(M, u) - g₍₀₎₁₁(u)) / 2

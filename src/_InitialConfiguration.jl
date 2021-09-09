@@ -1,9 +1,9 @@
 """
-    initial_configulation(D; n₁ = 15)
+    initial_state(D; n₁ = 15)
 
-Compute the initial configulation, by solving a ODE.
+Compute the initial state, by solving a ODE.
 """
-function initial_configulation(D; n₁ = 15)
+function initial_state(D; n₁ = 15)
     parent = 0
 
     D₁, D₂ = D

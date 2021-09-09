@@ -1,5 +1,3 @@
-using FastGaussQuadrature
-
 """
 Numerical integral in 2-dimension.
 """

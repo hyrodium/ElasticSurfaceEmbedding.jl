@@ -1,15 +1,6 @@
 # The Package ColorBlendModes might work better than the code below, I guess.
 # https://github.com/kimikage/ColorBlendModes.jl
 
-import FileIO.load
-import FileIO.save
-using OffsetArrays
-import Statistics.mean
-using Colors
-using Luxor
-using Printf
-using ExportNURBS
-
 # Images related
 function Base.:/(c1::AbstractRGB, c2::Union{AbstractRGB,TransparentRGB})
     return c1
