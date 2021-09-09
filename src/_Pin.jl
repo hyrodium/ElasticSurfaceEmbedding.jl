@@ -1,7 +1,7 @@
 """
     add_pin(; parent::Int = 0, tag::String = "")
 
-Add a pin for the given index
+Add a pin 📌 for the given index
 """
 function add_pin(; parent::Int = 0, tag::String = "")
     if tag == ""
@@ -52,7 +52,7 @@ end
 """
     remove_pin(index)
 
-remeve a pin for the given index
+remeve a pin 💨 for the given index
 """
 function remove_pin(index)
     dict = LoadResultDict()
@@ -114,6 +114,4 @@ function export_all_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), 
             unitlength = unitlength,
         )
     end
-
-    return
 end

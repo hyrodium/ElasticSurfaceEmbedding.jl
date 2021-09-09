@@ -298,7 +298,9 @@ end
 
 
 """
-Show and return the names of computed shapes in the directory (default: ~/ElasticSurfaceEmbedding-Result)
+    computed_shapes()
+
+Show and return the names of computed shapes in the directory (default: `~/ElasticSurfaceEmbedding-Result`)
 """
 function computed_shapes()
     shapes = readdir(ElasticSurfaceEmbedding.OUT_DIR)

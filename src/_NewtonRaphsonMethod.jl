@@ -28,7 +28,11 @@ function SecondsToString(Δt::Float64)
     return AbbStr(prds)
 end
 
-export newton_onestep
+"""
+    newton_onestep(; fixingmethod = :DefaultOrientation, parent::Int = 0, nip = NIP)
+
+Compute one step of Newton-Raphson method
+"""
 function newton_onestep(; fixingmethod = :DefaultOrientation, parent::Int = 0, nip = NIP)
     if fixingmethod == :DefaultOrientation
         fixed = DefaultOrientation

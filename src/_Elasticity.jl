@@ -60,7 +60,8 @@ Show the predicted maximum strain and, if possible, also the computed strain wit
 function print_strain(D; index = 0)
     minE, maxE = PredictMaximumStrain(D)
 
-    msg = "Strain\n"
+    D₁, D₂ = D
+    msg = "Strain - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...]) * "\n"
     msg *= "Predicted: (min: $(minE), max: $(maxE))\n"
 
     if isTheShapeComputed()
