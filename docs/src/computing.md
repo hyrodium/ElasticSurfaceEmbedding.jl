@@ -112,7 +112,7 @@ spline_refinement(p₊=[0,1],k₊=[Knots([]),Knots([(i-1/2)/10])])
 ### Pin the state
 
 ```
-pin_state(tag="paraboloid-"*string(i+1))
+add_pin(tag="paraboloid-"*string(i+1))
 ```
 
 ### Finish

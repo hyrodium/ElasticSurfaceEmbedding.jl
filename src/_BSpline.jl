@@ -44,7 +44,11 @@ function Positioning(M::AbstractBSplineManifold) # 制御点の位置調整
     return typeof(M)(Ps, 𝒂′)
 end
 
-export spline_refinement
+"""
+    spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{Knots,1}=[Knots(), Knots()], parent::Int=0)
+
+Compute a refinement of the B-spline manifold
+"""
 function spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{Knots,1}=[Knots(), Knots()], parent::Int=0)
     parent = Parent(parent)
     M = loadM(index = parent)
@@ -68,7 +72,11 @@ function spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{Knots,1}=[Kn
     return
 end
 
-export print_knots
+"""
+    print_knots(; index = 0)
+
+Show current knots and suggestions for knot insertions (with given index).
+"""
 function print_knots(; index = 0)
     M = loadM(index = index)
 

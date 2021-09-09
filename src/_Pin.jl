@@ -1,10 +1,14 @@
-export pin_state
-function pin_state(; parent::Int = 0, tag::String = "")
+"""
+    add_pin(; parent::Int = 0, tag::String = "")
+
+Add a pin for the given index
+"""
+function add_pin(; parent::Int = 0, tag::String = "")
     if tag == ""
         tag = Dates.format(now(), "yyyy-mm-dd_H-M-S")
     end
     _check_filename(tag)
-    if TagExists(tag)
+    if _tag_exists(tag)
         error("The tag $(tag) is already exists.")
     end
     dict = LoadResultDict()
@@ -22,11 +26,8 @@ function pin_state(; parent::Int = 0, tag::String = "")
     return
 end
 
-function TagExists(tag, dict::Union{Dict,Nothing} = nothing)::Bool
-    if isnothing(dict)
-        dict = LoadResultDict()
-    end
-    PinnedStates = FindPinnedStates()
+function _tag_exists(tag)
+    PinnedStates = _find_all_pinned_states()
     for i_key in PinnedStates
         index = parse(Int, i_key)
         if GetTag(index) == tag
@@ -48,18 +49,20 @@ function GetTag(index; dict::Union{Dict,Nothing} = nothing)::String
     end
 end
 
-export remove_pin
-function remove_pin(index)::Nothing
+"""
+    remove_pin(index)
+
+remeve a pin for the given index
+"""
+function remove_pin(index)
     dict = LoadResultDict()
-    tag = GetTag(index)
     comment = dict["Result"][repr(index)]["comment"]
     comment = replace(comment, "📌" => "💨")
     dict["Result"][repr(index)]["comment"] = comment
     SaveResultDict(dict)
-    return
 end
 
-function FindPinnedStates(; dict::Union{Dict,Nothing} = nothing)::Array{String}
+function _find_all_pinned_states()
     if isnothing(dict)
         dict = LoadResultDict()
     end
@@ -73,11 +76,14 @@ function FindPinnedStates(; dict::Union{Dict,Nothing} = nothing)::Array{String}
     return PinnedStates
 end
 
-export export_pinned_states
-function export_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
+"""
+    export_all_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
+
+Export all pinned states for final output
+"""
+function export_all_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
     mkpath(DIR * "/pinned")
-    dict = LoadResultDict()
-    PinnedStates = FindPinnedStates(dict = dict)
+    PinnedStates = _find_all_pinned_states()
 
     for i_key in PinnedStates
         index = parse(Int, i_key)

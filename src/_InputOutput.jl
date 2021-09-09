@@ -1,4 +1,6 @@
-export @parametric_mapping
+"""
+A macro to define parametrized shape of surface
+"""
 macro parametric_mapping(ex)
     expr = toJSON(ex)
     if startswith(expr, "function 𝒑₍₀₎(u)\n") || startswith(expr, "𝒑₍₀₎(u) =")
@@ -15,7 +17,11 @@ function _check_filename(name::String)
     end
 end
 
-export settings
+"""
+    settings(name::String; up::Real=5, down::Real=-5, right::Real=5, left::Real=-5, mesh::Tuple{Int, Int}=(10,  1), unit::Real=100, slack::Bool=true, maximumstrain::Real=0.0, colorbarsize::Float64=0.2)
+
+Initial settings for the given shape
+"""
 function settings(
     name::String;
     up::Real = 5,
@@ -284,20 +290,18 @@ function ExportFiles(
     img_strain_with_colorbar = copy(img_strain_white_background)
     img_strain_with_colorbar[axes(img_offset_colorbar)...] = img_offset_colorbar ./ img_strain_with_colorbar[axes(img_offset_colorbar)...]
     img_strain_with_colorbar = [RGB(mean(img_strain_with_colorbar[5i-4:5i, 5j-4:5j])) for i in 1:size_nurbs[1], j in 1:size_nurbs[2]]
-    # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but previous one is better for anti-alias
+    # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but the previous one is better for anti-alias
     img_append = hcat(img_nurbs_white_background, img_strain_with_colorbar)
 
     save(path_png_append, img_append)
 end
 
 
-export computed_shapes
-
 """
-Show and return the names of computed shapes.
+Show and return the names of computed shapes in the directory (default: ~/ElasticSurfaceEmbedding-Result)
 """
 function computed_shapes()
-    shapes = Base.Filesystem.readdir(ElasticSurfaceEmbedding.OUT_DIR)
+    shapes = readdir(ElasticSurfaceEmbedding.OUT_DIR)
     println(shapes)
     return shapes
 end

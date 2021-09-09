@@ -1,4 +1,8 @@
-export initial_configulation
+"""
+    initial_configulation(D; n₁ = 15)
+
+Compute the initial configulation, by solving a ODE.
+"""
 function initial_configulation(D; n₁ = 15)
     parent = 0
 
