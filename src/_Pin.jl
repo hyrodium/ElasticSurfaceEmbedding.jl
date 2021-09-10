@@ -15,7 +15,7 @@ function add_pin(; parent::Int = 0, tag::String = "")
     parent = _realparent(parent)
     M = loadM(index = parent)
 
-    index = latest_index(dict = dict) + 1
+    index = latest_index(dict) + 1
     dict["result"][string(index)] = Dict{String,Any}("parent" => string(parent))
     dict["result"][string(index)]["BSplineManifold"] = toJSON(M)
 
@@ -56,7 +56,7 @@ end
 """
     remove_pin(index::Integer)
 
-Remeve a pin 💨 for the given index
+Remeve a pin 💨 with the given index
 """
 function remove_pin(index::Integer)
     if !(index in _find_all_pinned_states())
@@ -79,9 +79,9 @@ function remove_pin(index::Integer)
 end
 
 """
-    remove_pin(index::Integer)
+    remove_pin(; tag::AbstractString)
 
-Remeve a pin 💨 for the given index
+Remeve a pin 💨 with the given tag
 """
 function remove_pin(; tag::AbstractString)
     pinned_states = _find_all_pinned_states()
