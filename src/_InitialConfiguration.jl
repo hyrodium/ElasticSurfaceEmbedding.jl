@@ -8,7 +8,7 @@ function initial_state(D; n₁ = 15)
 
     D₁, D₂ = D
     M = _initialize(D, n₁)
-    comment = "Initial Configuration - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
+    comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
 
     _export(M, parent, comment = comment)
 end
@@ -28,7 +28,7 @@ function _initialize(D, n₁)
 
 
     # Number of divisions for ODE
-    N = 128
+    N = 6n₁
 
     # Solve 𝒄̈(t) = A(t)𝒄̇(t) with Runge-Kutta method
     A(t) = [s̈₍₀₎(D₂, t) / ṡ₍₀₎(D₂, t) -𝜅₍₀₎(D₂, t) * ṡ₍₀₎(D₂, t)
@@ -91,5 +91,5 @@ function _initialize(D, n₁)
 
     M = BSplineSurface([P₁, P₂], 𝒂)
     M′ = refinement(M, p₊ = [0, 1])
-    return Positioning(M′)
+    return _positioning(M′)
 end

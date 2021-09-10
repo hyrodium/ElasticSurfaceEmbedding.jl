@@ -31,7 +31,9 @@ end
 SLACK = SlackConfig("","")
 
 """
-config_slack(;channel, token)
+    config_slack(;channel, token)
+
+Set the channel and token for Slack bot. (optional)
 """
 function config_slack(;channel, token)
     global SLACK = SlackConfig(channel, token)

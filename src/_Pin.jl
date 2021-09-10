@@ -13,7 +13,7 @@ function add_pin(; parent::Int = 0, tag::String = "")
     end
     dict = LoadResultDict()
     parent = _realparent(parent)
-    M = loadM(index = parent, dict = dict)
+    M = loadM(index = parent)
 
     index = latest_index(dict = dict) + 1
     dict["result"][string(index)] = Dict{String,Any}("parent" => string(parent))
@@ -54,11 +54,15 @@ function _get_tag(index)::String
 end
 
 """
-    remove_pin(index)
+    remove_pin(index::Integer)
 
 Remeve a pin 💨 for the given index
 """
-function remove_pin(index)
+function remove_pin(index::Integer)
+    if !(index in _find_all_pinned_states())
+        @warn "There's no pin with the index $index"
+        return
+    end
     dict = LoadResultDict()
     comment = dict["result"][repr(index)]["comment"]
     comment = replace(comment, "📌" => "💨")
@@ -72,6 +76,22 @@ function remove_pin(index)
     message = TreeString(dict["result"])
     println(message)
     _send_file_to_slack("", comment="```\n" * message * "```")
+end
+
+"""
+    remove_pin(index::Integer)
+
+Remeve a pin 💨 for the given index
+"""
+function remove_pin(; tag::AbstractString)
+    pinned_states = _find_all_pinned_states()
+    for index in pinned_states
+        if _get_tag(index) == tag
+            remove_pin(index)
+            return
+        end
+    end
+    @warn "There's no pin with the tag $tag"
 end
 
 function _find_all_pinned_states()
@@ -91,8 +111,12 @@ end
 
 Export all pinned states for final output
 """
-function export_all_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
+function export_all_pinned_states(; unitlength::Tuple{<:Real,<:AbstractString} = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
+    # Delete current pinned directory
+    rm(joinpath(DIR, "pinned"), recursive=true, force=true)
+    # Make path to pinned directory
     mkpath(joinpath(DIR, "pinned"))
+
     pinned_states = _find_all_pinned_states()
 
     for index in pinned_states

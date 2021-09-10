@@ -24,7 +24,7 @@ function Ẽ⁽⁰⁾₁₁(M::AbstractBSplineManifold, u)
     return Ẽ⁽⁰⁾₁₁(D₂, u)
 end
 
-function ComputeMaximumStrain(; index = 0, mesh = tuple(20 * [MESH...]...))
+function ComputeMaximumStrain(; index=0, mesh=tuple(20 * [MESH...]...))
     M = loadM(index = index)
     P = bsplinespaces(M)
     p₁, p₂ = degree.(P)
@@ -51,11 +51,11 @@ function PredictMaximumStrain(D; mesh = tuple(20 * [MESH...]...))
 end
 
 """
-    print_strain(D; index = 0)
+    show_strain(D; index=0)
 
 Show the predicted maximum strain and, if possible, also the computed strain with the given index.
 """
-function print_strain(D; index = 0)
+function show_strain(D; index=0)
     minE, maxE = PredictMaximumStrain(D)
 
     D₁, D₂ = D

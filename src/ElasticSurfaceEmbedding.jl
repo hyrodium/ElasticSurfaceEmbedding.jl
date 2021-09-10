@@ -27,8 +27,8 @@ export spline_refinement
 export add_pin
 export remove_pin
 export export_all_pinned_states
-export print_strain
-export print_knots
+export show_strain
+export show_knots
 export computed_shapes
 
 include("_Constants.jl")

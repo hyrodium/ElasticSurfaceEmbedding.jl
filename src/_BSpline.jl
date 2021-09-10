@@ -18,29 +18,43 @@ end
 """
 Affine transform of control points.
 """
-function affine(𝒂::Array{Float64,3}, A::Array{Float64,2}, b::Array{Float64,1})::Array{Float64,3}
+function _affine(𝒂, A, b)
     # x'=Ax+b
     n₁, n₂, d = size(𝒂)
     return [(A*𝒂[I₁, I₂, :]+b)[i] for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:d]
 end
 
-function Positioning(𝒂::Array{Float64,3})::Array{Float64,3} # 制御点の位置調整
+function _rotate(𝒂)
     n₁, n₂, _ = size(𝒂)
     ind0 = [(n₁ + 1) ÷ 2, (n₂ + 1) ÷ 2]
     ind1 = ind0 - [0, 1]
     v = 𝒂[ind1..., :] - 𝒂[ind0..., :]
     R = -[v[2] -v[1]; v[1] v[2]] / norm(v)
-    return affine(𝒂, R, -R * 𝒂[ind0..., :])
+    return _affine(𝒂, R, [0.0, 0.0])
 end
 
-function Positioning(M::AbstractBSplineManifold) # 制御点の位置調整
+function _center(𝒂)
+    x_min = minimum(𝒂[:,:,1])
+    x_max = maximum(𝒂[:,:,1])
+    y_min = minimum(𝒂[:,:,2])
+    y_max = maximum(𝒂[:,:,2])
+    x = (x_min+x_max)/2
+    y = (y_min+y_max)/2
+    return _affine(𝒂, I(2), -[x,y])
+end
+
+function _positioning(𝒂)
+    return _center(_rotate(𝒂))
+end
+
+function _positioning(M::AbstractBSplineManifold)
     Ps = collect(bsplinespaces(M))
     𝒂 = controlpoints(M)
     if length(Ps) ≠ 2
         error("dimension does not match")
     end
 
-    𝒂′ = Positioning(𝒂)
+    𝒂′ = _positioning(𝒂)
     return typeof(M)(Ps, 𝒂′)
 end
 
@@ -49,13 +63,14 @@ end
 
 Compute a refinement of the B-spline manifold
 """
-function spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{Knots,1}=[Knots(), Knots()], parent::Int=0)
+function spline_refinement(; p₊=(0,0), k₊=(Knots(),Knots()), parent::Int=0)
     parent = _realparent(parent)
-    M = loadM(index = parent)
+    M = loadM(index=parent)
 
     P₁, P₂ = collect(bsplinespaces(M))
     k₁, k₂ = knots(P₁), knots(P₂)
 
+    p₊₁, p₊₂ = p₊
     k₊₁, k₊₂ = k₊
 
     if (k₊₁ ≠ Knots()) && !(k₁[1] < k₊₁[1] && k₊₁[end] < k₁[end])
@@ -66,18 +81,19 @@ function spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{Knots,1}=[Kn
         error("given additional knots for refinement are out of range")
     end
 
-    comment = "Refinement - p₊:" * string(p₊) * ", k₊:" * string([k₊₁.vector, k₊₂.vector])
-    M = refinement(M, p₊ = p₊, k₊ = k₊)
-    _export(M, parent, comment = comment)
+    comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((k₊₁.vector, k₊₂.vector))"
+    comment = replace(comment, "Float64"=>"")
+    M = refinement(M, p₊=[p₊₁, p₊₂], k₊=[k₊₁, k₊₂])
+    _export(M, parent, comment=comment)
     return
 end
 
 """
-    print_knots(; index = 0)
+    show_knots(; index=0)
 
 Show current knots and suggestions for knot insertions (with given index).
 """
-function print_knots(; index = 0)
+function show_knots(; index=0)
     M = loadM(index = index)
 
     P = bsplinespaces(M)
