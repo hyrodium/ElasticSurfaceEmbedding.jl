@@ -16,7 +16,7 @@ The computation process proceeds as shown in the following flowchart (from our p
 1. Define the shape of surface
 1. Split the surface into strips
 1. Check the strain prediction
-1. Initial configuration
+1. Compute the initial state
 1. Newton-Raphson method iteration
 1. Refinement B-spline manifold
 1. Newton-Raphson method iteration, again
@@ -46,17 +46,17 @@ config_dir
 
 Configure the slack bot. *(optional)*
 ```julia
-config_slack(channel="xxxx", token="xxxx")
-```
-
-```@docs
-config_slack
+config_slack(channel="XXXXXXXXXXX",token="xoxb-0000000000000-0000000000000-XXXXXXXXXXXXXXXXXXXXXXXX")
 ```
 
 !!! info "Slack bot"
     If you would like to use this feature, the bot in the channel must have the following permissions.
     * [`chat.post`](https://api.slack.com/methods/chat.postMessage)
     * [`files.upload`](https://api.slack.com/methods/files.upload)
+
+```@docs
+config_slack
+```
 
 ### Define the shape of surface
 ```julia
@@ -121,7 +121,7 @@ E_{11}^{\langle 0\rangle}&\approx\frac{1}{2}K_{[0]}B^2\left(r^2-\frac{1}{3}\righ
 
 ```julia
 for i in 1:n
-    print_strain(D(i,n))
+    show_strain(D(i,n))
 end
 ```
 
@@ -134,11 +134,11 @@ The output information will be like this:
     Empirically, it is better if the absolute value of strain is smaller than ``0.01``.
 
 ```@docs
-print_strain
+show_strain
 ```
 
-### Initial configuration
-If you finished checking the strain prediction, the next step is determine the initial configuration.
+### Initial state
+If you finished checking the strain prediction, the next step is determine the initial state.
 
 From this section, the computing is done for each piece of the surface.
 First, let's calculate for ``i=1``.
@@ -174,7 +174,7 @@ You can choose the fixing method from below:
 newton_onestep
 ```
 
-### Refinement B-spline manifold
+### Refinement of B-spline manifold
 
 ```julia
 spline_refinement(p₊=[0,1],k₊=[Knots(),Knots([(i-1/2)/10])])
@@ -185,7 +185,7 @@ spline_refinement
 ```
 
 ```@docs
-print_knots
+show_knots
 ```
 
 ### Pin the state
