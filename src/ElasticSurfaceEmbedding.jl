@@ -31,16 +31,16 @@ export show_strain
 export show_knots
 export computed_shapes
 
-include("_Constants.jl")
-include("_NumericalIntegral.jl")
-include("_Images.jl")
-include("_Slack.jl")
-include("_BSpline.jl")
-include("_Geometry.jl")
-include("_Elasticity.jl")
-include("_InputOutput.jl")
-include("_InitialConfiguration.jl")
-include("_NewtonRaphsonMethod.jl")
-include("_Pin.jl")
+include("_constants.jl")
+include("_integral.jl")
+include("_graphics.jl")
+include("_slack.jl")
+include("_bspline.jl")
+include("_geometry.jl")
+include("_elasticity.jl")
+include("_io.jl")
+include("_initialstates.jl")
+include("_newton.jl")
+include("_pin.jl")
 
 end # module
