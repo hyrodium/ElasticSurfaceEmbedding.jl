@@ -58,7 +58,7 @@ Cut papers into strips, and weave them into surface.
 | --- | :-- |
 
 ### ..me!:bowtie:
-<div style="display:table;  width:100%;">
+<div style="display:table;  width:80%;">
     <div style="display:table-cell; width:160px;">
         <img src="docs/src/img/me_thumbnail.jpg">
     </div>
