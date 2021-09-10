@@ -58,9 +58,19 @@ Cut papers into strips, and weave them into surface.
 | --- | :-- |
 
 ### ..me!:bowtie:
-| <img src="docs/src/img/me.jpg" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/). <br> Read my upcoming paper. |
-| --- | :-- |
-
+<div style="display:table;  width:100%;">
+    <div style="display:table-cell; width:160px;">
+        <img src="docs/src/img/me_thumbnail.jpg">
+    </div>
+    <div style="display:table-cell; vertical-align:middle;">
+        <ul>
+            <li>Follow <a href="https://twitter.com/Hyrodium">my twitter account</a>!</li>
+            <li>Visit <a href="https://hyrodium.github.io/">my website</a>!</li>
+            <li>Read my upcoming paper!</li>
+            <li>Give star to <a href="https://github.com/hyrodium/ElasticSurfaceEmbedding.jl">this repository</a>!</li>
+        </ul>
+    </div>
+</div>
 
 ## Gallery
 <img src="docs/src/img/Paraboloid1.png" width="160"> <img src="docs/src/img/Paraboloid2.png" width="160"> <img src="docs/src/img/Paraboloid3.png" width="160"> <img src="docs/src/img/Paraboloid4.jpg" width="160"> <img src="docs/src/img/Paraboloid5.png" width="160">
