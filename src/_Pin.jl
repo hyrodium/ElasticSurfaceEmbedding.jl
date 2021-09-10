@@ -111,18 +111,19 @@ end
 
 Export all pinned states for final output
 """
-function export_all_pinned_states(; unitlength::Tuple{<:Real,<:AbstractString} = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
+function export_all_pinned_states(; unitlength::Tuple{<:Real,<:AbstractString}, cutout=(0.1, 5), mesh::Int=60)
+    dir_pinned = joinpath(DIR, "pinned")
     # Delete current pinned directory
-    rm(joinpath(DIR, "pinned"), recursive=true, force=true)
+    rm(dir_pinned, recursive=true, force=true)
     # Make path to pinned directory
-    mkpath(joinpath(DIR, "pinned"))
+    mkpath(dir_pinned)
 
     pinned_states = _find_all_pinned_states()
 
     for index in pinned_states
         M = loadM(index=index)
         filename = joinpath(DIR, "pinned", "$(_get_tag(index)).svg")
-        save_svg(filename, M, up = UP, down = DOWN, right = RIGHT, left = LEFT, mesh = MESH, unitlength = unitlength[1], points = false)
+        save_svg(filename, M, up=UP, down=DOWN, right=RIGHT, left=LEFT, mesh=MESH, unitlength=unitlength[1], points=false)
 
         P = bsplinespaces(M)
         p₁, p₂ = degree.(P)
@@ -143,7 +144,12 @@ function export_all_pinned_states(; unitlength::Tuple{<:Real,<:AbstractString} =
             left = LEFT,
             thickness = 0.1,
             mesh = mesh,
-            unitlength = unitlength,
+            unitlength = unitlength[1]
         )
+    end
+
+    for name in readdir(dir_pinned)
+        file = joinpath(dir_pinned, name)
+        _changeunit(file, "pt"=>unitlength[2])
     end
 end

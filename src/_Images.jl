@@ -23,31 +23,22 @@ end
 
 
 # Luxor related
-function ChangeUnit(filename, before, after)
-    ss = open(filename) do file
-        strn = read(file, String)
-        replace(strn, Regex("(\\d+)" * before) => SubstitutionString("\\1" * after))
+function _changeunit(path_svg, units::Pair{String,String})
+    old_unit, new_unit = units
+    acceptable_units = ["px", "in", "pt", "pc", "cm", "mm"]
+    if !(new_unit in acceptable_units)
+        error("The unit $(new_unit) is not support in SVG format.")
     end
-    open(filename, "w") do file
-        write(file, ss)
-    end
-    return ss
+    script = read(path_svg, String)
+    lines = split(script, "\n")
+    lines[2] = replace(lines[2],"$(old_unit)\""=>"$(new_unit)\"")
+    write(path_svg, join(lines,"\n"))
 end
-function SvgCurve(
-    𝒑s::Array{T,1},
-    I::ClosedInterval;
-    filename = "BCA.svg",
-    up = 5,
-    down = -5,
-    right = 5,
-    left = -5,
-    thickness = 1,
-    mesh = 50,
-    unitlength = (100, "pt"),
-) where {T<:Any}
+
+function SvgCurve(𝒑s::Array{T,1}, I::ClosedInterval; filename, up=5, down=-5, right=5, left=-5, thickness=1, mesh=50, unitlength=100) where {T<:Any}
     k = collect(range(endpoints(I)..., length = mesh + 1))
     n = length(k) - 1
-    step, unit = (unitlength[1], unitlength[2])
+    step = unitlength
     Drawing((right - left) * step, (up - down) * step, filename)
 
     Luxor.origin(-left * step, up * step)
@@ -62,7 +53,6 @@ function SvgCurve(
     end
 
     finish()
-    ChangeUnit(filename, "pt", unit)
     return
 end
 function ColorBar(; max = 1.234, filename = "ColorBar.png", width = 100)
