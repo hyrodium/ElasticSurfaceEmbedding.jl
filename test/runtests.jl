@@ -44,36 +44,19 @@ config_dir(dir_result_b)
     @test 𝒂[5,3,:] ≈ [√(3/2), 3/√(2)]
 end
 
-@testset "Rhomboid" begin
-    @parametric_mapping 𝒑₍₀₎(u) = [u...,u[1]+u[2]]
-    D = (-1.0..1.0, -1.0..1.0)
-    name = "Rhomboid"
+@testset "Planar" begin
+    @parametric_mapping 𝒑₍₀₎(u) = [sin(u[1])*u[2], u[2]+cos(u[1])-u[1]^2/5, 0.0]
+    D = (-1.0..2.0, 1.0..1.2)
+    name = "Planar"
     settings(name,canvas=(4,4),mesh=(20,1),unit=200,colorbarsize=0.3)
 
-    initial_state(D, n₁=5)
+    initial_state(D, n₁=35)
     M = ElasticSurfaceEmbedding.loadM()
-    𝒂 = controlpoints(M)
-    @test 𝒂[1,1,:] ≈ [-√(3/2), -3/√(2)]
-    @test 𝒂[1,2,:] ≈ [-√(3/2), -1/√(2)]
-    @test 𝒂[3,1,:] ≈ [0, -2/√(2)]
-    @test norm(𝒂[3,2,:]) < 1e-14
-    @test 𝒂[3,3,:] ≈ [0, 2/√(2)]
-    @test 𝒂[5,1,:] ≈ [√(3/2), -1/√(2)]
-    @test 𝒂[5,2,:] ≈ [√(3/2), 1/√(2)]
-    @test 𝒂[5,3,:] ≈ [√(3/2), 3/√(2)]
+    @test norm([tr(ElasticSurfaceEmbedding.E(M, [u¹, u²])) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
 
     newton_onestep()
     M = ElasticSurfaceEmbedding.loadM()
-    𝒂 = controlpoints(M)
-    @test 𝒂[1,1,:] ≈ [-√(3/2), -3/√(2)]
-    @test 𝒂[1,2,:] ≈ [-√(3/2), -1/√(2)]
-    @test 𝒂[1,3,:] ≈ [-√(3/2), 1/√(2)]
-    @test 𝒂[3,1,:] ≈ [0, -2/√(2)]
-    @test norm(𝒂[3,2,:]) < 1e-14
-    @test 𝒂[3,3,:] ≈ [0, 2/√(2)]
-    @test 𝒂[5,1,:] ≈ [√(3/2), -1/√(2)]
-    @test 𝒂[5,2,:] ≈ [√(3/2), 1/√(2)]
-    @test 𝒂[5,3,:] ≈ [√(3/2), 3/√(2)]
+    @test norm([tr(ElasticSurfaceEmbedding.E(M, [u¹, u²])) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
 end
 
 @testset "Paraboloid" begin
