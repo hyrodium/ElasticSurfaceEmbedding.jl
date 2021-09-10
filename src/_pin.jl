@@ -27,7 +27,7 @@ function add_pin(; parent::Int = 0, tag::String = "")
     write(joinpath(DIR, NAME*".json"), JSON.json(dict, 4))
 
     # Send messages
-    message = TreeString(dict["result"])
+    message = _tree_as_string(dict["result"])
     println(message)
     _send_file_to_slack("", comment="```\n" * message * "```")
 end
@@ -73,7 +73,7 @@ function remove_pin(index::Integer)
     write(joinpath(DIR, NAME*".json"), JSON.json(dict, 4))
 
     # Send messages
-    message = TreeString(dict["result"])
+    message = _tree_as_string(dict["result"])
     println(message)
     _send_file_to_slack("", comment="```\n" * message * "```")
 end

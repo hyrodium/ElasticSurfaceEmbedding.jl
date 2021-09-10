@@ -1,3 +1,18 @@
+# Default output directory
+OUT_DIR = joinpath(homedir(),"ElasticSurfaceEmbedding-Result")
+
+"""
+    config_dir(dir)
+
+Set the output directory.
+The default is `~/ElasticSurfaceEmbedding-Result`.
+"""
+function config_dir(dir)
+    _dir = expanduser(dir)
+    mkpath(_dir)
+    global OUT_DIR = _dir
+end
+
 """
 A macro to define parametrized shape of surface
 """
@@ -43,7 +58,7 @@ function settings(
     global COLORBARSIZE = colorbarsize
     if isTheShapeComputed()
         dict = LoadResultDict()
-        println(TreeString(dict["result"]))
+        println(_tree_as_string(dict["result"]))
         global EXPR = dict["expr"]
     elseif !(@isdefined EXPR)
         error("use @parametric_mapping or input name of computed shape")
@@ -97,7 +112,7 @@ function NodeSeries(tree::Dict, node)
     return Nodes
 end
 
-function TreeString(tree::Dict)
+function _tree_as_string(tree::Dict)
     serieses = Array{Int,1}[]
     for key in keys(tree)
         push!(serieses, (s -> parse(Int, s)).(reverse(NodeSeries(tree, key))))
@@ -217,7 +232,7 @@ function _export(M::AbstractBSplineManifold, parent::Int; comment = "", maximums
 
     # Send messages
     path_png_append = joinpath(DIR, "append", "$(NAME)-$(index)_append.png")
-    message = TreeString(dict["result"])
+    message = _tree_as_string(dict["result"])
     println(message)
     _send_file_to_slack(path_png_append, comment = "```\n" * message * "```")
 end
