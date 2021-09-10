@@ -55,14 +55,14 @@ function SvgCurve(𝒑s::Array{T,1}, I::ClosedInterval; filename, up=5, down=-5,
     finish()
     return
 end
-function ColorBar(; max = 1.234, filename = "ColorBar.png", width = 100)
+function ColorBar(; max = 1.000, filename = "ColorBar.png", width = 100)
     up = 4
     down = -4
     right = 4.6
     right = 6.2
     left = -2
     Length = 3.5
-    FontSize = 1
+    FontSize = 0.85
     unit = width / (right - left)
     Thickness = unit / 10
 
@@ -71,13 +71,13 @@ function ColorBar(; max = 1.234, filename = "ColorBar.png", width = 100)
     setblend(blend(Point(0, -Length * unit), Point(0, Length * unit), "red", "cyan"))
     box(ExportNURBS.LxrPt([-0.9, 0], unit), 1.8 * unit, 7 * unit, :fill)
     sethue("Black")
-    fontface("Cica")
+    fontface("JuliaMono")
     fontsize(unit * FontSize)
     setline(Thickness)
     setlinecap("round")
-    text(" " * @sprintf("%.6f", max), ExportNURBS.LxrPt([1.5, Length - 0.32 * FontSize], unit))
-    text(" " * @sprintf("%.6f", 0), ExportNURBS.LxrPt([1.5, -0.32 * FontSize], unit))
-    text("-" * @sprintf("%.6f", max), ExportNURBS.LxrPt([1.5, -Length - 0.32 * FontSize], unit))
+    text(" " * @sprintf("%.6f", max), ExportNURBS.LxrPt([1.4, Length - 0.28 * FontSize], unit))
+    text(" " * @sprintf("%.6f", 0), ExportNURBS.LxrPt([1.4, -0.28 * FontSize], unit))
+    text("-" * @sprintf("%.6f", max), ExportNURBS.LxrPt([1.4, -Length - 0.28 * FontSize], unit))
     line(ExportNURBS.LxrPt([0.5, 0], unit), ExportNURBS.LxrPt([1.2, 0], unit), :stroke)
     line(ExportNURBS.LxrPt([0.5, -Length], unit), ExportNURBS.LxrPt([1.2, -Length], unit), :stroke)
     line(ExportNURBS.LxrPt([0.5, Length], unit), ExportNURBS.LxrPt([1.2, Length], unit), :stroke)
