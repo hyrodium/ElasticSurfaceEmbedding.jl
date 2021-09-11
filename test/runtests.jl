@@ -46,17 +46,18 @@ end
 
 @testset "Planar" begin
     @parametric_mapping 𝒑₍₀₎(u) = [sin(u[1])*u[2], u[2]+cos(u[1])-u[1]^2/5, 0.0]
+    # See https://www.desmos.com/calculator/4usvqpr0iu
     D = (-1.0..2.0, 1.0..1.2)
     name = "Planar"
     settings(name,canvas=(4,4),mesh=(20,1),unit=200,colorbarsize=0.3)
 
     initial_state(D, n₁=35)
     M = ElasticSurfaceEmbedding.loadM()
-    @test norm([tr(ElasticSurfaceEmbedding.E(M, [u¹, u²])) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
+    @test norm([ElasticSurfaceEmbedding.E(M, [u¹, u²]) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
 
     newton_onestep()
     M = ElasticSurfaceEmbedding.loadM()
-    @test norm([tr(ElasticSurfaceEmbedding.E(M, [u¹, u²])) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
+    @test norm([ElasticSurfaceEmbedding.E(M, [u¹, u²]) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
 end
 
 @testset "Paraboloid" begin
