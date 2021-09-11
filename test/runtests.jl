@@ -165,6 +165,14 @@ end
 
     @test L²(h′,h̃′,B)/delta(h′,B) < 1e-2
     @test L²(h′,ĥ′,B)/delta(h′,B) > 1e-2
+
+    ## Note
+    # Try the following script to check the difference between analytical solution and numerical solution.
+    # using Plots
+    # 𝟙 = 0.99999
+    # plot(h′,-B*𝟙,B*𝟙)
+    # plot!(h̃′,-B*𝟙,B*𝟙)
+    # plot!(ĥ′,-B*𝟙,B*𝟙)
 end
 @testset "Paraboloid" begin
     @parametric_mapping 𝒑₍₀₎(u) = [u...,u'*u]
