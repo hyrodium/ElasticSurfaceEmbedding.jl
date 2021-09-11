@@ -1,7 +1,7 @@
 # [Numerical computation](@id numerical_computation)
 
 ## Installation
-On Julia's package mode,
+On Julia's package mode, run the following commands.
 ```julia-repl
 pkg> add IntervalSets
 pkg> add BasicBSpline
@@ -70,13 +70,13 @@ D
 !!! info "Limitations of a definition of a surface"
     The definition of the parameterized surface must be self-contained.
     This is because, the package will save the definition as string.
-    (See the `"expr"` key in `~/ElasticSurfaceEmbedding-Result/<name>/<name>.json`.)
+    See `"expr"` key in `~/ElasticSurfaceEmbedding-Result/<name>/<name>.json`.
 
     For example:
     ```julia
     # This is ok
     @parametric_mapping 𝒑₍₀₎(u) = [sin(u[1]), sin(u[2]), u[1]*u[2]]
-    
+
     # This is ng
     f(x,y) = x*y
     @parametric_mapping 𝒑₍₀₎(u) = [sin(u[1]), sin(u[2]), f(u[1],u[2])]
