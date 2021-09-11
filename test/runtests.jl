@@ -83,6 +83,7 @@ end
 end
 
 @testset "Sphere-thin" begin
+    # See https://hackmd.io/@hyrodium/r1sCtEsLX
     L = 20
     B = 1/8
 
@@ -125,6 +126,7 @@ end
 
 
 @testset "Sphere-thick" begin
+    # See https://hackmd.io/@hyrodium/r1sCtEsLX
     L = 20
     B = 2/3
 
