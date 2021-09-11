@@ -83,7 +83,7 @@ end
 end
 
 @testset "Sphere-thin" begin
-    # See https://hackmd.io/@hyrodium/r1sCtEsLX
+    # For deriving analytical solution, see https://hackmd.io/@hyrodium/r1sCtEsLX
     L = 20
     B = 1/8
 
@@ -110,6 +110,7 @@ end
     # Approximated
     k̂ = 1-B^2/6
 
+    # If the strip is thin, the analytical result k can be approximated with k̂.
     @test abs(log(k̃/k)) < 1e-4
     @test abs(log(k̂/k)) < 1e-4
 
@@ -120,13 +121,14 @@ end
     # Approximated
     ĥ′(u²) = √(1+𝝂*(1-k̂^2))-(𝝂*k̂^2*u²^2)/(2*√(1+𝝂*(1-k̂^2)))
 
+    # If the strip is thin, the analytical result h′ can be approximated with ĥ′.
     @test L²(h′,h̃′,B)/delta(h′,B) < 1e-2
     @test L²(h′,ĥ′,B)/delta(h′,B) < 1e-2
 end
 
 
 @testset "Sphere-thick" begin
-    # See https://hackmd.io/@hyrodium/r1sCtEsLX
+    # For deriving analytical solution, see https://hackmd.io/@hyrodium/r1sCtEsLX
     L = 20
     B = 2/3
 
@@ -153,6 +155,7 @@ end
     # Approximated
     k̂ = 1-B^2/6
 
+    # If the strip is thick, the analytical result k cannot be approximated with k̂.
     @test abs(log(k̃/k)) < 1e-4
     @test abs(log(k̂/k)) > 1e-4
 
@@ -163,6 +166,7 @@ end
     # Approximated
     ĥ′(u²) = √(1+𝝂*(1-k̂^2))-(𝝂*k̂^2*u²^2)/(2*√(1+𝝂*(1-k̂^2)))
 
+    # If the strip is thick, the analytical result h′ cannot be approximated with ĥ′.
     @test L²(h′,h̃′,B)/delta(h′,B) < 1e-2
     @test L²(h′,ĥ′,B)/delta(h′,B) > 1e-2
 
@@ -174,6 +178,7 @@ end
     # plot!(h̃′,-B*𝟙,B*𝟙)
     # plot!(ĥ′,-B*𝟙,B*𝟙)
 end
+
 @testset "Paraboloid" begin
     @parametric_mapping 𝒑₍₀₎(u) = [u...,u'*u]
     D(i,n) = (-1.0..1.0, (i-1)/n..i/n)
