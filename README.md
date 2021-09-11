@@ -15,9 +15,9 @@ This is the meaning of "Elastic Surface Embedding".
 The definition must consists of parametric mapping and its domain.
 For example, a paraboloid can be parametrized as below.
 
-<img src="docs/src/img/Paraboloid-parametricmapping.png" width="338">
+<img src="docs/src/img/paraboloid-formula.png" width="338">
 <br>
-<img src="docs/src/img/Paraboloid-D.png" width="220">
+<img src="docs/src/img/paraboloid-domain.png" width="220">
 
 The domain D will be split into D_i.
 
