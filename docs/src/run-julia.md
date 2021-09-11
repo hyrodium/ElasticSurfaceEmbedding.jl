@@ -13,15 +13,6 @@ The computation process proceeds as shown in the following flowchart (from our p
 
 ![](img/flowchart.png)
 
-1. Define the shape of surface
-1. Split the surface into strips
-1. Check the strain prediction
-1. Compute the initial state
-1. Newton-Raphson method iteration
-1. Refinement B-spline manifold
-1. Newton-Raphson method iteration, again
-1. Finish Computation
-
 ## Example: Paraboloid
 Through this section, we treat a paraboloid ``z=x^2+y^2`` as an example.
 
@@ -75,6 +66,21 @@ D
 &= [-1,1]\times[-1,1]
 \end{aligned}
 ```
+
+!!! info "Limitations of a definition of a surface"
+    The definition of the parameterized surface must be self-contained.
+    This is because, the package will save the definition as string.
+    (See the `"expr"` key in `~/ElasticSurfaceEmbedding-Result/<name>/<name>.json`.)
+
+    For example:
+    ```julia
+    # This is ok
+    @parametric_mapping 𝒑₍₀₎(u) = [sin(u[1]), sin(u[2]), u[1]*u[2]]
+    
+    # This is ng
+    f(x,y) = x*y
+    @parametric_mapping 𝒑₍₀₎(u) = [sin(u[1]), sin(u[2]), f(u[1],u[2])]
+    ```
 
 ```@docs
 @parametric_mapping

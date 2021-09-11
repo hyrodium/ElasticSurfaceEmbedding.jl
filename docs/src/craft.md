@@ -9,7 +9,7 @@ You can:
 * [Compute the shape of paper strip](@ref numerical_computation), instead of downloading the paraboloid.
     * This needs setup for Julia environment.
 * Buy already cut pieces of paper at [Booth](https://hyrodium.booth.pm/).
-    * Ships from Japan (esp. from my house).
+    * Ships from Japan (i.e. from my house).
 
 ## Images during the making process
 
