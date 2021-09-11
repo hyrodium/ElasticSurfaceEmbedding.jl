@@ -31,11 +31,11 @@ function _initialize(D, n₁)
     N = 6n₁
 
     # Solve 𝒄̈(t) = A(t)𝒄̇(t) with Runge-Kutta method
-    A(t) = [s̈₍₀₎(D₂, t) / ṡ₍₀₎(D₂, t) -𝜅₍₀₎(D₂, t) * ṡ₍₀₎(D₂, t)
-    𝜅₍₀₎(D₂, t) * ṡ₍₀₎(D₂, t) s̈₍₀₎(D₂, t) / ṡ₍₀₎(D₂, t)]
+    A(t) = [s̈₍₀₎(t, D₂) / ṡ₍₀₎(t, D₂) -𝜅₍₀₎(t, D₂) * ṡ₍₀₎(t, D₂)
+    𝜅₍₀₎(t, D₂) * ṡ₍₀₎(t, D₂) s̈₍₀₎(t, D₂) / ṡ₍₀₎(t, D₂)]
 
     # Initial condition
-    𝒄̇₀ = [1.0, 0.0] * ṡ₍₀₎(D₂, minimum(D₁))
+    𝒄̇₀ = [1.0, 0.0] * ṡ₍₀₎(minimum(D₁), D₂)
 
     Δt = (t₊-t₋)/N
     ts = range(t₋, stop=t₊, length=N+1)
@@ -77,10 +77,10 @@ function _initialize(D, n₁)
     𝒎[n₁,:] = 𝒎[n₁-1,:] + 𝒎̇[n₁-1,:]*Δk*1/3
 
     # Approximate 𝒄₂ with B-spline curve
-    𝒄₂s = [[g₍₀₎₁₂(c(D₂, ts[i])) -𝝊₍₀₎(c(D₂, ts[i])); 𝝊₍₀₎(c(D₂, ts[i])) g₍₀₎₁₂(c(D₂, ts[i]))] * 𝒄̇s[i,:] / g₍₀₎₁₁(c(D₂, ts[i])) for i in 1:N+1]
+    𝒄₂s = [[g₍₀₎₁₂(ts[i],D₂) -𝝊₍₀₎(ts[i],D₂); 𝝊₍₀₎(ts[i],D₂) g₍₀₎₁₂(ts[i],D₂)] * 𝒄̇s[i,:] / g₍₀₎₁₁(ts[i],D₂) for i in 1:N+1]
     𝒄₂s = hcat(𝒄₂s...)'
 
-    _B = [bsplinebasis(i, P₁, t) for i in 1:n₁, t in ts]
+    _B = [bsplinebasis(i,P₁,t) for i in 1:n₁, t in ts]
     _BB = _B * _B'
     _b = _B * 𝒄₂s
     𝒓 = _BB\_b  # control points of 𝒄̃₂

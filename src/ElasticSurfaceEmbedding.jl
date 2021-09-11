@@ -6,6 +6,7 @@ using Dates
 import Statistics.mean
 
 using IntervalSets
+using StaticArrays
 using JSON
 import FileIO.load
 import FileIO.save

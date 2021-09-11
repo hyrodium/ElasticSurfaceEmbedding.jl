@@ -1,27 +1,27 @@
 # Strain related functions
-E(M, u) = (g₍ₜ₎(M, u) - g₍₀₎(u)) / 2
-E₁₁(M::AbstractBSplineManifold, u) = (g₍ₜ₎₁₁(M, u) - g₍₀₎₁₁(u)) / 2
-E⁽⁰⁾₁₁(M::AbstractBSplineManifold, u) = E₁₁(M, u) / g₍₀₎₁₁(u)
-E₁₁_cont(M::AbstractBSplineManifold, u) = (g₍ₜ₎₁₁_cont(M, u) - g₍₀₎₁₁(u)) / 2
-E⁽⁰⁾₁₁_cont(M::AbstractBSplineManifold, u) = E₁₁_cont(M, u) / g₍₀₎₁₁(u)
+E(M,u¹,u²) = (g₍ₜ₎(M,u¹,u²) - g₍₀₎(u¹,u²)) / 2
+E₁₁(M::AbstractBSplineManifold,u¹,u²) = (g₍ₜ₎₁₁(M,u¹,u²) - g₍₀₎₁₁(u¹,u²)) / 2
+E⁽⁰⁾₁₁(M::AbstractBSplineManifold,u¹,u²) = E₁₁(M,u¹,u²) / g₍₀₎₁₁(u¹,u²)
+E₁₁_cont(M::AbstractBSplineManifold,u¹,u²) = (g₍ₜ₎₁₁_cont(M,u¹,u²) - g₍₀₎₁₁(u¹,u²)) / 2
+E⁽⁰⁾₁₁_cont(M::AbstractBSplineManifold,u¹,u²) = E₁₁_cont(M,u¹,u²) / g₍₀₎₁₁(u¹,u²)
 
-function Ẽ⁽⁰⁾₁₁(D₂::ClosedInterval, u)
+function Ẽ⁽⁰⁾₁₁(D₂::ClosedInterval,u¹,u²)
     # Breadth of the strip-like shape
     b = width(D₂) / 2
     # Center coordinate of u²
     c = sum(extrema(D₂)) / 2
     # Normalized coordinate of u²
-    r = (u[2] - c) / b
+    r = (u² - c) / b
     # Compute the predicted strain with the Strain Approximation Theorem
-    return (1 / 2) * K₍₀₎(D₂, u[1]) * B̃(D₂, u[1])^2 * (r^2 - 1 / 3)
+    return (1/2) * K₍₀₎(u¹,D₂) * B̃(u¹, D₂)^2 * (r^2 - 1 / 3)
 end
 
-function Ẽ⁽⁰⁾₁₁(M::AbstractBSplineManifold, u)
+function Ẽ⁽⁰⁾₁₁(M::AbstractBSplineManifold,u¹,u²)
     _, P₂ = bsplinespaces(M)
     p₂ = degree(P₂)
     k₂ = P₂.knots
     D₂ = k₂[1+p₂]..k₂[end-p₂]
-    return Ẽ⁽⁰⁾₁₁(D₂, u)
+    return Ẽ⁽⁰⁾₁₁(D₂,u¹,u²)
 end
 
 function ComputeMaximumStrain(; index=0, mesh=tuple(20 * [MESH...]...))
@@ -34,7 +34,7 @@ function ComputeMaximumStrain(; index=0, mesh=tuple(20 * [MESH...]...))
     κ₁ = range(leftendpoint(D₁) + 0.0001, stop = rightendpoint(D₁) - 0.0001, length = mesh[1] + 1)
     κ₂ = range(leftendpoint(D₂) + 0.0001, stop = rightendpoint(D₂) - 0.0001, length = mesh[2] + 1)
 
-    E = [E⁽⁰⁾₁₁(M, [u₁, u₂]) for u₁ in κ₁, u₂ in κ₂]
+    E = [E⁽⁰⁾₁₁(M, u₁, u₂) for u₁ in κ₁, u₂ in κ₂]
 
     return (minimum(E), maximum(E))
 end
@@ -45,7 +45,7 @@ function PredictMaximumStrain(D; mesh = tuple(20 * [MESH...]...))
     κ₁ = range(leftendpoint(D₁), stop = rightendpoint(D₁), length = mesh[1] + 1)
     κ₂ = range(leftendpoint(D₂), stop = rightendpoint(D₂), length = mesh[2] + 1)
 
-    E = [Ẽ⁽⁰⁾₁₁(D₂, [u₁, u₂]) for u₁ in κ₁, u₂ in κ₂]
+    E = [Ẽ⁽⁰⁾₁₁(D₂, u₁, u₂) for u₁ in κ₁, u₂ in κ₂]
 
     return (minimum(E), maximum(E))
 end

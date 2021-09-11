@@ -1,17 +1,17 @@
 # BSpline
-function N′(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u)::Float64
+function N′(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u¹, u²)::Float64
     if i == 1
-        return bsplinebasis′₊₀(I₁, P₁, u[1]) * bsplinebasis(I₂, P₂, u[2])
+        return bsplinebasis′₊₀(I₁, P₁, u¹) * bsplinebasis(I₂, P₂, u²)
     else
-        return bsplinebasis(I₁, P₁, u[1]) * bsplinebasis′₊₀(I₂, P₂, u[2])
+        return bsplinebasis(I₁, P₁, u¹) * bsplinebasis′₊₀(I₂, P₂, u²)
     end
 end
 
-function N′_cont(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u)::Float64
+function N′_cont(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u¹, u²)::Float64
     if i == 1
-        return bsplinebasis′(I₁, P₁, u[1]) * bsplinebasis(I₂, P₂, u[2])
+        return bsplinebasis′(I₁, P₁, u¹) * bsplinebasis(I₂, P₂, u²)
     else
-        return bsplinebasis(I₁, P₁, u[1]) * bsplinebasis′(I₂, P₂, u[2])
+        return bsplinebasis(I₁, P₁, u¹) * bsplinebasis′(I₂, P₂, u²)
     end
 end
 

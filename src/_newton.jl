@@ -119,12 +119,12 @@ function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip=NIP
     elseif i == r
         return sum(
             GaussianQuadrature(
-                u ->
+                (u¹,u²) ->
                     (
-                        g = g₍₀₎(u);
+                        g = g₍₀₎(u¹,u²);
                         g⁻ = inv(g);
                         𝝊 = sqrt(det(g));
-                        𝑁 = [N′(P₁, P₂, I₁, I₂, i, u) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
+                        𝑁 = [N′(P₁, P₂, I₁, I₂, i, u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
                         Q = [sum(𝒂[I₁, I₂, i]*𝑁[I₁, I₂, j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
                         sum(
                             C(p, q, m, n, g⁻)*
@@ -141,12 +141,12 @@ function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip=NIP
     else
         return sum(
             GaussianQuadrature(
-                u ->
+                (u¹,u²) ->
                     (
-                        g = g₍₀₎(u);
+                        g = g₍₀₎(u¹,u²);
                         g⁻ = inv(g);
                         𝝊 = sqrt(det(g));
-                        𝑁 = [N′(P₁, P₂, I₁, I₂, i, u) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
+                        𝑁 = [N′(P₁, P₂, I₁, I₂, i, u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
                         Q = [sum(𝒂[I₁, I₂, i]*𝑁[I₁, I₂, j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
                         2*sum(
                             C(p, q, m, n, g⁻)*𝑁[I₁, I₂, p]*𝑁[R₁, R₂, n]*Q[i, q]*Q[r, m]
@@ -173,12 +173,12 @@ function elm_F(M::AbstractBSplineManifold, I₁, I₂, i; nip = NIP)
 
     return sum(
         GaussianQuadrature(
-            u ->
+            (u¹,u²) ->
                 (
-                    g = g₍₀₎(u);
+                    g = g₍₀₎(u¹,u²);
                     g⁻ = inv(g);
                     𝝊 = sqrt(det(g));
-                    𝑁 = [N′(P₁, P₂, I₁, I₂, i, u) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
+                    𝑁 = [N′(P₁, P₂, I₁, I₂, i, u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
                     Q = [sum(𝒂[I₁, I₂, i] * 𝑁[I₁, I₂, j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
                     sum(
                         sum(C(p, q, m, n, g⁻) * 𝑁[I₁, I₂, p] * Q[i, q] for p in 1:2, q in 1:2) * (sum(Q[o, m] * Q[o, n] for o in 1:2) - g[m, n])

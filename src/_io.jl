@@ -18,7 +18,7 @@ A macro to define parametrized shape of surface
 """
 macro parametric_mapping(ex)
     expr = toJSON(ex)
-    if startswith(expr, "function 𝒑₍₀₎(u)\n") || startswith(expr, "𝒑₍₀₎(u) =")
+    if startswith(expr, "function 𝒑₍₀₎(u¹, u²)\n") || startswith(expr, "𝒑₍₀₎(u¹, u²) =")
         global EXPR = expr
     else
         error("symbol of parametric mapping must be 𝒑₍₀₎(u)")
@@ -259,7 +259,7 @@ function ExportFiles(
     Width = (Right - Left) * Unit[1]
     Height = (Up - Down) * Unit[1]
 
-    normalized_strain(u) = E⁽⁰⁾₁₁_cont(M, u) / MaximumStrain # bounded in -1 to 1
+    normalized_strain(u¹, u²) = E⁽⁰⁾₁₁_cont(M, u¹, u²) / MaximumStrain # bounded in -1 to 1
 
     aa = 5 # magnification parameter for antialias
 
@@ -269,7 +269,7 @@ function ExportFiles(
     path_png_colorbar = joinpath(Dir, "colorbar", "$(Name)-$(index)_colorbar.png")
     path_png_append = joinpath(Dir, "append", "$(Name)-$(index)_append.png")
 
-    colorfunc(u) = normalized_strain(u) * RGB(0.5, -0.5, -0.5) + RGB(0.5, 0.5, 0.5) # red to cyan
+    colorfunc(u) = normalized_strain(u[1], u[2]) * RGB(0.5, -0.5, -0.5) + RGB(0.5, 0.5, 0.5) # red to cyan
 
     save_svg(path_svg_nurbs, M, up = Up, down = Down, right = Right, left = Left, mesh = Mesh, unitlength = Int(Unit[1]))
     save_png(path_png_nurbs, M, up = Up, down = Down, right = Right, left = Left, mesh = Mesh, unitlength = Int(Unit[1]))
