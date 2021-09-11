@@ -111,12 +111,33 @@ function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip=NIP
     k₁, k₂ = knots.(P)
     n₁, n₂ = dim.(P)
 
-    𝜹 = [1.0 0.0; 0.0 1.0]
     Σ₁ = max(I₁, R₁):min(I₁, R₁)+p₁
     Σ₂ = max(I₂, R₂):min(I₂, R₂)+p₂
 
     if length(Σ₁) == 0 || length(Σ₂) == 0
         return 0.0
+    elseif i == r
+        return sum(
+            GaussianQuadrature(
+                u ->
+                    (
+                        g = g₍₀₎(u);
+                        g⁻ = inv(g);
+                        𝝊 = sqrt(det(g));
+                        𝑁 = [N′(P₁, P₂, I₁, I₂, i, u) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
+                        Q = [sum(𝒂[I₁, I₂, i]*𝑁[I₁, I₂, j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
+                        sum(
+                            C(p, q, m, n, g⁻)*
+                            𝑁[I₁, I₂, p]*
+                            (𝑁[R₁, R₂, q] * (Q[1, m]*Q[1, n]+Q[2, m]*Q[2, n] - g[m, n]) + 2*𝑁[R₁, R₂, n]*Q[i, q]*Q[r, m])
+                            for p in 1:2, q in 1:2, m in 1:2, n in 1:2
+                        )*𝝊
+                    ),
+                k₁[s₁]..k₁[s₁+1],
+                k₂[s₂]..k₂[s₂+1],
+                nip=nip,
+            ) for s₁ in Σ₁, s₂ in Σ₂
+        )
     else
         return sum(
             GaussianQuadrature(
@@ -126,14 +147,12 @@ function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip=NIP
                         g⁻ = inv(g);
                         𝝊 = sqrt(det(g));
                         𝑁 = [N′(P₁, P₂, I₁, I₂, i, u) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
-                        Q = [sum(𝒂[I₁, I₂, i] * 𝑁[I₁, I₂, j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
-                        sum(
-                            C(p, q, m, n, g⁻) *
-                            𝑁[I₁, I₂, p] *
-                            (𝜹[i, r] * 𝑁[R₁, R₂, q] * (sum(Q[o, m] * Q[o, n] for o in 1:2) - g[m, n]) + 2 * 𝑁[R₁, R₂, n] * Q[i, q] * Q[r, m])
+                        Q = [sum(𝒂[I₁, I₂, i]*𝑁[I₁, I₂, j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
+                        2*sum(
+                            C(p, q, m, n, g⁻)*𝑁[I₁, I₂, p]*𝑁[R₁, R₂, n]*Q[i, q]*Q[r, m]
                             for p in 1:2, q in 1:2, m in 1:2, n in 1:2
-                        )
-                    ) * 𝝊,
+                        )*𝝊
+                    ),
                 k₁[s₁]..k₁[s₁+1],
                 k₂[s₂]..k₂[s₂+1],
                 nip=nip,
