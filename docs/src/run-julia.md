@@ -5,6 +5,7 @@ On Julia's package mode, run the following commands.
 ```julia-repl
 pkg> add IntervalSets
 pkg> add BasicBSpline
+pkg> add StaticArrays
 pkg> add https://github.com/hyrodium/ElasticSurfaceEmbedding.jl
 ```
 
@@ -23,6 +24,7 @@ Load packages with the following script.
 ```julia
 using IntervalSets
 using BasicBSpline
+using StaticArrays
 using ElasticSurfaceEmbedding
 ```
 
@@ -51,7 +53,7 @@ config_slack
 
 ### Define the shape of surface
 ```julia
-@parametric_mapping 𝒑₍₀₎(u) = [u[1],u[2],u[1]^2+u[2]^2]
+@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(u¹, u², u¹^2+u²^2)
 ```
 
 ```math
@@ -75,12 +77,18 @@ D
     For example:
     ```julia
     # This is ok
-    @parametric_mapping 𝒑₍₀₎(u) = [sin(u[1]), sin(u[2]), u[1]*u[2]]
+    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(sin(u¹), sin(u²), u¹*u²)
 
     # This is ng
     f(x,y) = x*y
-    @parametric_mapping 𝒑₍₀₎(u) = [sin(u[1]), sin(u[2]), f(u[1],u[2])]
+    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(sin(u¹), sin(u²), f(u¹,u²))
     ```
+
+
+!!! info "Direction of the surface"
+    In the next step, we'll split the surface into elongated strips.
+    The domain of each strip should be a rectangular, and the longer direction is `u¹`, and the shorter direction is `u²`.
+    The paraboloid has four‐fold symmetry, so we don't have to take care of it.
 
 ```@docs
 @parametric_mapping
@@ -90,7 +98,7 @@ D
 Before the computation, we need to set the name of the surface, and output graphics region.
 ```julia
 name = "Paraboloid"
-settings(name,up=2,down=-2,right=2,left=-2,mesh=(20,1),unit=200,colorbarsize=0.3)
+settings(name,canvas=(4,4),mesh=(20,1),unit=200,colorbarsize=0.3)
 ```
 
 ```@docs
