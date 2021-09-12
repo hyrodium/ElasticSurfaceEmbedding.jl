@@ -58,13 +58,14 @@ function 𝒑₁₍ₜ₎(M::BSplineSurface,u¹,u²)
     P₁, P₂ = bsplinespaces(M)
     𝒂 = controlpoints(M)
     n₁, n₂, _ = size(𝒂)
-    return sum(N′(P₁, P₂, I₁, I₂, 1, u¹, u²) * 𝒂[I₁, I₂, :] for I₁ in 1:n₁, I₂ in 1:n₂)
+    return sum(N₁(P₁, P₂, I₁, I₂, u¹, u²) * 𝒂[I₁, I₂, :] for I₁ in 1:n₁, I₂ in 1:n₂)
 end
-function 𝒑₂₍ₜ₎(M::BSplineSurface, u)
+
+function 𝒑₂₍ₜ₎(M::BSplineSurface,u¹,u²)
     P₁, P₂ = bsplinespaces(M)
     𝒂 = controlpoints(M)
     n₁, n₂, _ = size(𝒂)
-    return sum(N′(P₁, P₂, I₁, I₂, 2, u) * 𝒂[I₁, I₂, :] for I₁ in 1:n₁, I₂ in 1:n₂)
+    return sum(N₂(P₁, P₂, I₁, I₂, u¹, u²) * 𝒂[I₁, I₂, :] for I₁ in 1:n₁, I₂ in 1:n₂)
 end
 
 g₍ₜ₎₁₁(M,u¹,u²) = dot(𝒑₁₍ₜ₎(M,u¹,u²),𝒑₁₍ₜ₎(M,u¹,u²)) # 第1基本量
@@ -73,7 +74,7 @@ g₍ₜ₎₂₁(M,u¹,u²) = dot(𝒑₂₍ₜ₎(M,u¹,u²),𝒑₁₍ₜ₎(M
 g₍ₜ₎₂₂(M,u¹,u²) = dot(𝒑₂₍ₜ₎(M,u¹,u²),𝒑₂₍ₜ₎(M,u¹,u²)) # 第1基本量
 g₍ₜ₎(M,u¹,u²)   = @SMatrix [g₍ₜ₎₁₁(M,u¹,u²) g₍ₜ₎₁₂(M,u¹,u²) ; g₍ₜ₎₂₁(M,u¹,u²) g₍ₜ₎₂₂(M,u¹,u²)]
 
-function 𝒑₁₍ₜ₎_cont(M::BSplineSurface, u¹, u²)
+function 𝒑₁₍ₜ₎_cont(M::BSplineSurface,u¹,u²)
     P₁, P₂ = bsplinespaces(M)
     𝒂 = controlpoints(M)
     n₁, n₂, _ = size(𝒂)

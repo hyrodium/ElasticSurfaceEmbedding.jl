@@ -7,6 +7,14 @@ function N′(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u¹
     end
 end
 
+function N₁(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, u¹, u²)::Float64
+    return bsplinebasis′₊₀(I₁, P₁, u¹) * bsplinebasis(I₂, P₂, u²)
+end
+
+function N₂(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, u¹, u²)::Float64
+    return bsplinebasis(I₁, P₁, u¹) * bsplinebasis′₊₀(I₂, P₂, u²)
+end
+
 function N′_cont(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u¹, u²)::Float64
     if i == 1
         return bsplinebasis′(I₁, P₁, u¹) * bsplinebasis(I₂, P₂, u²)
