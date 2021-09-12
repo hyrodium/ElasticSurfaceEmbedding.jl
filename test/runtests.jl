@@ -1,5 +1,6 @@
 using Test
 using IntervalSets
+using StaticArrays
 using Images
 using LinearAlgebra
 using BasicBSpline
@@ -34,7 +35,7 @@ rm(dir_result_b, recursive=true, force=true)
 config_dir(dir_result_b)
 
 @testset "Rhomboid" begin
-    @parametric_mapping 𝒑₍₀₎(u) = [u...,u[1]+u[2]]
+    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹+u²)
     D = (-1.0..1.0, -1.0..1.0)
     name = "Rhomboid"
     settings(name,canvas=(3,5),mesh=(20,1),unit=200,colorbarsize=0.3)
@@ -67,7 +68,7 @@ config_dir(dir_result_b)
 end
 
 @testset "Planar" begin
-    @parametric_mapping 𝒑₍₀₎(u) = [sin(u[1])*u[2], u[2]+cos(u[1])-u[1]^2/5, 0.0]
+    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(sin(u¹)*u², u²+cos(u¹)-u¹^2/5, 0.0)
     # See https://www.desmos.com/calculator/4usvqpr0iu
     D = (-1.0..2.0, 1.0..1.2)
     name = "Planar"
@@ -75,11 +76,11 @@ end
 
     initial_state(D, n₁=35)
     M = ElasticSurfaceEmbedding.loadM()
-    @test norm([ElasticSurfaceEmbedding.E(M, [u¹, u²]) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
+    @test norm([ElasticSurfaceEmbedding.E(M, u¹, u²) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
 
     newton_onestep()
     M = ElasticSurfaceEmbedding.loadM()
-    @test norm([ElasticSurfaceEmbedding.E(M, [u¹, u²]) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
+    @test norm([ElasticSurfaceEmbedding.E(M, u¹, u²) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
 end
 
 @testset "Sphere-thin" begin
@@ -87,7 +88,7 @@ end
     L = 20
     B = 1/8
 
-    @parametric_mapping 𝒑₍₀₎(u) = [cos(u[1])*cos(u[2]), sin(u[1])*cos(u[2]), sin(u[2])]
+    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cos(u²), sin(u¹)*cos(u²), sin(u²))
     D = (-L..L, -B..B)
     name = "Sphere-thin"
     settings(name,canvas=(2L,2),mesh=(L,1),unit=50,colorbarsize=0.05)
@@ -106,7 +107,7 @@ end
     # Analytical
     k = sqrt(4atanh(tan(B/2))/(sin(B)/cos(B)^2+2atanh(tan(B/2))))
     # Numerical computed
-    k̃ = 𝒑₁₍ₜ₎(M, [0,0])[1]
+    k̃ = 𝒑₁₍ₜ₎(M,0,0)[1]
     # Approximated
     k̂ = 1-B^2/6
 
@@ -117,7 +118,7 @@ end
     # Analytical
     h′(u²) = √(1-𝝂*(k^2/cos(u²)^2-1))
     # Numerical computed
-    h̃′(u²) = 𝒑₂₍ₜ₎(M, [0,u²])[2]
+    h̃′(u²) = 𝒑₂₍ₜ₎(M,0,u²)[2]
     # Approximated
     ĥ′(u²) = √(1+𝝂*(1-k̂^2))-(𝝂*k̂^2*u²^2)/(2*√(1+𝝂*(1-k̂^2)))
 
@@ -132,7 +133,7 @@ end
     L = 20
     B = 2/3
 
-    @parametric_mapping 𝒑₍₀₎(u) = [cos(u[1])*cos(u[2]), sin(u[1])*cos(u[2]), sin(u[2])]
+    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cos(u²), sin(u¹)*cos(u²), sin(u²))
     D = (-L..L, -B..B)
     name = "Sphere-thick"
     settings(name,canvas=(2L,2),mesh=(L,1),unit=50,colorbarsize=0.05)
@@ -151,7 +152,7 @@ end
     # Analytical
     k = sqrt(4atanh(tan(B/2))/(sin(B)/cos(B)^2+2atanh(tan(B/2))))
     # Numerical computed
-    k̃ = 𝒑₁₍ₜ₎(M, [0,0])[1]
+    k̃ = 𝒑₁₍ₜ₎(M,0,0)[1]
     # Approximated
     k̂ = 1-B^2/6
 
@@ -162,7 +163,7 @@ end
     # Analytical
     h′(u²) = √(1-𝝂*(k^2/cos(u²)^2-1))
     # Numerical computed
-    h̃′(u²) = 𝒑₂₍ₜ₎(M, [0,u²])[2]
+    h̃′(u²) = 𝒑₂₍ₜ₎(M,0,u²)[2]
     # Approximated
     ĥ′(u²) = √(1+𝝂*(1-k̂^2))-(𝝂*k̂^2*u²^2)/(2*√(1+𝝂*(1-k̂^2)))
 
@@ -180,7 +181,7 @@ end
 end
 
 @testset "Paraboloid" begin
-    @parametric_mapping 𝒑₍₀₎(u) = [u...,u'*u]
+    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹^2+u²^2)
     D(i,n) = (-1.0..1.0, (i-1)/n..i/n)
     name = "Paraboloid"
     settings(name,canvas=(4,4),mesh=(20,1),unit=200,colorbarsize=0.3)
