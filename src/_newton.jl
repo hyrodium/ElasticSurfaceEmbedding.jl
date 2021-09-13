@@ -124,13 +124,13 @@ function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip=NIP
                         g = g₍₀₎(u¹,u²);
                         g⁻ = inv(g);
                         𝝊 = sqrt(det(g));
-                        𝑁 = [N′(P₁, P₂, I₁, I₂, i, u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
-                        Q = @SMatrix [sum(𝒂[I₁, I₂, i]*𝑁[I₁, I₂, j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
-                        QQ = @SMatrix [Q[1, m]*Q[1, n]+Q[2, m]*Q[2, n] for m in 1:2, n in 1:2];
+                        𝑁 = [N′(P₁,P₂,I₁,I₂,i,u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
+                        Q = @SMatrix [sum(𝒂[I₁,I₂,i] * 𝑁[I₁,I₂,j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
+                        QQ = @SMatrix [Q[1,m]*Q[1,n] + Q[2,m]*Q[2,n] for m in 1:2, n in 1:2];
                         sum(
-                            C(p, q, m, n, g⁻)*
-                            𝑁[I₁, I₂, p]*
-                            (𝑁[R₁, R₂, q] * (QQ[m, n] - g[m, n]) + 2𝑁[R₁, R₂, n]*Q[i, q]*Q[r, m])
+                            C(p,q,m,n,g⁻)*
+                            𝑁[I₁,I₂,p]*
+                            (𝑁[R₁,R₂,q] * (QQ[m,n] - g[m,n]) + 2𝑁[R₁,R₂,n]*Q[i,q]*Q[r,m])
                             for p in 1:2, q in 1:2, m in 1:2, n in 1:2
                         )*𝝊
                     ),
@@ -147,10 +147,10 @@ function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip=NIP
                         g = g₍₀₎(u¹,u²);
                         g⁻ = inv(g);
                         𝝊 = sqrt(det(g));
-                        𝑁 = [N′(P₁, P₂, I₁, I₂, i, u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
-                        Q = @SMatrix [sum(𝒂[I₁, I₂, i]*𝑁[I₁, I₂, j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
+                        𝑁 = [N′(P₁,P₂,I₁,I₂,i,u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
+                        Q = @SMatrix [sum(𝒂[I₁,I₂,i] * 𝑁[I₁,I₂,j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
                         2*sum(
-                            C(p, q, m, n, g⁻)*𝑁[I₁, I₂, p]*𝑁[R₁, R₂, n]*Q[i, q]*Q[r, m]
+                            C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*𝑁[R₁,R₂,n]*Q[i,q]*Q[r,m]
                             for p in 1:2, q in 1:2, m in 1:2, n in 1:2
                         )*𝝊
                     ),
@@ -179,14 +179,14 @@ function elm_F(M::AbstractBSplineManifold, I₁, I₂, i; nip = NIP)
                     g = g₍₀₎(u¹,u²);
                     g⁻ = inv(g);
                     𝝊 = sqrt(det(g));
-                    𝑁 = [N′(P₁, P₂, I₁, I₂, i, u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
-                    Q = @SMatrix [sum(𝒂[I₁, I₂, i] * 𝑁[I₁, I₂, j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
-                    QQ = @SMatrix [Q[1, m]*Q[1, n]+Q[2, m]*Q[2, n] for m in 1:2, n in 1:2];
+                    𝑁 = [N′(P₁,P₂,I₁,I₂,i,u¹,u²) for I₁ in 1:n₁,I₂ in 1:n₂, i in 1:2];
+                    Q = @SMatrix [sum(𝒂[I₁,I₂,i] * 𝑁[I₁,I₂,j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
+                    QQ = @SMatrix [Q[1,m]*Q[1,n] + Q[2,m]*Q[2,n] for m in 1:2, n in 1:2];
                     sum(
-                        sum(C(p, q, m, n, g⁻) * 𝑁[I₁, I₂, p] * Q[i, q] for p in 1:2, q in 1:2) * (QQ[m, n] - g[m, n])
+                        sum(C(p,q,m,n,g⁻) * 𝑁[I₁,I₂,p] * Q[i,q] for p in 1:2, q in 1:2) * (QQ[m,n] - g[m,n])
                         for m in 1:2, n in 1:2
-                    )
-                ) * 𝝊,
+                    ) * 𝝊
+                ),
             k₁[s₁]..k₁[s₁+1],
             k₂[s₂]..k₂[s₂+1],
             nip = nip,
