@@ -19,17 +19,19 @@ using Luxor
 using BasicBSpline
 using ExportNURBS
 
-export @parametric_mapping
+# config
 export config_dir, config_slack
+# shape definition
+export @parametric_mapping
 export settings
+# Numerical computing
 export initial_state
 export newton_onestep
 export spline_refinement
-export add_pin
-export remove_pin
-export export_all_pinned_states
-export show_strain
-export show_knots
+# Pin related
+export add_pin, remove_pin, export_all_pinned_states
+# utilities
+export show_strain, show_knots
 export computed_shapes
 
 include("_constants.jl")
