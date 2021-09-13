@@ -10,11 +10,3 @@ function GaussianQuadrature(f::Function, D₁::ClosedInterval, D₂::ClosedInter
            width(D₁) *
            width(D₂) / 4
 end
-
-"""
-Numerical integral in 1-dimension.
-"""
-function GaussianQuadrature(f::Function, D::ClosedInterval; nip = NIP)
-    nodes, weights = gausslegendre(nip)
-    return sum(weights .* [f(x) for x in (width(D) * nodes .+ sum(extrema(D))) / 2]) * width(D)
-end
