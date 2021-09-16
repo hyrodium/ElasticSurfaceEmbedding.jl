@@ -257,16 +257,125 @@ computed_shapes
 
 ## Other examples
 ### Catenoid
+![](img/catenoid.png)
+
 ```julia
+## Load packages
 using IntervalSets
 using BasicBSpline
+using StaticArrays
 using ElasticSurfaceEmbedding
 
+## Set parametric mapping (x-direction)
+@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u²)*cosh(u¹),sin(u²)*cosh(u¹),u¹)
 n=9
-domain = (-π/2..π/2,-π/(4n)..π/(4n))
-@parametric_mapping 𝒑₍₀₎(u)=[cos(u[2])*cosh(u[1]),sin(u[2])*cosh(u[1]),u[1]]
-@parametric_mapping 𝒑₍₀₎(u)=[cos(u[1])*cosh(u[2]),sin(u[1])*cosh(u[2]),u[2]]
+Dx(n) = (-π/2..π/2,-π/(4n)..π/(4n))
+
+name = "Catenoid-x"
+settings(name,canvas=(8,8),mesh=(18,1),unit=200,colorbarsize=0.3)
+
+## Check the maximum strain
+show_strain(Dx(n))
+
+## Numerical computing
+initial_state(Dx(n), n₁=19)
+newton_onestep(fixingmethod=:fix3points)
+newton_onestep()
+newton_onestep()
+spline_refinement(p₊=(0,1),k₊=(Knots(),Knots(0)))
+newton_onestep()
+newton_onestep()
+newton_onestep()
+add_pin(tag="$name")
+export_all_pinned_states(unitlength=(30,"mm"))
+
+
+## Set parametric mapping (y-direction)
+@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cosh(u²),sin(u¹)*cosh(u²),u²)
+n=9
+Dy(i,n) = (-π..π,(i-1)*π/(2n)..(i)*π/(2n))
+
+name = "Catenoid-y"
+settings(name,canvas=(8,8),mesh=(36,1),unit=200,colorbarsize=0.3)
+
+## Check the maximum strain
+for i in 1:9
+    show_strain(Dy(i,n))
+end
+
+## Numerical computing
+for i in 1:9
+    initial_state(Dy(i,n), n₁=19)
+    newton_onestep(fixingmethod=:fix3points)
+    newton_onestep()
+    newton_onestep()
+    spline_refinement(p₊=(0,1),k₊=(Knots(),Knots((i-1/2)*π/(2n))))
+    newton_onestep()
+    newton_onestep()
+    newton_onestep()
+    add_pin(tag="$name-$i")
+end
+export_all_pinned_states(unitlength=(30,"mm"))
 ```
 
 ### Helicoid
+![](img/helicoid.png)
 
+```julia
+## Load packages
+using IntervalSets
+using BasicBSpline
+using StaticArrays
+using ElasticSurfaceEmbedding
+
+## Set parametric mapping (x-direction)
+@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u²)*sinh(u¹),sin(u²)*sinh(u¹),u²)
+n=9
+Dx(n) = (-π/2..π/2,-π/(4n)..π/(4n))
+
+name = "Helicoid-x"
+settings(name,canvas=(8,8),mesh=(18,1),unit=200,colorbarsize=0.3)
+
+## Check the maximum strain
+show_strain(Dx(n))
+
+## Numerical computing
+initial_state(Dx(n), n₁=19)
+newton_onestep(fixingmethod=:fix3points)
+newton_onestep()
+newton_onestep()
+spline_refinement(p₊=(0,1),k₊=(Knots(),Knots(0)))
+newton_onestep()
+newton_onestep()
+newton_onestep()
+add_pin(tag="$name")
+export_all_pinned_states(unitlength=(30,"mm"))
+
+
+## Set parametric mapping (y-direction)
+@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*sinh(u²),sin(u¹)*sinh(u²),u¹)
+n=9
+Dy(i,n) = (-π..π,(i-1)*π/(2n)..(i)*π/(2n))
+
+name = "Helicoid-y"
+settings(name,canvas=(8,8),mesh=(36,1),unit=200,colorbarsize=0.3)
+
+## Check the maximum strain
+for i in 1:9
+    show_strain(Dy(i,n))
+end
+
+## Numerical computing
+for i in 1:9
+    initial_state(Dy(i,n), n₁=19)
+    newton_onestep(fixingmethod=:fix3points)
+    newton_onestep()
+    newton_onestep()
+    spline_refinement(p₊=(0,1),k₊=(Knots(),Knots((i-1/2)*π/(2n))))
+    newton_onestep()
+    newton_onestep()
+    newton_onestep()
+    add_pin(tag="$name-$i")
+end
+export_all_pinned_states(unitlength=(30,"mm"))
+```
