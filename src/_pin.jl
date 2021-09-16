@@ -130,10 +130,10 @@ function export_all_pinned_states(; unitlength::Tuple{<:Real,<:AbstractString}, 
         k₁, k₂ = knots.(P)
         D₁, D₂ = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
 
-        𝒆⁽⁰⁾₁(u) = normalize(𝒑₁₍ₜ₎(M, u))
-        𝒆⁽⁰⁾₂(u) = [0.0 -1.0; 1.0 0.0] * 𝒆⁽⁰⁾₁(u)
-        𝒑a(i, t) = 𝒑₍ₜ₎(M, [t, leftendpoint(D₂)]) + 𝒆⁽⁰⁾₂([t, leftendpoint(D₂)]) * i * cutout[1] / unitlength[1]
-        𝒑b(i, t) = 𝒑₍ₜ₎(M, [t, rightendpoint(D₂)]) - 𝒆⁽⁰⁾₂([t, rightendpoint(D₂)]) * i * cutout[1] / unitlength[1]
+        𝒆⁽⁰⁾₁(u¹,u²) = normalize(𝒑₁₍ₜ₎(M,u¹,u²))
+        𝒆⁽⁰⁾₂(u¹,u²) = [0.0 -1.0; 1.0 0.0] * 𝒆⁽⁰⁾₁(u¹,u²)
+        𝒑a(i, t) = 𝒑₍ₜ₎(M, t, leftendpoint(D₂)) + 𝒆⁽⁰⁾₂(t, leftendpoint(D₂)) * i * cutout[1] / unitlength[1]
+        𝒑b(i, t) = 𝒑₍ₜ₎(M, t, rightendpoint(D₂)) - 𝒆⁽⁰⁾₂(t, rightendpoint(D₂)) * i * cutout[1] / unitlength[1]
         SvgCurve(
             [[t -> 𝒑a(i, t) for i in 0:cutout[2]]..., [t -> 𝒑b(i, t) for i in 0:cutout[2]]...],
             D₁,
