@@ -199,5 +199,5 @@ end
     img_a = load(joinpath(dir_result_a,"Paraboloid","append","Paraboloid-5_append.png"))
     img_b = load(joinpath(dir_result_b,"Paraboloid","append","Paraboloid-5_append.png"))
     d = Euclidean()
-    @test d(img_a, img_b) < 0.0001
+    @test d(RGB.(img_a), RGB.(img_b)) < 0.0001
 end
