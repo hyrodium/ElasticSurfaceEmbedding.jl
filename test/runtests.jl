@@ -35,7 +35,7 @@ rm(dir_result_b, recursive=true, force=true)
 config_dir(dir_result_b)
 
 @testset "Rhomboid" begin
-    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹+u²)
+    ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹+u²)
     D = (-1.0..1.0, -1.0..1.0)
     name = "Rhomboid"
     settings(name,canvas=(3,5),mesh=(20,1),unit=200,colorbarsize=0.3)
@@ -68,7 +68,7 @@ config_dir(dir_result_b)
 end
 
 @testset "Planar" begin
-    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(sin(u¹)*u², u²+cos(u¹)-u¹^2/5, 0.0)
+    ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(sin(u¹)*u², u²+cos(u¹)-u¹^2/5, 0.0)
     # See https://www.desmos.com/calculator/4usvqpr0iu
     D = (-1.0..2.0, 1.0..1.2)
     name = "Planar"
@@ -88,7 +88,7 @@ end
     L = 20
     B = 1/8
 
-    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cos(u²), sin(u¹)*cos(u²), sin(u²))
+    ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cos(u²), sin(u¹)*cos(u²), sin(u²))
     D = (-L..L, -B..B)
     name = "Sphere-thin"
     settings(name,canvas=(2L,2),mesh=(L,1),unit=50,colorbarsize=0.05)
@@ -133,7 +133,7 @@ end
     L = 20
     B = 2/3
 
-    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cos(u²), sin(u¹)*cos(u²), sin(u²))
+    ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cos(u²), sin(u¹)*cos(u²), sin(u²))
     D = (-L..L, -B..B)
     name = "Sphere-thick"
     settings(name,canvas=(2L,2),mesh=(L,1),unit=50,colorbarsize=0.05)
@@ -181,7 +181,7 @@ end
 end
 
 @testset "Paraboloid" begin
-    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹^2+u²^2)
+    ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹^2+u²^2)
     D(i,n) = (-1.0..1.0, (i-1)/n..i/n)
     name = "Paraboloid"
     settings(name,canvas=(4,4),mesh=(20,1),unit=200,colorbarsize=0.3)

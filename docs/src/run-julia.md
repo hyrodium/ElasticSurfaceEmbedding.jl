@@ -53,7 +53,7 @@ config_slack
 
 ### Define the shape of surface
 ```julia
-@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(u¹, u², u¹^2+u²^2)
+ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(u¹, u², u¹^2+u²^2)
 ```
 
 ```math
@@ -68,22 +68,6 @@ D
 &= [-1,1]\times[-1,1]
 \end{aligned}
 ```
-
-!!! info "Limitations of a definition of a surface"
-    The definition of the parameterized surface must be self-contained.
-    This is because, the package will save the definition as string.
-    See `"expr"` key in `~/ElasticSurfaceEmbedding-Result/<name>/<name>.json`.
-
-    For example:
-    ```julia
-    # This is ok
-    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(sin(u¹), sin(u²), u¹*u²)
-
-    # This is ng
-    f(x,y) = x*y
-    @parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(sin(u¹), sin(u²), f(u¹,u²))
-    ```
-
 
 !!! info "Direction of the surface"
     In the next step, we'll split the surface into elongated strips.
@@ -267,7 +251,7 @@ using StaticArrays
 using ElasticSurfaceEmbedding
 
 ## Set parametric mapping (x-direction)
-@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u²)*cosh(u¹),sin(u²)*cosh(u¹),u¹)
+ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u²)*cosh(u¹),sin(u²)*cosh(u¹),u¹)
 n=9
 Dx(n) = (-π/2..π/2,-π/(4n)..π/(4n))
 
@@ -291,7 +275,7 @@ export_all_pinned_states(unitlength=(30,"mm"))
 
 
 ## Set parametric mapping (y-direction)
-@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cosh(u²),sin(u¹)*cosh(u²),u²)
+ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cosh(u²),sin(u¹)*cosh(u²),u²)
 n=9
 Dy(i,n) = (-π..π,(i-1)*π/(2n)..(i)*π/(2n))
 
@@ -329,7 +313,7 @@ using StaticArrays
 using ElasticSurfaceEmbedding
 
 ## Set parametric mapping (x-direction)
-@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u²)*sinh(u¹),sin(u²)*sinh(u¹),u²)
+ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u²)*sinh(u¹),sin(u²)*sinh(u¹),u²)
 n=9
 Dx(n) = (-π/2..π/2,-π/(4n)..π/(4n))
 
@@ -353,7 +337,7 @@ export_all_pinned_states(unitlength=(30,"mm"))
 
 
 ## Set parametric mapping (y-direction)
-@parametric_mapping 𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*sinh(u²),sin(u¹)*sinh(u²),u¹)
+ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*sinh(u²),sin(u¹)*sinh(u²),u¹)
 n=9
 Dy(i,n) = (-π..π,(i-1)*π/(2n)..(i)*π/(2n))
 
