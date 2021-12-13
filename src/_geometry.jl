@@ -1,5 +1,8 @@
 ## Reference State
 
+# Parametric mapping of Reference state
+𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,0)
+
 # Tangent vector
 𝒑₁₍₀₎(u¹,u²) = ForwardDiff.derivative(u¹ -> 𝒑₍₀₎(u¹,u²), u¹)
 𝒑₂₍₀₎(u¹,u²) = ForwardDiff.derivative(u² -> 𝒑₍₀₎(u¹,u²), u²)
