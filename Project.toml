@@ -26,6 +26,8 @@ BasicBSpline = "0.1.6"
 Colors = "0.12"
 ForwardDiff = "0.10"
 ImageIO = "0.5
+StaticArrays = "1.2"
+ImageIO = "0.5"
 
 [extras]
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
