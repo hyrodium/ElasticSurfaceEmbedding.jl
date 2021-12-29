@@ -17,7 +17,7 @@ using Colors
 using Luxor
 
 using BasicBSpline
-using ExportNURBS
+using BasicBSplineExporter
 
 # config
 export config_dir, config_slack
@@ -31,7 +31,7 @@ export spline_refinement
 # Pin related
 export add_pin, remove_pin, export_all_pinned_states
 # utilities
-export show_strain, show_knots
+export show_strain, show_knotvector
 export computed_shapes
 
 include("_constants.jl")

@@ -59,9 +59,9 @@ function newton_onestep(; fixingmethod=:default, parent::Int=0, nip=NIP)
     _export(M, parent, comment=comment)
 end
 
-function _newton(M::AbstractBSplineManifold, fix_method; nip=NIP)
+function _newton(M::BSplineManifold{2}, fix_method; nip=NIP)
     𝒂 = controlpoints(M)
-    P = collect(bsplinespaces(M))
+    P = bsplinespaces(M)
     n₁, n₂ = dim.(P)
     lineup(I₁, I₂, i) = (i-1)*n₁*n₂ + (I₂-1)*n₁ + (I₁-1) + 1
 
@@ -100,15 +100,15 @@ function _newton(M::AbstractBSplineManifold, fix_method; nip=NIP)
         insert!(𝒂̌, i, 𝒂ₒ[i])
     end
     𝒂 = reshape(𝒂̌, n₁, n₂, 2)
-    M = typeof(M)(P, 𝒂)
+    M = BSplineManifold(𝒂, P)
     return M, F, Ǧ, t₁ - t₀
 end
 
-function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip=NIP)
+function elm_H(M::BSplineManifold{2}, I₁, I₂, i, R₁, R₂, r; nip=NIP)
     𝒂 = controlpoints(M)
     P₁, P₂ = P = bsplinespaces(M)
     p₁, p₂ = degree.(P)
-    k₁, k₂ = knots.(P)
+    k₁, k₂ = knotvector.(P)
     n₁, n₂ = dim.(P)
 
     Σ₁ = max(I₁, R₁):min(I₁, R₁)+p₁
@@ -162,11 +162,11 @@ function elm_H(M::AbstractBSplineManifold, I₁, I₂, i, R₁, R₂, r; nip=NIP
     end
 end
 
-function elm_F(M::AbstractBSplineManifold, I₁, I₂, i; nip = NIP)
+function elm_F(M::BSplineManifold{2}, I₁, I₂, i; nip = NIP)
     𝒂 = controlpoints(M)
     P₁, P₂ = P = bsplinespaces(M)
     p₁, p₂ = degree.(P)
-    k₁, k₂ = knots.(P)
+    k₁, k₂ = knotvector.(P)
     n₁, n₂ = dim.(P)
 
     Σ₁ = I₁:I₁+p₁

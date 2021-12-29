@@ -22,8 +22,8 @@ function _initialize(D, n₁)
     p₂ = 1
     k₁ = KnotVector(range(t₋, t₊, length = n₁-p₁+1)) + p₁ * KnotVector(t₋, t₊)
     k₂ = KnotVector(repeat(collect(extrema(D₂)), inner = 2))
-    P₁ = FastBSplineSpace(p₁, k₁)
-    P₂ = FastBSplineSpace(p₂, k₂)
+    P₁ = BSplineSpace{p₁}(k₁)
+    P₂ = BSplineSpace{p₂}(k₂)
     n₂ = dim(P₂)
 
 
@@ -57,9 +57,9 @@ function _initialize(D, n₁)
     # Approximate 𝒄̇=𝒄₁ with B-spline curve
     _p₁ = p₁-1
     _k₁ = KnotVector(range(t₋, t₊, length = n₁-_p₁)) + _p₁ * KnotVector(t₋, t₊)
-    _P₁ = FastBSplineSpace(_p₁, _k₁)
+    _P₁ = BSplineSpace{_p₁}(_k₁)
     _n₁ =  dim(_P₁)
-    _B = [bsplinebasis(i, _P₁, t) for i in 1:_n₁, t in ts]
+    _B = [bsplinebasis(_P₁,i,t) for i in 1:_n₁, t in ts]
     _BB = _B * _B'
     _b = _B * 𝒄̇s
     𝒎̇ = _BB\_b  # control points of 𝒄̃₁
@@ -80,7 +80,7 @@ function _initialize(D, n₁)
     𝒄₂s = [[g₍₀₎₁₂(ts[i],D₂) -𝝊₍₀₎(ts[i],D₂); 𝝊₍₀₎(ts[i],D₂) g₍₀₎₁₂(ts[i],D₂)] * 𝒄̇s[i,:] / g₍₀₎₁₁(ts[i],D₂) for i in 1:N+1]
     𝒄₂s = hcat(𝒄₂s...)'
 
-    _B = [bsplinebasis(i,P₁,t) for i in 1:n₁, t in ts]
+    _B = [bsplinebasis(P₁,i,t) for i in 1:n₁, t in ts]
     _BB = _B * _B'
     _b = _B * 𝒄₂s
     𝒓 = _BB\_b  # control points of 𝒄̃₂
@@ -89,7 +89,7 @@ function _initialize(D, n₁)
     a2 = 𝒎 + width(D₂) * 𝒓/2
     𝒂 = [(a1[I₁,i],a2[I₁,i])[I₂] for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2]
 
-    M = BSplineSurface([P₁, P₂], 𝒂)
-    M′ = refinement(M, p₊ = [0, 1])
+    M = BSplineManifold(𝒂, (P₁, P₂))
+    M′ = refinement(M, p₊ = (0, 1))
     return _positioning(M′)
 end

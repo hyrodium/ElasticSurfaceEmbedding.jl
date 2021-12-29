@@ -1,9 +1,9 @@
 # Strain related functions
 E(M,u¹,u²) = (g₍ₜ₎(M,u¹,u²) - g₍₀₎(u¹,u²)) / 2
-E₁₁(M::AbstractBSplineManifold,u¹,u²) = (g₍ₜ₎₁₁(M,u¹,u²) - g₍₀₎₁₁(u¹,u²)) / 2
-E⁽⁰⁾₁₁(M::AbstractBSplineManifold,u¹,u²) = E₁₁(M,u¹,u²) / g₍₀₎₁₁(u¹,u²)
-E₁₁_cont(M::AbstractBSplineManifold,u¹,u²) = (g₍ₜ₎₁₁_cont(M,u¹,u²) - g₍₀₎₁₁(u¹,u²)) / 2
-E⁽⁰⁾₁₁_cont(M::AbstractBSplineManifold,u¹,u²) = E₁₁_cont(M,u¹,u²) / g₍₀₎₁₁(u¹,u²)
+E₁₁(M::BSplineManifold{2},u¹,u²) = (g₍ₜ₎₁₁(M,u¹,u²) - g₍₀₎₁₁(u¹,u²)) / 2
+E⁽⁰⁾₁₁(M::BSplineManifold{2},u¹,u²) = E₁₁(M,u¹,u²) / g₍₀₎₁₁(u¹,u²)
+E₁₁_cont(M::BSplineManifold{2},u¹,u²) = (g₍ₜ₎₁₁_cont(M,u¹,u²) - g₍₀₎₁₁(u¹,u²)) / 2
+E⁽⁰⁾₁₁_cont(M::BSplineManifold{2},u¹,u²) = E₁₁_cont(M,u¹,u²) / g₍₀₎₁₁(u¹,u²)
 
 function Ẽ⁽⁰⁾₁₁(D₂::ClosedInterval,u¹,u²)
     # Breadth of the strip-like shape
@@ -16,10 +16,10 @@ function Ẽ⁽⁰⁾₁₁(D₂::ClosedInterval,u¹,u²)
     return (1/2) * K₍₀₎(u¹,D₂) * B̃(u¹, D₂)^2 * (r^2 - 1 / 3)
 end
 
-function Ẽ⁽⁰⁾₁₁(M::AbstractBSplineManifold,u¹,u²)
+function Ẽ⁽⁰⁾₁₁(M::BSplineManifold{2},u¹,u²)
     _, P₂ = bsplinespaces(M)
     p₂ = degree(P₂)
-    k₂ = P₂.knots
+    k₂ = knotvector(P₂)
     D₂ = k₂[1+p₂]..k₂[end-p₂]
     return Ẽ⁽⁰⁾₁₁(D₂,u¹,u²)
 end
@@ -28,7 +28,7 @@ function ComputeMaximumStrain(; index=0, mesh=tuple(20 * [MESH...]...))
     M = loadM(index = index)
     P = bsplinespaces(M)
     p₁, p₂ = degree.(P)
-    k₁, k₂ = knots.(P)
+    k₁, k₂ = knotvector.(P)
     D₁, D₂ = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
 
     κ₁ = range(leftendpoint(D₁) + 0.0001, stop = rightendpoint(D₁) - 0.0001, length = mesh[1] + 1)

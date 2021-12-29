@@ -123,11 +123,11 @@ function export_all_pinned_states(; unitlength::Tuple{<:Real,<:AbstractString}, 
     for index in pinned_states
         M = loadM(index=index)
         filename = joinpath(DIR, "pinned", "$(_get_tag(index)).svg")
-        save_svg(filename, M, up=UP, down=DOWN, right=RIGHT, left=LEFT, mesh=MESH, unitlength=unitlength[1], points=false)
+        save_svg(filename, M, xlims=XLIMS, ylims=YLIMS, mesh=MESH, unitlength=unitlength[1], points=false)
 
         P = bsplinespaces(M)
         p₁, p₂ = degree.(P)
-        k₁, k₂ = knots.(P)
+        k₁, k₂ = knotvector.(P)
         D₁, D₂ = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
 
         𝒆⁽⁰⁾₁(u¹,u²) = normalize(𝒑₁₍ₜ₎(M,u¹,u²))

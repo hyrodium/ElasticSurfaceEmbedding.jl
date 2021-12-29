@@ -50,24 +50,24 @@ g₍₀₎₂₂(u¹,D₂::ClosedInterval) = g₍₀₎₂₂(u¹,c(D₂))
 
 # Current State
 𝒑₍ₜ₎(M,u¹,u²) = M(u¹,u²)
-function 𝒑′₍ₜ₎(M::BSplineSurface,u¹,u²)
+function 𝒑′₍ₜ₎(M::BSplineManifold{2},u¹,u²)
     P₁, P₂ = bsplinespaces(M)
     𝒂 = controlpoints(M)
-    n₁, n₂, _ = size(𝒂)
+    n₁, n₂ = size(𝒂)
     return [sum(N′(P₁, P₂, I₁, I₂, j, u¹, u²) * 𝒂[I₁, I₂, i] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:d, j in 1:d]
 end
 
-function 𝒑₁₍ₜ₎(M::BSplineSurface,u¹,u²)
+function 𝒑₁₍ₜ₎(M::BSplineManifold{2},u¹,u²)
     P₁, P₂ = bsplinespaces(M)
     𝒂 = controlpoints(M)
-    n₁, n₂, _ = size(𝒂)
+    n₁, n₂ = size(𝒂)
     return sum(N₁(P₁, P₂, I₁, I₂, u¹, u²) * 𝒂[I₁, I₂, :] for I₁ in 1:n₁, I₂ in 1:n₂)
 end
 
-function 𝒑₂₍ₜ₎(M::BSplineSurface,u¹,u²)
+function 𝒑₂₍ₜ₎(M::BSplineManifold{2},u¹,u²)
     P₁, P₂ = bsplinespaces(M)
     𝒂 = controlpoints(M)
-    n₁, n₂, _ = size(𝒂)
+    n₁, n₂ = size(𝒂)
     return sum(N₂(P₁, P₂, I₁, I₂, u¹, u²) * 𝒂[I₁, I₂, :] for I₁ in 1:n₁, I₂ in 1:n₂)
 end
 
@@ -77,10 +77,10 @@ g₍ₜ₎₂₁(M,u¹,u²) = dot(𝒑₂₍ₜ₎(M,u¹,u²),𝒑₁₍ₜ₎(M
 g₍ₜ₎₂₂(M,u¹,u²) = dot(𝒑₂₍ₜ₎(M,u¹,u²),𝒑₂₍ₜ₎(M,u¹,u²)) # 第1基本量
 g₍ₜ₎(M,u¹,u²)   = @SMatrix [g₍ₜ₎₁₁(M,u¹,u²) g₍ₜ₎₁₂(M,u¹,u²) ; g₍ₜ₎₂₁(M,u¹,u²) g₍ₜ₎₂₂(M,u¹,u²)]
 
-function 𝒑₁₍ₜ₎_cont(M::BSplineSurface,u¹,u²)
+function 𝒑₁₍ₜ₎_cont(M::BSplineManifold{2},u¹,u²)
     P₁, P₂ = bsplinespaces(M)
     𝒂 = controlpoints(M)
-    n₁, n₂, _ = size(𝒂)
+    n₁, n₂ = size(𝒂)
     return sum(N′_cont(P₁, P₂, I₁, I₂, 1, u¹, u²) * 𝒂[I₁, I₂, :] for I₁ in 1:n₁, I₂ in 1:n₂)
 end
 g₍ₜ₎₁₁_cont(M,u¹,u²) = 𝒑₁₍ₜ₎_cont(M,u¹,u²)'𝒑₁₍ₜ₎_cont(M,u¹,u²) # 第1基本量

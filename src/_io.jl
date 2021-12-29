@@ -53,35 +53,38 @@ end
 function toJSON(k::KnotVector)
     return k.vector
 end
-function toJSON(P::FastBSplineSpace)
-    return Dict("degree" => degree(P), "knots" => toJSON(knots(P)))
+function toJSON(P::BSplineSpace)
+    return Dict("degree" => degree(P), "knotvector" => toJSON(knotvector(P)))
 end
-function toJSON(P::Array{P,1} where {P<:FastBSplineSpace})
+function toJSON(P::Array{P,1} where {P<:BSplineSpace})
     return convert(Array{Any,1}, toJSON.(P))
 end
 function toJSON(a::Array{Float64})
     return convert(Array{Any,1}, a[:])
 end
-function toJSON(M::AbstractBSplineManifold)
+function toJSON(M::BSplineManifold{2})
     return Dict("bsplinespaces" => toJSON(collect(bsplinespaces(M))), "controlpoints" => toJSON(controlpoints(M)))
 end
 
 function JSONtoBSplineSpace(jP::Dict)
-    return FastBSplineSpace(jP["degree"], KnotVector(Vector{Float64}(jP["knots"])))
+    p = jP["degree"]
+    return BSplineSpace{p}(KnotVector(Vector{Float64}(jP["knotvector"])))
 end
 function JSONtoBSplineSpaces(jPs::Array)
-    return [JSONtoBSplineSpace(jP) for jP in jPs]
+    P1 = JSONtoBSplineSpace(jPs[1])
+    P2 = JSONtoBSplineSpace(jPs[1])
+    return (P1,P2)
 end
 function JSONtoControlPoints(ja, dims)
     n = prod(dims)
     d = length(ja) ÷ n
     return reshape(convert(Array{Float64}, ja), dims..., d)
 end
-function JSONtoBSplineSurface(dict::Dict)
+function JSONtoBSplineManifold(dict::Dict)
     P = JSONtoBSplineSpaces(dict["bsplinespaces"])
     dims = dim.(P)
     𝒂 = JSONtoControlPoints(dict["controlpoints"], dims)
-    return BSplineSurface(P, 𝒂)
+    return BSplineManifold(𝒂, P)
 end
 
 function NodeSeries(tree::Dict, node)
@@ -158,7 +161,7 @@ function loadM(; index=0)
     end
     dict = LoadResultDict()
     index = _realparent(index)
-    M = JSONtoBSplineSurface(dict["result"][string(index)]["BSplineManifold"])
+    M = JSONtoBSplineManifold(dict["result"][string(index)]["BSplineManifold"])
     return M
 end
 
@@ -175,7 +178,7 @@ function LoadResultDict()::Dict
     end
 end
 
-function _export(M::AbstractBSplineManifold, parent::Int; comment = "", maximumstrain = MAXIMUMSTRAIN)
+function _export(M::BSplineManifold{2}, parent::Int; comment = "", maximumstrain = MAXIMUMSTRAIN)
     if isTheShapeComputed()
         dict = LoadResultDict()
         index = latest_index(dict) + 1
@@ -213,7 +216,7 @@ function _export(M::AbstractBSplineManifold, parent::Int; comment = "", maximums
 end
 
 function ExportFiles(
-    M::AbstractBSplineManifold,
+    M::BSplineManifold{2},
     MaximumStrain::Real,
     index;
     Name::String = NAME,

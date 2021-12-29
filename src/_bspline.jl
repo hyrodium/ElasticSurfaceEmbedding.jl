@@ -1,25 +1,25 @@
 # BSpline
-function N′(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u¹, u²)::Float64
+function N′(P₁::BSplineSpace, P₂::BSplineSpace, I₁, I₂, i, u¹, u²)::Float64
     if i == 1
-        return bsplinebasis′₊₀(I₁, P₁, u¹) * bsplinebasis(I₂, P₂, u²)
+        return bsplinebasis′₊₀(P₁,I₁,u¹) * bsplinebasis(P₂,I₂,u²)
     else
-        return bsplinebasis(I₁, P₁, u¹) * bsplinebasis′₊₀(I₂, P₂, u²)
+        return bsplinebasis(P₁,I₁,u¹) * bsplinebasis′₊₀(P₂,I₂,u²)
     end
 end
 
-function N₁(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, u¹, u²)::Float64
-    return bsplinebasis′₊₀(I₁, P₁, u¹) * bsplinebasis(I₂, P₂, u²)
+function N₁(P₁::BSplineSpace, P₂::BSplineSpace, I₁, I₂, u¹, u²)::Float64
+    return bsplinebasis′₊₀(P₁,I₁,u¹) * bsplinebasis(P₂,I₂,u²)
 end
 
-function N₂(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, u¹, u²)::Float64
-    return bsplinebasis(I₁, P₁, u¹) * bsplinebasis′₊₀(I₂, P₂, u²)
+function N₂(P₁::BSplineSpace, P₂::BSplineSpace, I₁, I₂, u¹, u²)::Float64
+    return bsplinebasis(P₁,I₁,u¹) * bsplinebasis′₊₀(P₂,I₂,u²)
 end
 
-function N′_cont(P₁::FastBSplineSpace, P₂::FastBSplineSpace, I₁, I₂, i, u¹, u²)::Float64
+function N′_cont(P₁::BSplineSpace, P₂::BSplineSpace, I₁, I₂, i, u¹, u²)::Float64
     if i == 1
-        return bsplinebasis′(I₁, P₁, u¹) * bsplinebasis(I₂, P₂, u²)
+        return bsplinebasis′(P₁,I₁,u¹) * bsplinebasis(P₂,I₂,u²)
     else
-        return bsplinebasis(I₁, P₁, u¹) * bsplinebasis′(I₂, P₂, u²)
+        return bsplinebasis(P₁,I₁,u¹) * bsplinebasis′(P₂,I₂,u²)
     end
 end
 
@@ -55,15 +55,15 @@ function _positioning(𝒂)
     return _center(_rotate(𝒂))
 end
 
-function _positioning(M::AbstractBSplineManifold)
-    Ps = collect(bsplinespaces(M))
+function _positioning(M::BSplineManifold{2})
+    Ps = bsplinespaces(M)
     𝒂 = controlpoints(M)
     if length(Ps) ≠ 2
         error("dimension does not match")
     end
 
     𝒂′ = _positioning(𝒂)
-    return typeof(M)(Ps, 𝒂′)
+    return BSplineManifold(𝒂′,Ps)
 end
 
 """
@@ -75,8 +75,8 @@ function spline_refinement(; p₊=(0,0), k₊=(KnotVector(),KnotVector()), paren
     parent = _realparent(parent)
     M = loadM(index=parent)
 
-    P₁, P₂ = collect(bsplinespaces(M))
-    k₁, k₂ = knots(P₁), knots(P₂)
+    P₁, P₂ = bsplinespaces(M)
+    k₁, k₂ = knotvector(P₁), knotvector(P₂)
 
     p₊₁, p₊₂ = p₊
     k₊₁, k₊₂ = k₊
@@ -97,19 +97,19 @@ function spline_refinement(; p₊=(0,0), k₊=(KnotVector(),KnotVector()), paren
 end
 
 """
-    show_knots(; index=0)
+    show_knotvector(; index=0)
 
-Show current knots and suggestions for knot insertions (with given index).
+Show current knotvector and suggestions for knot insertions (with given index).
 """
-function show_knots(; index=0)
+function show_knotvector(; index=0)
     M = loadM(index = index)
 
     P = bsplinespaces(M)
-    k₁, k₂ = knots.(P)
+    k₁, k₂ = knotvector.(P)
     k₁′ = unique(k₁)
     k₂′ = unique(k₂)
     msg = """
-    Current knots (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
+    Current knotvectors (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
     k₁: , $(k₁.vector)
     k₂: , $(k₂.vector)
     k₁₊: , $([(k₁′[i] + k₁′[i+1]) / 2 for i in 1:(length(k₁′)-1)])
