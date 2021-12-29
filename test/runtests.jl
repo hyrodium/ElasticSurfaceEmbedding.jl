@@ -97,7 +97,7 @@ end
 
     newton_onestep()
     newton_onestep()
-    spline_refinement(p₊=[0,1],k₊=[KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0, B/2)])
+    spline_refinement(p₊=(0,1),k₊=(KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0., B/2)))
     newton_onestep()
     newton_onestep()
 
@@ -142,7 +142,7 @@ end
 
     newton_onestep()
     newton_onestep()
-    spline_refinement(p₊=[0,1],k₊=[KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0, B/2)])
+    spline_refinement(p₊=(0,1),k₊=(KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0., B/2)))
     newton_onestep()
     newton_onestep()
 
