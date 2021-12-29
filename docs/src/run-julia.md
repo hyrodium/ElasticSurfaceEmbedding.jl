@@ -74,10 +74,6 @@ D
     The domain of each strip should be a rectangular, and the longer direction is `u¹`, and the shorter direction is `u²`.
     The paraboloid has four‐fold symmetry, so we don't have to take care of it.
 
-```@docs
-@parametric_mapping
-```
-
 ### Settings
 Before the computation, we need to set the name of the surface, and output graphics region.
 ```julia
@@ -175,7 +171,7 @@ newton_onestep
 ### Refinement of B-spline manifold
 
 ```julia
-spline_refinement(p₊=[0,1],k₊=[KnotVector(),KnotVector([(i-1/2)/10])])
+spline_refinement(p₊=(0,1),k₊=(KnotVector(),KnotVector((i-1/2)/10)))
 ```
 
 ```@docs
@@ -183,7 +179,7 @@ spline_refinement
 ```
 
 ```@docs
-show_knots
+show_knotvector
 ```
 
 ### Pin the state
