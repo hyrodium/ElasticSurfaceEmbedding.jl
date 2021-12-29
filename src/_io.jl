@@ -36,10 +36,8 @@ function settings(
     _check_filename(name)
     global NAME = name
     global DIR = joinpath(OUT_DIR, NAME)
-    global UP = canvas[2]/2
-    global DOWN = -canvas[2]/2
-    global RIGHT = canvas[1]/2
-    global LEFT = -canvas[1]/2
+    global YLIMS = (-canvas[2]/2, canvas[2]/2)
+    global XLIMS = (-canvas[1]/2, canvas[1]/2)
     global MESH = mesh
     global UNIT = (unit, "pt")
     global MAXIMUMSTRAIN = maximumstrain
@@ -72,7 +70,7 @@ function JSONtoBSplineSpace(jP::Dict)
 end
 function JSONtoBSplineSpaces(jPs::Array)
     P1 = JSONtoBSplineSpace(jPs[1])
-    P2 = JSONtoBSplineSpace(jPs[1])
+    P2 = JSONtoBSplineSpace(jPs[2])
     return (P1,P2)
 end
 function JSONtoControlPoints(ja, dims)
@@ -221,10 +219,8 @@ function ExportFiles(
     index;
     Name::String = NAME,
     Dir = DIR,
-    Up = UP,
-    Down = DOWN,
-    Right = RIGHT,
-    Left = LEFT,
+    Xlims = XLIMS,
+    Ylims = YLIMS,
     Mesh = MESH,
     Unit = UNIT,
     Colorbarsize = COLORBARSIZE,
@@ -234,8 +230,8 @@ function ExportFiles(
     mkpath(joinpath(DIR, "colorbar"))
     mkpath(joinpath(DIR, "append"))
 
-    Width = (Right - Left) * Unit[1]
-    Height = (Up - Down) * Unit[1]
+    Width = (Xlims[2] - Xlims[1]) * Unit[1]
+    Height = (Ylims[2] - Ylims[1]) * Unit[1]
 
     normalized_strain(u¹, u²) = E⁽⁰⁾₁₁_cont(M, u¹, u²) / MaximumStrain # bounded in -1 to 1
 
@@ -247,12 +243,12 @@ function ExportFiles(
     path_png_colorbar = joinpath(Dir, "colorbar", "$(Name)-$(index)_colorbar.png")
     path_png_append = joinpath(Dir, "append", "$(Name)-$(index)_append.png")
 
-    colorfunc(u) = normalized_strain(u[1], u[2]) * RGB(0.5, -0.5, -0.5) + RGB(0.5, 0.5, 0.5) # red to cyan
+    colorfunc(u¹,u²) = normalized_strain(u¹,u²) * RGB(0.5, -0.5, -0.5) + RGB(0.5, 0.5, 0.5) # red to cyan
 
-    save_svg(path_svg_nurbs, M, up = Up, down = Down, right = Right, left = Left, mesh = Mesh, unitlength = Int(Unit[1]))
-    save_png(path_png_nurbs, M, up = Up, down = Down, right = Right, left = Left, mesh = Mesh, unitlength = Int(Unit[1]))
-    save_png(path_png_strain, M, colorfunc, up = Up, down = Down, right = Right, left = Left, unitlength = Int(aa * Unit[1]))
-    ColorBar(max = MaximumStrain, filename = path_png_colorbar, width = aa * Colorbarsize * Width)
+    save_svg(path_svg_nurbs, M, xlims=Xlims, ylims=Ylims, mesh=Mesh, unitlength=Int(Unit[1]))
+    save_png(path_png_nurbs, M, xlims=Xlims, ylims=Ylims, mesh=Mesh, unitlength=Int(Unit[1]))
+    save_png(path_png_strain, M, colorfunc, xlims=Xlims, ylims=Ylims, unitlength=Int(aa*Unit[1]))
+    ColorBar(max=MaximumStrain, filename=path_png_colorbar, width=aa*Colorbarsize*Width)
 
     img_nurbs = load(path_png_nurbs)
     img_strain = load(path_png_strain)
