@@ -20,8 +20,8 @@ function _initialize(D, n₁)
     t₋, t₊ = extrema(D₁)
     p₁ = 3
     p₂ = 1
-    k₁ = Knots(range(t₋, t₊, length = n₁-p₁+1)) + p₁ * Knots(t₋, t₊)
-    k₂ = Knots(repeat(collect(extrema(D₂)), inner = 2))
+    k₁ = KnotVector(range(t₋, t₊, length = n₁-p₁+1)) + p₁ * KnotVector(t₋, t₊)
+    k₂ = KnotVector(repeat(collect(extrema(D₂)), inner = 2))
     P₁ = FastBSplineSpace(p₁, k₁)
     P₂ = FastBSplineSpace(p₂, k₂)
     n₂ = dim(P₂)
@@ -56,7 +56,7 @@ function _initialize(D, n₁)
 
     # Approximate 𝒄̇=𝒄₁ with B-spline curve
     _p₁ = p₁-1
-    _k₁ = Knots(range(t₋, t₊, length = n₁-_p₁)) + _p₁ * Knots(t₋, t₊)
+    _k₁ = KnotVector(range(t₋, t₊, length = n₁-_p₁)) + _p₁ * KnotVector(t₋, t₊)
     _P₁ = FastBSplineSpace(_p₁, _k₁)
     _n₁ =  dim(_P₁)
     _B = [bsplinebasis(i, _P₁, t) for i in 1:_n₁, t in ts]

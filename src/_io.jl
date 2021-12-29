@@ -50,7 +50,7 @@ function settings(
     end
 end
 
-function toJSON(k::Knots)
+function toJSON(k::KnotVector)
     return k.vector
 end
 function toJSON(P::FastBSplineSpace)
@@ -67,7 +67,7 @@ function toJSON(M::AbstractBSplineManifold)
 end
 
 function JSONtoBSplineSpace(jP::Dict)
-    return FastBSplineSpace(jP["degree"], Knots(Vector{Float64}(jP["knots"])))
+    return FastBSplineSpace(jP["degree"], KnotVector(Vector{Float64}(jP["knots"])))
 end
 function JSONtoBSplineSpaces(jPs::Array)
     return [JSONtoBSplineSpace(jP) for jP in jPs]

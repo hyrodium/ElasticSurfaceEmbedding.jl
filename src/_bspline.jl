@@ -67,11 +67,11 @@ function _positioning(M::AbstractBSplineManifold)
 end
 
 """
-    spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{Knots,1}=[Knots(), Knots()], parent::Int=0)
+    spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{KnotVector,1}=[KnotVector(), KnotVector()], parent::Int=0)
 
 Compute a refinement of the B-spline manifold
 """
-function spline_refinement(; p₊=(0,0), k₊=(Knots(),Knots()), parent::Int=0)
+function spline_refinement(; p₊=(0,0), k₊=(KnotVector(),KnotVector()), parent::Int=0)
     parent = _realparent(parent)
     M = loadM(index=parent)
 
@@ -81,11 +81,11 @@ function spline_refinement(; p₊=(0,0), k₊=(Knots(),Knots()), parent::Int=0)
     p₊₁, p₊₂ = p₊
     k₊₁, k₊₂ = k₊
 
-    if (k₊₁ ≠ Knots()) && !(k₁[1] < k₊₁[1] && k₊₁[end] < k₁[end])
+    if (k₊₁ ≠ KnotVector()) && !(k₁[1] < k₊₁[1] && k₊₁[end] < k₁[end])
         error("given additional knots for refinement are out of range")
     end
 
-    if (k₊₂ ≠ Knots()) && !(k₂[1] < k₊₂[1] && k₊₂[end] < k₂[end])
+    if (k₊₂ ≠ KnotVector()) && !(k₂[1] < k₊₂[1] && k₊₂[end] < k₂[end])
         error("given additional knots for refinement are out of range")
     end
 

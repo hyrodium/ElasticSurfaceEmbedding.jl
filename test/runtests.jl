@@ -97,7 +97,7 @@ end
 
     newton_onestep()
     newton_onestep()
-    spline_refinement(p₊=[0,1],k₊=[Knots(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),Knots(-B/2, 0, B/2)])
+    spline_refinement(p₊=[0,1],k₊=[KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0, B/2)])
     newton_onestep()
     newton_onestep()
 
@@ -142,7 +142,7 @@ end
 
     newton_onestep()
     newton_onestep()
-    spline_refinement(p₊=[0,1],k₊=[Knots(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),Knots(-B/2, 0, B/2)])
+    spline_refinement(p₊=[0,1],k₊=[KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0, B/2)])
     newton_onestep()
     newton_onestep()
 
@@ -191,7 +191,7 @@ end
 
     newton_onestep(fixingmethod=:fix3points)
     newton_onestep()
-    spline_refinement(p₊=(0,1),k₊=(Knots(),Knots([(i-1/2)/10])))
+    spline_refinement(p₊=(0,1),k₊=(KnotVector(),KnotVector([(i-1/2)/10])))
     newton_onestep()
     newton_onestep()
     add_pin(tag="$name-$i")
