@@ -21,8 +21,6 @@ using BasicBSplineExporter
 
 # config
 export config_dir, config_slack
-# shape definition
-export @parametric_mapping
 export settings
 # Numerical computing
 export initial_state
