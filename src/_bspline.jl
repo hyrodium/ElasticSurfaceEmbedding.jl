@@ -67,7 +67,7 @@ function _positioning(M::BSplineManifold{2})
 end
 
 """
-    spline_refinement(; p₊::Array{Int,1}=[0, 0], k₊::Array{KnotVector,1}=[KnotVector(), KnotVector()], parent::Int=0)
+    spline_refinement(; p₊::Tuple{Int,Int}=[0, 0], k₊::Tuple{<:KnotVector,<:KnotVector}=(KnotVector(),KnotVector()), parent::Int=0)
 
 Compute a refinement of the B-spline manifold
 """
@@ -91,7 +91,7 @@ function spline_refinement(; p₊=(0,0), k₊=(KnotVector(),KnotVector()), paren
 
     comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((k₊₁.vector, k₊₂.vector))"
     comment = replace(comment, "Float64"=>"")
-    M = refinement(M, p₊=[p₊₁, p₊₂], k₊=[k₊₁, k₊₂])
+    M = refinement(M, p₊=(p₊₁, p₊₂), k₊=(k₊₁, k₊₂))
     _export(M, parent, comment=comment)
     return
 end
