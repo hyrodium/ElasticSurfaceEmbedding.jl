@@ -31,7 +31,7 @@ JSON = "0.21"
 FileIO = "1.11"
 Luxor = "2.17"
 ForwardDiff = "0.10"
-ImageIO = "0.5
+ImageIO = "0.5"
 StaticArrays = "1.2"
 ImageIO = "0.5"
 
