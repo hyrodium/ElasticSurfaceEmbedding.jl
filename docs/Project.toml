@@ -1,4 +1,4 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 ElasticSurfaceEmbedding = "bcf6de08-7633-46ab-86e2-ee57f9a67390"
-ExportNURBS = "23a6489c-a236-4e7b-aa89-a91a497ba26e"
+BasicBSplineExporter = "769ccd65-a659-4118-b5e3-8f57c631b3e0"
