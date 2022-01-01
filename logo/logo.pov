@@ -79,6 +79,10 @@ background{rgb<1,1,1>}
     #declare i=i+2;
 #end
 
+#macro F(X,Y)
+    <X, Y, X*X+Y*Y-1>
+#end
+
 #declare paraboloid = union{
 #declare N = 50;
 #declare i=0;
@@ -88,11 +92,11 @@ background{rgb<1,1,1>}
         #declare d = 2/N;
         #declare x_ = -1+i*d;
         #declare y_ = -1+j*d;
-        #declare p0 = <x_+d/2,y_+d/2,(x_+d/2)*(x_+d/2)+(y_+d/2)*(y_+d/2)>-z;
-        #declare p1 = <x_,y_,x_*x_+y_*y_>-z;
-        #declare p2 = <x_+d,y_,(x_+d)*(x_+d)+y_*y_>-z;
-        #declare p3 = <x_+d,y_+d,(x_+d)*(x_+d)+(y_+d)*(y_+d)>-z;
-        #declare p4 = <x_,y_+d,x_*x_+(y_+d)*(y_+d)>-z;
+        #declare p0 = F(x_+d/2,y_+d/2);
+        #declare p1 = F(x_,y_);
+        #declare p2 = F(x_+d,y_);
+        #declare p3 = F(x_+d,y_+d);
+        #declare p4 = F(x_,y_+d);
         triangle{p1,p2,p0}
         triangle{p2,p3,p0}
         triangle{p3,p4,p0}
