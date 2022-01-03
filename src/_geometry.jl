@@ -37,9 +37,9 @@ e⁽⁰⁾₁(u¹,u²) = normalize(𝒑₁₍₀₎(u¹,u²))
 e⁽⁰⁾₂(u¹,u²) = normalize(𝒑₂₍₀₎(u¹,u²) - (g₍₀₎₁₂(u¹,u²) / g₍₀₎₁₁(u¹,u²)) * 𝒑₁₍₀₎(u¹,u²))
 
 c(D₂::ClosedInterval) = sum(extrema(D₂))/2 # Coordinate on the center curve
-ṡ₍₀₎(t, D₂::ClosedInterval) = sqrt(g₍₀₎₁₁(t,c(D₂)))
-s̈₍₀₎(t, D₂::ClosedInterval) = (1 / 2) * (g₁₍₀₎(t,c(D₂)))[1, 1] / sqrt(g₍₀₎₁₁(t,c(D₂)))
-𝜅₍₀₎(t, D₂::ClosedInterval) = 𝛤₍₀₎²₁₁(t,c(D₂)) * 𝝊₍₀₎(t,c(D₂)) / ṡ₍₀₎(t, D₂)^3 # Geodesic curvature
+s₍₀₎(t, D₂::ClosedInterval) = sqrt(g₍₀₎₁₁(t,c(D₂)))
+ṡ₍₀₎(t, D₂::ClosedInterval) = (1 / 2) * (g₁₍₀₎(t,c(D₂)))[1, 1] / sqrt(g₍₀₎₁₁(t,c(D₂)))
+𝜅₍₀₎(t, D₂::ClosedInterval) = 𝛤₍₀₎²₁₁(t,c(D₂)) * 𝝊₍₀₎(t,c(D₂)) / s₍₀₎(t, D₂)^3 # Geodesic curvature
 K₍₀₎(t, D₂::ClosedInterval) = K₍₀₎(t,c(D₂)) # Gaussian curvature
 B̃(t, D₂::ClosedInterval) = dot(e⁽⁰⁾₂(t,c(D₂)), 𝒑₂₍₀₎(t,c(D₂))) * width(D₂) / 2 # Breadth of the piece of surface
 g₍₀₎₁₁(u¹,D₂::ClosedInterval) = g₍₀₎₁₁(u¹,c(D₂))
