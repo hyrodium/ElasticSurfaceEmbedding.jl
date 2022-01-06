@@ -57,13 +57,12 @@ jobs:
           julia --project=docs -e '
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))
             Pkg.instantiate()'
       - run: |
           julia --project=docs -e '
             using Documenter
             using BasicBSpline
-            using Pkg
-            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))
             DocMeta.setdocmeta!(BasicBSpline, :DocTestSetup, :(using LinearAlgebra, BasicBSpline))
             doctest(BasicBSpline)'
       - run: julia --project=docs docs/make.jl
