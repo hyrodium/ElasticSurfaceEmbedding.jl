@@ -35,6 +35,10 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
+      - run: |
+          julia --project=docs -e '
+            using Pkg
+            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
@@ -58,6 +62,8 @@ jobs:
           julia --project=docs -e '
             using Documenter
             using BasicBSpline
+            using Pkg
+            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))
             DocMeta.setdocmeta!(BasicBSpline, :DocTestSetup, :(using LinearAlgebra, BasicBSpline))
             doctest(BasicBSpline)'
       - run: julia --project=docs docs/make.jl
