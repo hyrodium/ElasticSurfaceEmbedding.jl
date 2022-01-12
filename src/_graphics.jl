@@ -35,7 +35,7 @@ function _changeunit(path_svg, units::Pair{String,String})
     write(path_svg, join(lines,"\n"))
 end
 
-function SvgCurve(𝒑s::Array{T,1}, I::ClosedInterval; filename, up=5, down=-5, right=5, left=-5, thickness=1, mesh=50, unitlength=100) where {T<:Any}
+function _svgcurve(𝒑s::Array{T,1}, I::ClosedInterval; filename, up=5, down=-5, right=5, left=-5, thickness=1, mesh=50, unitlength=100) where {T<:Any}
     k = collect(range(endpoints(I)..., length = mesh + 1))
     n = length(k) - 1
     step = unitlength
@@ -55,7 +55,7 @@ function SvgCurve(𝒑s::Array{T,1}, I::ClosedInterval; filename, up=5, down=-5,
     finish()
     return
 end
-function ColorBar(; max = 1.000, filename = "ColorBar.png", width = 100)
+function _colorbar(; max=1.000, filename="ColorBar.png", width=100)
     up = 4
     down = -4
     right = 4.6

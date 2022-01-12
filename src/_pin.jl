@@ -11,7 +11,7 @@ function add_pin(; parent::Int = 0, tag::String = "")
     if _tag_exists(tag)
         error("The tag $(tag) is already exists.")
     end
-    dict = LoadResultDict()
+    dict = _loadresultdict()
     parent = _realparent(parent)
     M = loadM(index = parent)
 
@@ -43,7 +43,7 @@ function _tag_exists(tag)
 end
 
 function _get_tag(index)::String
-    dict = LoadResultDict()
+    dict = _loadresultdict()
 
     comment = dict["result"][repr(index)]["comment"]
     if startswith(comment, "📌 ")
@@ -63,7 +63,7 @@ function remove_pin(index::Integer)
         @warn "There's no pin with the index $index"
         return
     end
-    dict = LoadResultDict()
+    dict = _loadresultdict()
     comment = dict["result"][repr(index)]["comment"]
     comment = replace(comment, "📌" => "💨")
     dict["result"][repr(index)]["comment"] = comment
@@ -95,7 +95,7 @@ function remove_pin(; tag::AbstractString)
 end
 
 function _find_all_pinned_states()
-    dict = LoadResultDict()
+    dict = _loadresultdict()
     pinned_states = Int[]
     for key in keys(dict["result"])
         comment = dict["result"][key]["comment"]
@@ -134,7 +134,7 @@ function export_all_pinned_states(; unitlength::Tuple{<:Real,<:AbstractString}, 
         𝒆⁽⁰⁾₂(u¹,u²) = [0.0 -1.0; 1.0 0.0] * 𝒆⁽⁰⁾₁(u¹,u²)
         𝒑a(i, t) = 𝒑₍ₜ₎(M, t, leftendpoint(D₂)) + 𝒆⁽⁰⁾₂(t, leftendpoint(D₂)) * i * cutout[1] / unitlength[1]
         𝒑b(i, t) = 𝒑₍ₜ₎(M, t, rightendpoint(D₂)) - 𝒆⁽⁰⁾₂(t, rightendpoint(D₂)) * i * cutout[1] / unitlength[1]
-        SvgCurve(
+        _svgcurve(
             [[t -> 𝒑a(i, t) for i in 0:cutout[2]]..., [t -> 𝒑b(i, t) for i in 0:cutout[2]]...],
             D₁,
             filename = joinpath(DIR, "pinned", "$(_get_tag(index))-cutout.svg"),
