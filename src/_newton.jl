@@ -67,20 +67,8 @@ function _newton(M::BSplineManifold{2}, fix_method; nip=NIP)
 
     t₀ = time()
 
-    H = zeros(n₁,n₂,2,n₁,n₂,2)
-    F = zeros(n₁,n₂,2)
-    Threads.@threads for I₁ in 1:n₁
-        for I₂ in 1:n₂, i in 1:2, R₁ in 1:n₁, R₂ in 1:n₂, r in 1:2
-            if lineup(I₁, I₂, i) ≤ lineup(R₁, R₂, r)
-                H[I₁, I₂, i, R₁, R₂, r] = H[R₁, R₂, r, I₁, I₂, i] = elm_H(M, I₁, I₂, i, R₁, R₂, r, nip=nip)
-            end
-        end
-    end
-    Threads.@threads for I₁ in 1:n₁
-        for I₂ in 1:n₂, i in 1:2
-            F[I₁, I₂, i] = elm_F(M, I₁, I₂, i, nip=nip)
-        end
-    end
+    H = _matrix_H(M)
+    F = _vector_F(M)
 
     t₁ = time()
 
@@ -104,92 +92,195 @@ function _newton(M::BSplineManifold{2}, fix_method; nip=NIP)
     return M, F, Ǧ, t₁ - t₀
 end
 
-function elm_H(M::BSplineManifold{2}, I₁, I₂, i, R₁, R₂, r; nip=NIP)
+function _matrix_H(M::BSplineManifold{2,p}) where p
+    rrr = StaticArrays.SUnitRange{1,10}()
     𝒂 = controlpoints(M)
     P₁, P₂ = P = bsplinespaces(M)
-    p₁, p₂ = degree.(P)
-    k₁, k₂ = knotvector.(P)
+    p₁, p₂ = p
+    k₁, k₂ = k = knotvector.(P)
+    l₁, l₂ = length.(k)
     n₁, n₂ = dim.(P)
 
-    Σ₁ = max(I₁, R₁):min(I₁, R₁)+p₁
-    Σ₂ = max(I₂, R₂):min(I₂, R₂)+p₂
+    H = zeros(n₁,n₂,2,n₁,n₂,2)
+    _nodes, _weights = gausslegendre(10)
+    nodes = SVector{10,Float64}(_nodes)
+    weights = SVector{10,Float64}(_weights)
+    nodes₁ = nodes
+    nodes₂ = nodes
+    weights₁ = weights
+    weights₂ = weights
+    for s₁ in 1:l₁-1, s₂ in 1:l₂-1
+        a₁ = k₁[s₁]
+        b₁ = k₁[s₁+1]
+        a₂ = k₂[s₂]
+        b₂ = k₂[s₂+1]
+        w₁ = b₁-a₁
+        w₂ = b₂-a₂
+        iszero(w₁) && continue
+        iszero(w₂) && continue
+        dnodes₁ = (w₁ * nodes₁ .+ (a₁+b₁)) / 2
+        dnodes₂ = (w₂ * nodes₂ .+ (a₂+b₂)) / 2
+        for ii1 in rrr, ii2 in rrr
+            u¹,u² = dnodes₁[ii1],dnodes₂[ii2]
+            g₁₁ = g₍₀₎₁₁(u¹,u²)
+            g₁₂ = g₂₁ = g₍₀₎₁₂(u¹,u²)
+            g₂₂ = g₍₀₎₂₂(u¹,u²)
+            g = @SMatrix [g₁₁ g₁₂;g₂₁ g₂₂]
+            g⁻ = inv(g)
+            𝝊 = sqrt(det(g))
 
-    if length(Σ₁) == 0 || length(Σ₂) == 0
-        return 0.0
-    elseif i == r
-        return sum(
-            GaussianQuadrature(
-                (u¹,u²) ->
-                    (
-                        g = g₍₀₎(u¹,u²);
-                        g⁻ = inv(g);
-                        𝝊 = sqrt(det(g));
-                        𝑁 = [N′(P₁,P₂,I₁,I₂,i,u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
-                        Q = @SMatrix [sum(𝒂[I₁,I₂,i] * 𝑁[I₁,I₂,j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
-                        QQ = @SMatrix [Q[1,m]*Q[1,n] + Q[2,m]*Q[2,n] for m in 1:2, n in 1:2];
-                        sum(
-                            C(p,q,m,n,g⁻)*
-                            𝑁[I₁,I₂,p]*
-                            (𝑁[R₁,R₂,q] * (QQ[m,n] - g[m,n]) + 2𝑁[R₁,R₂,n]*Q[i,q]*Q[r,m])
-                            for p in 1:2, q in 1:2, m in 1:2, n in 1:2
-                        )*𝝊
-                    ),
-                k₁[s₁]..k₁[s₁+1],
-                k₂[s₂]..k₂[s₂+1],
-                nip=nip,
-            ) for s₁ in Σ₁, s₂ in Σ₂
-        )
-    else
-        return sum(
-            GaussianQuadrature(
-                (u¹,u²) ->
-                    (
-                        g = g₍₀₎(u¹,u²);
-                        g⁻ = inv(g);
-                        𝝊 = sqrt(det(g));
-                        𝑁 = [N′(P₁,P₂,I₁,I₂,i,u¹,u²) for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:2];
-                        Q = @SMatrix [sum(𝒂[I₁,I₂,i] * 𝑁[I₁,I₂,j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
-                        2*sum(
-                            C(p,q,m,n,g⁻)*𝑁[I₁,I₂,p]*𝑁[R₁,R₂,n]*Q[i,q]*Q[r,m]
-                            for p in 1:2, q in 1:2, m in 1:2, n in 1:2
-                        )*𝝊
-                    ),
-                k₁[s₁]..k₁[s₁+1],
-                k₂[s₂]..k₂[s₂+1],
-                nip=nip,
-            ) for s₁ in Σ₁, s₂ in Σ₂
-        )
+            B₁ = bsplinebasisall(P₁,s₁-p₁,u¹)
+            B₂ = bsplinebasisall(P₂,s₂-p₂,u²)
+            Ḃ₁ = bsplinebasisall(BSplineDerivativeSpace{1}(P₁),s₁-p₁,u¹)
+            Ḃ₂ = bsplinebasisall(BSplineDerivativeSpace{1}(P₂),s₂-p₂,u²)
+
+            Q1 = @SVector [sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1,i] * Ḃ₁[J₁]*B₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1) for i in 1:2]
+            Q2 = @SVector [sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1,i] * B₁[J₁]*Ḃ₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1) for i in 1:2]
+            Q = hcat(Q1,Q2)
+            QQ = @SMatrix [Q[1,m]*Q[1,n] + Q[2,m]*Q[2,n] for m in 1:2, n in 1:2]
+            weight1 = weights₁[ii1]
+            weight2 = weights₂[ii2]
+            C¹¹¹¹ = C(1,1,1,1,g⁻)
+            C¹¹¹² = C¹¹²¹ = C¹²¹¹ = C²¹¹¹ = C(1,1,1,2,g⁻)
+            C¹¹²² = C²²¹¹ = C(1,1,2,2,g⁻)
+            C¹²¹² = C¹²²¹ = C²¹¹² = C²¹²¹ = C(1,2,1,2,g⁻)
+            C¹²²² = C²¹²² = C²²¹² = C²²²¹ = C(1,2,2,2,g⁻)
+            C²²²² = C(2,2,2,2,g⁻)
+            for i₁ in 1:p₁+1, i₂ in 1:p₂+1, i in 1:2, r₁ in 1:p₁+1, r₂ in 1:p₂+1, r in 1:2
+                I₁ = i₁+(s₁-p₁)-1
+                R₁ = r₁+(s₁-p₁)-1
+                I₂ = i₂+(s₂-p₂)-1
+                R₂ = r₂+(s₂-p₂)-1
+
+                NI1 = Ḃ₁[i₁]*B₂[i₂]
+                NI2 = B₁[i₁]*Ḃ₂[i₂]
+                NR1 = Ḃ₁[r₁]*B₂[r₂]
+                NR2 = B₁[r₁]*Ḃ₂[r₂]
+                s = 0.0
+                s += C¹¹¹¹ * NI1 * NR1*Q1[i]*Q1[r]
+                s += C¹¹¹² * NI1 * NR2*Q1[i]*Q1[r]
+                s += C¹¹²¹ * NI1 * NR1*Q1[i]*Q2[r]
+                s += C¹¹²² * NI1 * NR2*Q1[i]*Q2[r]
+                s += C¹²¹¹ * NI1 * NR1*Q2[i]*Q1[r]
+                s += C¹²¹² * NI1 * NR2*Q2[i]*Q1[r]
+                s += C¹²²¹ * NI1 * NR1*Q2[i]*Q2[r]
+                s += C¹²²² * NI1 * NR2*Q2[i]*Q2[r]
+                s += C²¹¹¹ * NI2 * NR1*Q1[i]*Q1[r]
+                s += C²¹¹² * NI2 * NR2*Q1[i]*Q1[r]
+                s += C²¹²¹ * NI2 * NR1*Q1[i]*Q2[r]
+                s += C²¹²² * NI2 * NR2*Q1[i]*Q2[r]
+                s += C²²¹¹ * NI2 * NR1*Q2[i]*Q1[r]
+                s += C²²¹² * NI2 * NR2*Q2[i]*Q1[r]
+                s += C²²²¹ * NI2 * NR1*Q2[i]*Q2[r]
+                s += C²²²² * NI2 * NR2*Q2[i]*Q2[r]
+                if i == r
+                    s += C¹¹¹¹ * NI1 * NR1 * (QQ[1,1]-g₁₁)/2
+                    s += C¹¹¹² * NI1 * NR1 * (QQ[1,2]-g₁₂)/2
+                    s += C¹¹²¹ * NI1 * NR1 * (QQ[2,1]-g₂₁)/2
+                    s += C¹¹²² * NI1 * NR1 * (QQ[2,2]-g₂₂)/2
+                    s += C¹²¹¹ * NI1 * NR2 * (QQ[1,1]-g₁₁)/2
+                    s += C¹²¹² * NI1 * NR2 * (QQ[1,2]-g₁₂)/2
+                    s += C¹²²¹ * NI1 * NR2 * (QQ[2,1]-g₂₁)/2
+                    s += C¹²²² * NI1 * NR2 * (QQ[2,2]-g₂₂)/2
+                    s += C²¹¹¹ * NI2 * NR1 * (QQ[1,1]-g₁₁)/2
+                    s += C²¹¹² * NI2 * NR1 * (QQ[1,2]-g₁₂)/2
+                    s += C²¹²¹ * NI2 * NR1 * (QQ[2,1]-g₂₁)/2
+                    s += C²¹²² * NI2 * NR1 * (QQ[2,2]-g₂₂)/2
+                    s += C²²¹¹ * NI2 * NR2 * (QQ[1,1]-g₁₁)/2
+                    s += C²²¹² * NI2 * NR2 * (QQ[1,2]-g₁₂)/2
+                    s += C²²²¹ * NI2 * NR2 * (QQ[2,1]-g₂₁)/2
+                    s += C²²²² * NI2 * NR2 * (QQ[2,2]-g₂₂)/2
+                end
+                s *= 𝝊*weight1*weight2*w₁*w₂/2
+                H[I₁, I₂, i, R₁, R₂, r] += s
+            end
+        end
     end
+    return H
 end
 
-function elm_F(M::BSplineManifold{2}, I₁, I₂, i; nip = NIP)
+
+function _vector_F(M::BSplineManifold{2,p}) where p
+    rrr = StaticArrays.SUnitRange{1,10}()
     𝒂 = controlpoints(M)
     P₁, P₂ = P = bsplinespaces(M)
-    p₁, p₂ = degree.(P)
-    k₁, k₂ = knotvector.(P)
+    p₁, p₂ = p
+    k₁, k₂ = k = knotvector.(P)
+    l₁, l₂ = length.(k)
     n₁, n₂ = dim.(P)
 
-    Σ₁ = I₁:I₁+p₁
-    Σ₂ = I₂:I₂+p₂
+    F = zeros(n₁,n₂,2)
+    _nodes, _weights = gausslegendre(10)
+    nodes = SVector{10,Float64}(_nodes)
+    weights = SVector{10,Float64}(_weights)
+    nodes₁ = nodes
+    nodes₂ = nodes
+    weights₁ = weights
+    weights₂ = weights
+    for s₁ in 1:l₁-1, s₂ in 1:l₂-1
+        a₁ = k₁[s₁]
+        b₁ = k₁[s₁+1]
+        a₂ = k₂[s₂]
+        b₂ = k₂[s₂+1]
+        w₁ = b₁-a₁
+        w₂ = b₂-a₂
+        iszero(w₁) && continue
+        iszero(w₂) && continue
+        dnodes₁ = (w₁ * nodes₁ .+ (a₁+b₁)) / 2
+        dnodes₂ = (w₂ * nodes₂ .+ (a₂+b₂)) / 2
+        for ii1 in rrr, ii2 in rrr
+            u¹,u² = dnodes₁[ii1],dnodes₂[ii2]
+            g₁₁ = g₍₀₎₁₁(u¹,u²)
+            g₁₂ = g₂₁ = g₍₀₎₁₂(u¹,u²)
+            g₂₂ = g₍₀₎₂₂(u¹,u²)
+            g = @SMatrix [g₁₁ g₁₂;g₂₁ g₂₂]
+            g⁻ = inv(g)
+            𝝊 = sqrt(det(g))
 
-    return sum(
-        GaussianQuadrature(
-            (u¹,u²) ->
-                (
-                    g = g₍₀₎(u¹,u²);
-                    g⁻ = inv(g);
-                    𝝊 = sqrt(det(g));
-                    𝑁 = [N′(P₁,P₂,I₁,I₂,i,u¹,u²) for I₁ in 1:n₁,I₂ in 1:n₂, i in 1:2];
-                    Q = @SMatrix [sum(𝒂[I₁,I₂,i] * 𝑁[I₁,I₂,j] for I₁ in 1:n₁, I₂ in 1:n₂) for i in 1:2, j in 1:2];
-                    QQ = @SMatrix [Q[1,m]*Q[1,n] + Q[2,m]*Q[2,n] for m in 1:2, n in 1:2];
-                    sum(
-                        sum(C(p,q,m,n,g⁻) * 𝑁[I₁,I₂,p] * Q[i,q] for p in 1:2, q in 1:2) * (QQ[m,n] - g[m,n])
-                        for m in 1:2, n in 1:2
-                    ) * 𝝊
-                ),
-            k₁[s₁]..k₁[s₁+1],
-            k₂[s₂]..k₂[s₂+1],
-            nip = nip,
-        ) for s₁ in Σ₁, s₂ in Σ₂
-    )
+            B₁ = bsplinebasisall(P₁,s₁-p₁,u¹)
+            B₂ = bsplinebasisall(P₂,s₂-p₂,u²)
+            Ḃ₁ = bsplinebasisall(BSplineDerivativeSpace{1}(P₁),s₁-p₁,u¹)
+            Ḃ₂ = bsplinebasisall(BSplineDerivativeSpace{1}(P₂),s₂-p₂,u²)
+
+            Q1 = @SVector [sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1,i] * Ḃ₁[J₁]*B₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1) for i in 1:2]
+            Q2 = @SVector [sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1,i] * B₁[J₁]*Ḃ₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1) for i in 1:2]
+            Q = hcat(Q1,Q2)
+            QQ = @SMatrix [Q[1,m]*Q[1,n] + Q[2,m]*Q[2,n] for m in 1:2, n in 1:2]
+            weight1 = weights₁[ii1]
+            weight2 = weights₂[ii2]
+            C¹¹¹¹ = C(1,1,1,1,g⁻)
+            C¹¹¹² = C¹¹²¹ = C¹²¹¹ = C²¹¹¹ = C(1,1,1,2,g⁻)
+            C¹¹²² = C²²¹¹ = C(1,1,2,2,g⁻)
+            C¹²¹² = C¹²²¹ = C²¹¹² = C²¹²¹ = C(1,2,1,2,g⁻)
+            C¹²²² = C²¹²² = C²²¹² = C²²²¹ = C(1,2,2,2,g⁻)
+            C²²²² = C(2,2,2,2,g⁻)
+            for i₁ in 1:p₁+1, i₂ in 1:p₂+1, i in 1:2
+                I₁ = i₁+(s₁-p₁)-1
+                I₂ = i₂+(s₂-p₂)-1
+
+                NI1 = Ḃ₁[i₁]*B₂[i₂]
+                NI2 = B₁[i₁]*Ḃ₂[i₂]
+                s = 0.0
+                s += C¹¹¹¹ * NI1 * Q[i,1] * (QQ[1,1]-g₁₁)/2
+                s += C¹¹¹² * NI1 * Q[i,1] * (QQ[1,2]-g₁₂)/2
+                s += C¹¹²¹ * NI1 * Q[i,1] * (QQ[2,1]-g₂₁)/2
+                s += C¹¹²² * NI1 * Q[i,1] * (QQ[2,2]-g₂₂)/2
+                s += C¹²¹¹ * NI1 * Q[i,2] * (QQ[1,1]-g₁₁)/2
+                s += C¹²¹² * NI1 * Q[i,2] * (QQ[1,2]-g₁₂)/2
+                s += C¹²²¹ * NI1 * Q[i,2] * (QQ[2,1]-g₂₁)/2
+                s += C¹²²² * NI1 * Q[i,2] * (QQ[2,2]-g₂₂)/2
+                s += C²¹¹¹ * NI2 * Q[i,1] * (QQ[1,1]-g₁₁)/2
+                s += C²¹¹² * NI2 * Q[i,1] * (QQ[1,2]-g₁₂)/2
+                s += C²¹²¹ * NI2 * Q[i,1] * (QQ[2,1]-g₂₁)/2
+                s += C²¹²² * NI2 * Q[i,1] * (QQ[2,2]-g₂₂)/2
+                s += C²²¹¹ * NI2 * Q[i,2] * (QQ[1,1]-g₁₁)/2
+                s += C²²¹² * NI2 * Q[i,2] * (QQ[1,2]-g₁₂)/2
+                s += C²²²¹ * NI2 * Q[i,2] * (QQ[2,1]-g₂₁)/2
+                s += C²²²² * NI2 * Q[i,2] * (QQ[2,2]-g₂₂)/2
+                s *= 𝝊*weight1*weight2*w₁*w₂/2
+                F[I₁, I₂, i] += s
+            end
+        end
+    end
+    return F
 end
