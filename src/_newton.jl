@@ -139,11 +139,16 @@ function _matrix_H(M::BSplineManifold{2,p}) where p
             weight1 = weights₁[ii1]
             weight2 = weights₂[ii2]
             C¹¹¹¹ = C(1,1,1,1,g⁻)
-            C¹¹¹² = C¹¹²¹ = C¹²¹¹ = C²¹¹¹ = C(1,1,1,2,g⁻)
-            C¹¹²² = C²²¹¹ = C(1,1,2,2,g⁻)
-            C¹²¹² = C¹²²¹ = C²¹¹² = C²¹²¹ = C(1,2,1,2,g⁻)
-            C¹²²² = C²¹²² = C²²¹² = C²²²¹ = C(1,2,2,2,g⁻)
+            C¹¹¹² = C(1,1,1,2,g⁻)
+            C¹¹²² = C(1,1,2,2,g⁻)
+            C¹²¹² = C(1,2,1,2,g⁻)
+            C¹²²² = C(1,2,2,2,g⁻)
             C²²²² = C(2,2,2,2,g⁻)
+            C¹¹²¹ = C¹²¹¹ = C²¹¹¹ = C¹¹¹²
+            C²²¹¹ = C¹¹²²
+            C¹²²¹ = C²¹¹² = C²¹²¹ = C¹²¹²
+            C²¹²² = C²²¹² = C²²²¹ = C¹²²²
+
             for i₁ in 1:p₁+1, i₂ in 1:p₂+1, i in 1:2, r₁ in 1:p₁+1, r₂ in 1:p₂+1, r in 1:2
                 I₁ = i₁+(s₁-p₁)-1
                 R₁ = r₁+(s₁-p₁)-1
@@ -154,23 +159,22 @@ function _matrix_H(M::BSplineManifold{2,p}) where p
                 Ni₂ = B₁[i₁]*Ḃ₂[i₂]
                 Nr₁ = Ḃ₁[r₁]*B₂[r₂]
                 Nr₂ = B₁[r₁]*Ḃ₂[r₂]
-                s = 0.0
-                s += C¹¹¹¹ * Ni₁ * Nr₁*Q₁[i]*Q₁[r]
-                s += C¹¹¹² * Ni₁ * Nr₂*Q₁[i]*Q₁[r]
-                s += C¹¹²¹ * Ni₁ * Nr₁*Q₁[i]*Q₂[r]
-                s += C¹¹²² * Ni₁ * Nr₂*Q₁[i]*Q₂[r]
-                s += C¹²¹¹ * Ni₁ * Nr₁*Q₂[i]*Q₁[r]
-                s += C¹²¹² * Ni₁ * Nr₂*Q₂[i]*Q₁[r]
-                s += C¹²²¹ * Ni₁ * Nr₁*Q₂[i]*Q₂[r]
-                s += C¹²²² * Ni₁ * Nr₂*Q₂[i]*Q₂[r]
-                s += C²¹¹¹ * Ni₂ * Nr₁*Q₁[i]*Q₁[r]
-                s += C²¹¹² * Ni₂ * Nr₂*Q₁[i]*Q₁[r]
-                s += C²¹²¹ * Ni₂ * Nr₁*Q₁[i]*Q₂[r]
-                s += C²¹²² * Ni₂ * Nr₂*Q₁[i]*Q₂[r]
-                s += C²²¹¹ * Ni₂ * Nr₁*Q₂[i]*Q₁[r]
-                s += C²²¹² * Ni₂ * Nr₂*Q₂[i]*Q₁[r]
-                s += C²²²¹ * Ni₂ * Nr₁*Q₂[i]*Q₂[r]
-                s += C²²²² * Ni₂ * Nr₂*Q₂[i]*Q₂[r]
+                s =  C¹¹¹¹ * Ni₁ * Nr₁ * Q₁[i] * Q₁[r]
+                s += C¹¹¹² * Ni₁ * Nr₂ * Q₁[i] * Q₁[r]
+                s += C¹¹²¹ * Ni₁ * Nr₁ * Q₁[i] * Q₂[r]
+                s += C¹¹²² * Ni₁ * Nr₂ * Q₁[i] * Q₂[r]
+                s += C¹²¹¹ * Ni₁ * Nr₁ * Q₂[i] * Q₁[r]
+                s += C¹²¹² * Ni₁ * Nr₂ * Q₂[i] * Q₁[r]
+                s += C¹²²¹ * Ni₁ * Nr₁ * Q₂[i] * Q₂[r]
+                s += C¹²²² * Ni₁ * Nr₂ * Q₂[i] * Q₂[r]
+                s += C²¹¹¹ * Ni₂ * Nr₁ * Q₁[i] * Q₁[r]
+                s += C²¹¹² * Ni₂ * Nr₂ * Q₁[i] * Q₁[r]
+                s += C²¹²¹ * Ni₂ * Nr₁ * Q₁[i] * Q₂[r]
+                s += C²¹²² * Ni₂ * Nr₂ * Q₁[i] * Q₂[r]
+                s += C²²¹¹ * Ni₂ * Nr₁ * Q₂[i] * Q₁[r]
+                s += C²²¹² * Ni₂ * Nr₂ * Q₂[i] * Q₁[r]
+                s += C²²²¹ * Ni₂ * Nr₁ * Q₂[i] * Q₂[r]
+                s += C²²²² * Ni₂ * Nr₂ * Q₂[i] * Q₂[r]
                 if i == r
                     s += C¹¹¹¹ * Ni₁ * Nr₁ * (QQ[1,1]-g₁₁)/2
                     s += C¹¹¹² * Ni₁ * Nr₁ * (QQ[1,2]-g₁₂)/2
@@ -247,19 +251,22 @@ function _vector_F(M::BSplineManifold{2,p}) where p
             weight1 = weights₁[ii1]
             weight2 = weights₂[ii2]
             C¹¹¹¹ = C(1,1,1,1,g⁻)
-            C¹¹¹² = C¹¹²¹ = C¹²¹¹ = C²¹¹¹ = C(1,1,1,2,g⁻)
-            C¹¹²² = C²²¹¹ = C(1,1,2,2,g⁻)
-            C¹²¹² = C¹²²¹ = C²¹¹² = C²¹²¹ = C(1,2,1,2,g⁻)
-            C¹²²² = C²¹²² = C²²¹² = C²²²¹ = C(1,2,2,2,g⁻)
+            C¹¹¹² = C(1,1,1,2,g⁻)
+            C¹¹²² = C(1,1,2,2,g⁻)
+            C¹²¹² = C(1,2,1,2,g⁻)
+            C¹²²² = C(1,2,2,2,g⁻)
             C²²²² = C(2,2,2,2,g⁻)
+            C¹¹²¹ = C¹²¹¹ = C²¹¹¹ = C¹¹¹²
+            C²²¹¹ = C¹¹²²
+            C¹²²¹ = C²¹¹² = C²¹²¹ = C¹²¹²
+            C²¹²² = C²²¹² = C²²²¹ = C¹²²²
             for i₁ in 1:p₁+1, i₂ in 1:p₂+1, i in 1:2
                 I₁ = i₁+(s₁-p₁)-1
                 I₂ = i₂+(s₂-p₂)-1
 
                 Ni₁ = Ḃ₁[i₁]*B₂[i₂]
                 Ni₂ = B₁[i₁]*Ḃ₂[i₂]
-                s = 0.0
-                s += C¹¹¹¹ * Ni₁ * Q₁[i] * (QQ[1,1]-g₁₁)/2
+                s =  C¹¹¹¹ * Ni₁ * Q₁[i] * (QQ[1,1]-g₁₁)/2
                 s += C¹¹¹² * Ni₁ * Q₁[i] * (QQ[1,2]-g₁₂)/2
                 s += C¹¹²¹ * Ni₁ * Q₁[i] * (QQ[2,1]-g₂₁)/2
                 s += C¹¹²² * Ni₁ * Q₁[i] * (QQ[2,2]-g₂₂)/2
