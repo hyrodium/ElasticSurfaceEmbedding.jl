@@ -59,8 +59,8 @@ function newton_onestep(; fixingmethod=:default, parent::Int=0, nip=NIP)
     _export(M, parent, comment=comment)
 end
 
-function _newton(M::BSplineManifold{2}, fix_method; nip=NIP)
-    𝒂 = controlpoints(M)
+function _newton(M::CustomBSplineManifold{2}, fix_method; nip=NIP)
+    𝒂 = _arrayofvector2array(controlpoints(M))
     P = bsplinespaces(M)
     n₁, n₂ = dim.(P)
     lineup(I₁, I₂, i) = (i-1)*n₁*n₂ + (I₂-1)*n₁ + (I₁-1) + 1
@@ -86,11 +86,11 @@ function _newton(M::BSplineManifold{2}, fix_method; nip=NIP)
         insert!(𝒂̌, i, 𝒂ₒ[i])
     end
     𝒂 = reshape(𝒂̌, n₁, n₂, 2)
-    M = BSplineManifold(𝒂, P)
+    M = CustomBSplineManifold(_array2arrayofvector(𝒂), P)
     return M, F, Ǧ, t₁ - t₀
 end
 
-function _matrix_H(M::BSplineManifold{2,p}) where p
+function _matrix_H(M::CustomBSplineManifold{2,p}) where p
     rrr = StaticArrays.SUnitRange{1,10}()
     𝒂 = controlpoints(M)
     P₁, P₂ = P = bsplinespaces(M)
@@ -132,8 +132,8 @@ function _matrix_H(M::BSplineManifold{2,p}) where p
             Ḃ₁ = bsplinebasisall(BSplineDerivativeSpace{1}(P₁),s₁-p₁,u¹)
             Ḃ₂ = bsplinebasisall(BSplineDerivativeSpace{1}(P₂),s₂-p₂,u²)
 
-            Q₁ = @SVector [sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1,i] * Ḃ₁[J₁]*B₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1) for i in 1:2]
-            Q₂ = @SVector [sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1,i] * B₁[J₁]*Ḃ₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1) for i in 1:2]
+            Q₁ = sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1] * Ḃ₁[J₁]*B₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1)
+            Q₂ = sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1] * B₁[J₁]*Ḃ₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1)
             Q = hcat(Q₁,Q₂)
             QQ = @SMatrix [Q[1,m]*Q[1,n] + Q[2,m]*Q[2,n] for m in 1:2, n in 1:2]
             weight1 = weights₁[ii1]
@@ -202,7 +202,7 @@ function _matrix_H(M::BSplineManifold{2,p}) where p
 end
 
 
-function _vector_F(M::BSplineManifold{2,p}) where p
+function _vector_F(M::CustomBSplineManifold{2,p}) where p
     rrr = StaticArrays.SUnitRange{1,10}()
     𝒂 = controlpoints(M)
     P₁, P₂ = P = bsplinespaces(M)
@@ -244,8 +244,8 @@ function _vector_F(M::BSplineManifold{2,p}) where p
             Ḃ₁ = bsplinebasisall(BSplineDerivativeSpace{1}(P₁),s₁-p₁,u¹)
             Ḃ₂ = bsplinebasisall(BSplineDerivativeSpace{1}(P₂),s₂-p₂,u²)
 
-            Q₁ = @SVector [sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1,i] * Ḃ₁[J₁]*B₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1) for i in 1:2]
-            Q₂ = @SVector [sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1,i] * B₁[J₁]*Ḃ₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1) for i in 1:2]
+            Q₁ = sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1] * Ḃ₁[J₁]*B₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1)
+            Q₂ = sum(𝒂[J₁+(s₁-p₁)-1,J₂+(s₂-p₂)-1] * B₁[J₁]*Ḃ₂[J₂] for J₁ in 1:p₁+1, J₂ in 1:p₂+1)
             Q = hcat(Q₁,Q₂)
             QQ = @SMatrix [Q[1,m]*Q[1,n] + Q[2,m]*Q[2,n] for m in 1:2, n in 1:2]
             weight1 = weights₁[ii1]

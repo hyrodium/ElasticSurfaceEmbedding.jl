@@ -55,12 +55,14 @@ function toJSON(P::BSplineSpace)
     return Dict("degree" => degree(P), "knotvector" => toJSON(knotvector(P)))
 end
 function toJSON(P::Array{P,1} where {P<:BSplineSpace})
-    return convert(Array{Any,1}, toJSON.(P))
+    return convert(Vector, toJSON.(P))
 end
-function toJSON(a::Array{Float64})
-    return convert(Array{Any,1}, a[:])
+function toJSON(𝒂::Matrix{SVector{2,Float64}})
+    xs = [p.x for p in vec(𝒂)]
+    ys = [p.y for p in vec(𝒂)]
+    return convert(Vector, vcat(xs,ys))
 end
-function toJSON(M::BSplineManifold{2})
+function toJSON(M::CustomBSplineManifold{2})
     return Dict("bsplinespaces" => toJSON(collect(bsplinespaces(M))), "controlpoints" => toJSON(controlpoints(M)))
 end
 
@@ -73,16 +75,18 @@ function JSONtoBSplineSpaces(jPs::Array)
     P2 = JSONtoBSplineSpace(jPs[2])
     return (P1,P2)
 end
-function JSONtoControlPoints(ja, dims)
-    n = prod(dims)
-    d = length(ja) ÷ n
-    return reshape(convert(Array{Float64}, ja), dims..., d)
+function JSONtoControlPoints(ja, n1, n2)
+    coords = convert(Vector{Float64}, ja)
+    xs = reshape(coords[1:n1*n2], n1, n2)
+    ys = reshape(coords[n1*n2+1:2n1*n2], n1, n2)
+    𝒂 = [SVector(xs[i1,i2],ys[i1,i2]) for i1 in 1:n1, i2 in 1:n2]
+    return 𝒂
 end
 function JSONtoBSplineManifold(dict::Dict)
     P = JSONtoBSplineSpaces(dict["bsplinespaces"])
-    dims = dim.(P)
-    𝒂 = JSONtoControlPoints(dict["controlpoints"], dims)
-    return BSplineManifold(𝒂, P)
+    n1, n2 = dim.(P)
+    𝒂 = JSONtoControlPoints(dict["controlpoints"], n1, n2)
+    return CustomBSplineManifold(𝒂, P)
 end
 
 function NodeSeries(tree::Dict, node)
@@ -176,7 +180,7 @@ function _loadresultdict()
     end
 end
 
-function _export(M::BSplineManifold{2}, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
+function _export(M::CustomBSplineManifold{2}, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
     if isTheShapeComputed()
         dict = _loadresultdict()
         index = latest_index(dict) + 1
@@ -215,7 +219,7 @@ function _export(M::BSplineManifold{2}, parent::Int; comment="", maximumstrain=M
 end
 
 function ExportFiles(
-    M::BSplineManifold{2},
+    M::CustomBSplineManifold{2},
     MaximumStrain::Real,
     index;
     Name::String = NAME,

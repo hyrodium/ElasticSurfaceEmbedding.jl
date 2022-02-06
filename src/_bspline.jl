@@ -1,3 +1,15 @@
+function _arrayofvector2array(a::AbstractArray{SVector{2,Float64},2})
+    n1,n2 = size(a)
+    a_2dim = [a[i1,i2][j] for i1 in 1:n1, i2 in 1:n2, j in 1:2]
+    return a_2dim
+end
+
+function _array2arrayofvector(a::Array{<:Real,3})
+    n1,n2 = size(a)
+    a_vec = [SVector{2}(a[i1,i2,:]) for i1 in 1:n1, i2 in 1:n2]
+    return a_vec
+end
+
 # BSpline
 function N′(P₁::BSplineSpace, P₂::BSplineSpace, I₁, I₂, i, u¹, u²)::Float64
     if i == 1
@@ -28,42 +40,40 @@ Affine transform of control points.
 """
 function _affine(𝒂, A, b)
     # x'=Ax+b
-    n₁, n₂, d = size(𝒂)
-    return [(A*𝒂[I₁, I₂, :]+b)[i] for I₁ in 1:n₁, I₂ in 1:n₂, i in 1:d]
+    n₁, n₂ = size(𝒂)
+    return [(A*𝒂[I₁,I₂]+b) for I₁ in 1:n₁, I₂ in 1:n₂]
 end
 
 function _rotate(𝒂)
-    n₁, n₂, _ = size(𝒂)
+    n₁, n₂ = size(𝒂)
     ind0 = [(n₁ + 1) ÷ 2, (n₂ + 1) ÷ 2]
     ind1 = ind0 - [0, 1]
-    v = 𝒂[ind1..., :] - 𝒂[ind0..., :]
+    v = 𝒂[ind1...] - 𝒂[ind0...]
     R = -[v[2] -v[1]; v[1] v[2]] / norm(v)
-    return _affine(𝒂, R, [0.0, 0.0])
+    return _affine(𝒂, R, SVector(0.0, 0.0))
 end
 
 function _center(𝒂)
-    x_min = minimum(𝒂[:,:,1])
-    x_max = maximum(𝒂[:,:,1])
-    y_min = minimum(𝒂[:,:,2])
-    y_max = maximum(𝒂[:,:,2])
+    xs = [p[1] for p in 𝒂]
+    ys = [p[2] for p in 𝒂]
+    x_min = minimum(xs)
+    x_max = maximum(xs)
+    y_min = minimum(ys)
+    y_max = maximum(ys)
     x = (x_min+x_max)/2
     y = (y_min+y_max)/2
-    return _affine(𝒂, I(2), -[x,y])
+    return _affine(𝒂, I(2), -SVector(x,y))
 end
 
 function _positioning(𝒂)
     return _center(_rotate(𝒂))
 end
 
-function _positioning(M::BSplineManifold{2})
+function _positioning(M::CustomBSplineManifold{2})
     Ps = bsplinespaces(M)
     𝒂 = controlpoints(M)
-    if length(Ps) ≠ 2
-        error("dimension does not match")
-    end
-
     𝒂′ = _positioning(𝒂)
-    return BSplineManifold(𝒂′,Ps)
+    return CustomBSplineManifold(𝒂′,Ps)
 end
 
 """
