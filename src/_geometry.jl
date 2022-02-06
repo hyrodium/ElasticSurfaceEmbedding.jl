@@ -28,8 +28,8 @@ K₍₀₎(u¹,u²) = det(h₍₀₎(u¹,u²)) / det(g₍₀₎(u¹,u²))
 # Volume form
 𝝊₍₀₎(u¹,u²) = norm(cross(𝒑₁₍₀₎(u¹,u²), 𝒑₂₍₀₎(u¹,u²)))
 g⁻₍₀₎(u¹,u²) = inv(g₍₀₎(u¹,u²)) # 第1基本量の逆
-g₁₍₀₎(u¹,u²) = ForwardDiff.derivative(u¹ -> ElasticSurfaceEmbedding.g₍₀₎(u¹,u²), u¹)
-g₂₍₀₎(u¹,u²) = ForwardDiff.derivative(u² -> ElasticSurfaceEmbedding.g₍₀₎(u¹,u²), u²)
+g₁₍₀₎(u¹,u²) = ForwardDiff.derivative(u¹ -> g₍₀₎(u¹,u²), u¹)
+g₂₍₀₎(u¹,u²) = ForwardDiff.derivative(u² -> g₍₀₎(u¹,u²), u²)
 
 # Christoffel symbol
 𝛤₍₀₎²₁₁(u¹,u²) = (g⁻₍₀₎(u¹,u²)[2,1] * g₁₍₀₎(u¹,u²)[1,1] + g⁻₍₀₎(u¹,u²)[2,2] * (2g₁₍₀₎(u¹,u²)[2,1] - g₂₍₀₎(u¹,u²)[1,1])) / 2
@@ -50,31 +50,12 @@ g₍₀₎₂₂(u¹,D₂::ClosedInterval) = g₍₀₎₂₂(u¹,c(D₂))
 
 # Current State
 𝒑₍ₜ₎(M,u¹,u²) = M(u¹,u²)
-
-function 𝒑₁₍ₜ₎(M::CustomBSplineManifold{2},u¹,u²)
-    P₁, P₂ = bsplinespaces(M)
-    𝒂 = controlpoints(M)
-    n₁, n₂ = size(𝒂)
-    return sum(N₁(P₁, P₂, I₁, I₂, u¹, u²) * 𝒂[I₁, I₂] for I₁ in 1:n₁, I₂ in 1:n₂)
-end
-
-function 𝒑₂₍ₜ₎(M::CustomBSplineManifold{2},u¹,u²)
-    P₁, P₂ = bsplinespaces(M)
-    𝒂 = controlpoints(M)
-    n₁, n₂ = size(𝒂)
-    return sum(N₂(P₁, P₂, I₁, I₂, u¹, u²) * 𝒂[I₁, I₂] for I₁ in 1:n₁, I₂ in 1:n₂)
-end
+# This can be faster with BSplineDerivativeSpace, but we don't need speed here.
+𝒑₁₍ₜ₎(M,u¹,u²) = ForwardDiff.derivative(u¹ -> 𝒑₍ₜ₎(M,u¹,u²), u¹)
+𝒑₂₍ₜ₎(M,u¹,u²) = ForwardDiff.derivative(u² -> 𝒑₍ₜ₎(M,u¹,u²), u²)
 
 g₍ₜ₎₁₁(M,u¹,u²) = dot(𝒑₁₍ₜ₎(M,u¹,u²),𝒑₁₍ₜ₎(M,u¹,u²)) # 第1基本量
 g₍ₜ₎₁₂(M,u¹,u²) = dot(𝒑₁₍ₜ₎(M,u¹,u²),𝒑₂₍ₜ₎(M,u¹,u²)) # 第1基本量
 g₍ₜ₎₂₁(M,u¹,u²) = dot(𝒑₂₍ₜ₎(M,u¹,u²),𝒑₁₍ₜ₎(M,u¹,u²)) # 第1基本量
 g₍ₜ₎₂₂(M,u¹,u²) = dot(𝒑₂₍ₜ₎(M,u¹,u²),𝒑₂₍ₜ₎(M,u¹,u²)) # 第1基本量
 g₍ₜ₎(M,u¹,u²)   = @SMatrix [g₍ₜ₎₁₁(M,u¹,u²) g₍ₜ₎₁₂(M,u¹,u²) ; g₍ₜ₎₂₁(M,u¹,u²) g₍ₜ₎₂₂(M,u¹,u²)]
-
-function 𝒑₁₍ₜ₎_cont(M::CustomBSplineManifold{2},u¹,u²)
-    P₁, P₂ = bsplinespaces(M)
-    𝒂 = controlpoints(M)
-    n₁, n₂ = size(𝒂)
-    return sum(N′_cont(P₁, P₂, I₁, I₂, 1, u¹, u²) * 𝒂[I₁, I₂] for I₁ in 1:n₁, I₂ in 1:n₂)
-end
-g₍ₜ₎₁₁_cont(M,u¹,u²) = 𝒑₁₍ₜ₎_cont(M,u¹,u²)'𝒑₁₍ₜ₎_cont(M,u¹,u²) # 第1基本量

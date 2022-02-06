@@ -10,31 +10,6 @@ function _array2arrayofvector(a::Array{<:Real,3})
     return a_vec
 end
 
-# BSpline
-function N′(P₁::BSplineSpace, P₂::BSplineSpace, I₁, I₂, i, u¹, u²)::Float64
-    if i == 1
-        return bsplinebasis′₊₀(P₁,I₁,u¹) * bsplinebasis(P₂,I₂,u²)
-    else
-        return bsplinebasis(P₁,I₁,u¹) * bsplinebasis′₊₀(P₂,I₂,u²)
-    end
-end
-
-function N₁(P₁::BSplineSpace, P₂::BSplineSpace, I₁, I₂, u¹, u²)::Float64
-    return bsplinebasis′₊₀(P₁,I₁,u¹) * bsplinebasis(P₂,I₂,u²)
-end
-
-function N₂(P₁::BSplineSpace, P₂::BSplineSpace, I₁, I₂, u¹, u²)::Float64
-    return bsplinebasis(P₁,I₁,u¹) * bsplinebasis′₊₀(P₂,I₂,u²)
-end
-
-function N′_cont(P₁::BSplineSpace, P₂::BSplineSpace, I₁, I₂, i, u¹, u²)::Float64
-    if i == 1
-        return bsplinebasis′(P₁,I₁,u¹) * bsplinebasis(P₂,I₂,u²)
-    else
-        return bsplinebasis(P₁,I₁,u¹) * bsplinebasis′(P₂,I₂,u²)
-    end
-end
-
 """
 Affine transform of control points.
 """

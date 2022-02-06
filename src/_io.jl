@@ -238,7 +238,7 @@ function ExportFiles(
     Width = (Xlims[2] - Xlims[1]) * Unit[1]
     Height = (Ylims[2] - Ylims[1]) * Unit[1]
 
-    normalized_strain(u¹, u²) = E⁽⁰⁾₁₁_cont(M, u¹, u²) / MaximumStrain # bounded in -1 to 1
+    normalized_strain(u¹, u²) = E⁽⁰⁾₁₁(M, u¹, u²) / MaximumStrain # bounded in -1 to 1
 
     aa = 5 # magnification parameter for antialias
 

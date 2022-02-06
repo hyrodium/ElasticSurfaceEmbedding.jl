@@ -2,8 +2,6 @@
 E(M,u¹,u²) = (g₍ₜ₎(M,u¹,u²) - g₍₀₎(u¹,u²)) / 2
 E₁₁(M::CustomBSplineManifold{2},u¹,u²) = (g₍ₜ₎₁₁(M,u¹,u²) - g₍₀₎₁₁(u¹,u²)) / 2
 E⁽⁰⁾₁₁(M::CustomBSplineManifold{2},u¹,u²) = E₁₁(M,u¹,u²) / g₍₀₎₁₁(u¹,u²)
-E₁₁_cont(M::CustomBSplineManifold{2},u¹,u²) = (g₍ₜ₎₁₁_cont(M,u¹,u²) - g₍₀₎₁₁(u¹,u²)) / 2
-E⁽⁰⁾₁₁_cont(M::CustomBSplineManifold{2},u¹,u²) = E₁₁_cont(M,u¹,u²) / g₍₀₎₁₁(u¹,u²)
 
 function Ẽ⁽⁰⁾₁₁(D₂::ClosedInterval,u¹,u²)
     # Breadth of the strip-like shape
