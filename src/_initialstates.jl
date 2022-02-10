@@ -87,7 +87,7 @@ function _initialize(D, n₁)
     a2 = 𝒎 + width(D₂) * 𝒓/2
     𝒂 = hcat(a1,a2)
 
-    M = CustomBSplineManifold(𝒂, (P₁, P₂))
+    M = BSplineManifold(𝒂, (P₁, P₂))
     M′ = refinement(M, p₊ = (0, 1))
     return _positioning(M′)
 end

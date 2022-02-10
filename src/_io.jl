@@ -62,7 +62,7 @@ function toJSON(𝒂::Matrix{SVector{2,Float64}})
     ys = [p.y for p in vec(𝒂)]
     return convert(Vector, vcat(xs,ys))
 end
-function toJSON(M::CustomBSplineManifold{2})
+function toJSON(M::BSplineManifold{2})
     return Dict("bsplinespaces" => toJSON(collect(bsplinespaces(M))), "controlpoints" => toJSON(controlpoints(M)))
 end
 
@@ -86,7 +86,7 @@ function JSONtoBSplineManifold(dict::Dict)
     P = JSONtoBSplineSpaces(dict["bsplinespaces"])
     n1, n2 = dim.(P)
     𝒂 = JSONtoControlPoints(dict["controlpoints"], n1, n2)
-    return CustomBSplineManifold(𝒂, P)
+    return BSplineManifold(𝒂, P)
 end
 
 function NodeSeries(tree::Dict, node)
@@ -180,7 +180,7 @@ function _loadresultdict()
     end
 end
 
-function _export(M::CustomBSplineManifold{2}, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
+function _export(M::BSplineManifold{2}, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
     if isTheShapeComputed()
         dict = _loadresultdict()
         index = latest_index(dict) + 1
@@ -219,7 +219,7 @@ function _export(M::CustomBSplineManifold{2}, parent::Int; comment="", maximumst
 end
 
 function ExportFiles(
-    M::CustomBSplineManifold{2},
+    M::BSplineManifold{2},
     MaximumStrain::Real,
     index;
     Name::String = NAME,
