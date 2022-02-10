@@ -44,11 +44,11 @@ function _positioning(𝒂)
     return _center(_rotate(𝒂))
 end
 
-function _positioning(M::CustomBSplineManifold{2})
+function _positioning(M::BSplineManifold{2})
     Ps = bsplinespaces(M)
     𝒂 = controlpoints(M)
     𝒂′ = _positioning(𝒂)
-    return CustomBSplineManifold(𝒂′,Ps)
+    return BSplineManifold(𝒂′,Ps)
 end
 
 """

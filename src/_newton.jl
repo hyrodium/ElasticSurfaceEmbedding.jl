@@ -59,7 +59,7 @@ function newton_onestep(; fixingmethod=:default, parent::Int=0, nip=NIP)
     _export(M, parent, comment=comment)
 end
 
-function _newton(M::CustomBSplineManifold{2}, fix_method; nip=NIP)
+function _newton(M::BSplineManifold{2}, fix_method; nip=NIP)
     𝒂 = _arrayofvector2array(controlpoints(M))
     P = bsplinespaces(M)
     n₁, n₂ = dim.(P)
@@ -86,11 +86,11 @@ function _newton(M::CustomBSplineManifold{2}, fix_method; nip=NIP)
         insert!(𝒂̌, i, 𝒂ₒ[i])
     end
     𝒂 = reshape(𝒂̌, n₁, n₂, 2)
-    M = CustomBSplineManifold(_array2arrayofvector(𝒂), P)
+    M = BSplineManifold(_array2arrayofvector(𝒂), P)
     return M, F, Ǧ, t₁ - t₀
 end
 
-function _matrix_H(M::CustomBSplineManifold{2,p}) where p
+function _matrix_H(M::BSplineManifold{2,p}) where p
     rrr = StaticArrays.SUnitRange{1,10}()
     𝒂 = controlpoints(M)
     P₁, P₂ = P = bsplinespaces(M)
@@ -202,7 +202,7 @@ function _matrix_H(M::CustomBSplineManifold{2,p}) where p
 end
 
 
-function _vector_F(M::CustomBSplineManifold{2,p}) where p
+function _vector_F(M::BSplineManifold{2,p}) where p
     rrr = StaticArrays.SUnitRange{1,10}()
     𝒂 = controlpoints(M)
     P₁, P₂ = P = bsplinespaces(M)
