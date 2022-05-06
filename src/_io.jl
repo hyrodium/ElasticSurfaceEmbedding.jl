@@ -1,6 +1,48 @@
 # Default output directory
 OUT_DIR = joinpath(homedir(),"ElasticSurfaceEmbedding-Result")
 
+mutable struct Step{T<:BSplineManifold{2}}
+    manifold::T
+    comment::String
+    pinned::Bool
+    function Step(manifold::BSplineManifold{2},comment,pinned=false)
+        new{typeof(manifold)}(manifold,comment,pinned)
+    end
+end
+
+struct AllSteps
+    steps::Vector{Tuple{Step,Int}}
+    function AllSteps()
+        new(Vector{Tuple{Step,Int}}())
+    end
+end
+
+function addstep!(allsteps::AllSteps, step::Step, parent::Int)
+    push!(allsteps.steps, (step, parent))
+    return allsteps
+end
+
+function parent_id(allsteps, id)
+    allsteps.steps[id][2]
+end
+
+function children_ids(allsteps, id)
+    findall(step->step[2]==id, allsteps.steps)
+end
+
+function _tmp_allsteps_from_result(result::Dict)
+    allsteps = AllSteps()
+    n = length(result)
+    for i in 1:n
+        manifold = ElasticSurfaceEmbedding.JSONtoBSplineManifold(ElasticSurfaceEmbedding._loadresultdict()["result"][string(i)]["BSplineManifold"])
+        comment = ElasticSurfaceEmbedding._loadresultdict()["result"][string(i)]["comment"]
+        parent = parse(Int,ElasticSurfaceEmbedding._loadresultdict()["result"][string(i)]["parent"])
+        step = Step(manifold, comment)
+        addstep!(allsteps, step, parent)
+    end
+    return allsteps
+end
+
 """
     config_dir(dir)
 
@@ -44,7 +86,8 @@ function settings(
     global COLORBARSIZE = colorbarsize
     if isTheShapeComputed()
         dict = _loadresultdict()
-        println(_tree_as_string(dict["result"]))
+        allsteps = _tmp_allsteps_from_result(dict["result"])
+        println(_tree_as_string(allsteps))
     end
 end
 
@@ -89,12 +132,58 @@ function JSONtoBSplineManifold(dict::Dict)
     return BSplineManifold(𝒂, P)
 end
 
+function nodeseries(allsteps, i)
+    series = [i]
+    while i ≠ 0
+        i = parent_id(allsteps, i)
+        pushfirst!(series, i)
+    end
+    return series
+end
+
 function NodeSeries(tree::Dict, node)
     Nodes = [node]
     while Nodes[end] ≠ "0"
         push!(Nodes, tree[Nodes[end]]["parent"])
     end
     return Nodes
+end
+
+function _tree_as_string(allsteps::AllSteps)
+    n = length(allsteps.steps)
+    serieses = [nodeseries(allsteps, i) for i in 1:n]
+    sort!(serieses)
+    lowstrings = String[]
+    for i in 1:n
+        l = length(serieses[i])
+        key = serieses[i][end]
+        step = allsteps.steps[key][1]
+        pinned = step.pinned
+        comment = "📌 "^pinned * step.comment
+        if l == 2
+            lowstring = "$(key): " * comment
+            push!(lowstrings, lowstring)
+        elseif l ≥ 3
+            lowstring = "  "^(l - 3) * "└─$(key): " * comment
+            push!(lowstrings, lowstring)
+            for j in 1:(i-1)
+                chars = collect(lowstrings[end-j])
+                if chars[2(l-3)+1] == ' '
+                    lowstrings[end-j] = join(chars[1:2(l-3)]) * "│" * join(chars[2(l-3)+2:end])
+                elseif chars[2(l-3)+1] == '└'
+                    lowstrings[end-j] = join(chars[1:2(l-3)]) * "├" * join(chars[2(l-3)+2:end])
+                    break
+                else
+                    break
+                end
+            end
+        end
+    end
+    outsting = ""
+    for s in lowstrings
+        outsting = outsting * s * "\n"
+    end
+    return outsting
 end
 
 function _tree_as_string(tree::Dict)
@@ -135,6 +224,10 @@ function _tree_as_string(tree::Dict)
     return outsting
 end
 
+function Base.show(io::IO, allsteps::AllSteps)
+    print(_tree_as_string(allsteps))
+end
+
 function isTheShapeComputed()
     return isfile(joinpath(DIR,NAME*".json"))
 end
@@ -164,6 +257,14 @@ function loadM(; index=0)
     dict = _loadresultdict()
     index = _realparent(index)
     M = JSONtoBSplineManifold(dict["result"][string(index)]["BSplineManifold"])
+    return M
+end
+
+function loadM(allsteps; index=0)
+    if index == 0
+        index = length(allsteps.steps)
+    end
+    M = allsteps.steps[index][1].manifold
     return M
 end
 
@@ -212,8 +313,8 @@ function _export(M::BSplineManifold{2}, parent::Int; comment="", maximumstrain=M
 
     # Send messages
     path_png_append = joinpath(DIR, "append", "$(NAME)-$(index)_append.png")
-    message = _tree_as_string(dict["result"])
-    println(message)
+    allsteps = _tmp_allsteps_from_result(dict["result"])
+    message = _tree_as_string(allsteps)
     comment = "```\n$(message)```"
     _send_file_to_slack(path_png_append, comment=comment)
 end

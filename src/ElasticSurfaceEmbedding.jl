@@ -24,8 +24,8 @@ export config_dir, config_slack
 export settings
 # Numerical computing
 export initial_state
-export newton_onestep
-export spline_refinement
+export newton_onestep!
+export refinement!
 # Pin related
 export add_pin, remove_pin, export_all_pinned_states
 # utilities

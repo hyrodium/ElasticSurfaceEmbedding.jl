@@ -52,13 +52,13 @@ function _positioning(M::BSplineManifold{2})
 end
 
 """
-    spline_refinement(; p₊::Tuple{Int,Int}=[0, 0], k₊::Tuple{<:KnotVector,<:KnotVector}=(KnotVector(),KnotVector()), parent::Int=0)
+    spline_refinement(; p₊::Tuple{Int,Int}=(0, 0), k₊::Tuple{<:KnotVector,<:KnotVector}=(KnotVector(),KnotVector()), parent::Int=0)
 
 Compute a refinement of the B-spline manifold
 """
-function spline_refinement(; p₊=(0,0), k₊=(KnotVector(),KnotVector()), parent::Int=0)
+function refinement!(allsteps; p₊=(0,0), k₊=(KnotVector(),KnotVector()), parent::Int=0)
     parent = _realparent(parent)
-    M = loadM(index=parent)
+    M = loadM(allsteps, index=parent)
 
     P₁, P₂ = bsplinespaces(M)
     k₁, k₂ = knotvector(P₁), knotvector(P₂)
@@ -78,7 +78,8 @@ function spline_refinement(; p₊=(0,0), k₊=(KnotVector(),KnotVector()), paren
     comment = replace(comment, "Float64"=>"")
     M = refinement(M, p₊=(p₊₁, p₊₂), k₊=(k₊₁, k₊₂))
     _export(M, parent, comment=comment)
-    return
+    step = Step(M, comment)
+    addstep!(allsteps, step, parent)
 end
 
 """
@@ -86,8 +87,8 @@ end
 
 Show current knotvector and suggestions for knot insertions (with given index).
 """
-function show_knotvector(; index=0)
-    M = loadM(index = index)
+function show_knotvector(allsteps; index=0)
+    M = loadM(allsteps, index = index)
 
     P = bsplinespaces(M)
     k₁, k₂ = knotvector.(P)

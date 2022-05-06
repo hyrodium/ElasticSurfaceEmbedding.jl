@@ -11,6 +11,9 @@ function initial_state(D; n₁ = 15)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
 
     _export(M, parent, comment = comment)
+    step = Step(M,comment)
+    allsteps = AllSteps()
+    addstep!(allsteps, step, 0)
 end
 
 function _initialize(D, n₁)

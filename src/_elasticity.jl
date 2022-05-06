@@ -22,8 +22,8 @@ function Ẽ⁽⁰⁾₁₁(M::BSplineManifold{2},u¹,u²)
     return Ẽ⁽⁰⁾₁₁(D₂,u¹,u²)
 end
 
-function _compute_minmax_strain(; index=0, mesh=tuple(20 * [MESH...]...))
-    M = loadM(index = index)
+function _compute_minmax_strain(allsteps; index=0, mesh=tuple(20 * [MESH...]...))
+    M = loadM(allsteps, index = index)
     P = bsplinespaces(M)
     p₁, p₂ = degree.(P)
     k₁, k₂ = knotvector.(P)
