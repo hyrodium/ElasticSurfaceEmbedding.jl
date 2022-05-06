@@ -22,8 +22,7 @@ function Ẽ⁽⁰⁾₁₁(M::BSplineManifold{2},u¹,u²)
     return Ẽ⁽⁰⁾₁₁(D₂,u¹,u²)
 end
 
-function _compute_minmax_strain(allsteps; index=0, mesh=tuple(20 * [MESH...]...))
-    M = loadM(allsteps, index = index)
+function _compute_minmax_strain(M, mesh=tuple(20 * [MESH...]...))
     P = bsplinespaces(M)
     p₁, p₂ = degree.(P)
     k₁, k₂ = knotvector.(P)
@@ -61,7 +60,8 @@ function show_strain(D; index=0)
     msg *= "Predicted: (min: $(minE), max: $(maxE))\n"
 
     if isTheShapeComputed()
-        minE, maxE = _compute_minmax_strain(index = index)
+        M = loadM(index=index)
+        minE, maxE = _compute_minmax_strain(M)
         msg *= "Computed: (min: $(minE), max: $(maxE))\n"
     end
     

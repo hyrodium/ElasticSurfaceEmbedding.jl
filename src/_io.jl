@@ -302,7 +302,7 @@ function _export(M::BSplineManifold{2}, parent::Int; comment="", maximumstrain=M
 
     # Compute maximum strain for graphics export
     if maximumstrain == 0.0
-        MS = _compute_minmax_strain(index = index)
+        MS = _compute_minmax_strain(M)
         MaximumStrain = max(-MS[1], MS[2])
     else
         MaximumStrain = maximumstrain
