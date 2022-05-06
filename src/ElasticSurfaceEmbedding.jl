@@ -27,7 +27,7 @@ export initial_state
 export newton_onestep!
 export refinement!
 # Pin related
-export add_pin, remove_pin, export_all_pinned_states
+export pin, unpin, export_all_pinned_states
 # utilities
 export show_strain, show_knotvector
 export computed_shapes
