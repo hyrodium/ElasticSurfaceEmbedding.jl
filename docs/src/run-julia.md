@@ -209,7 +209,7 @@ remove_pin
 This is the final step of the computational process.
 
 ```@docs
-export_all_pinned_states
+export_pinned_states
 ```
 
 This will create SVG files in `~/ElasticSurfaceEmbedding-Result/Paraboloid/pinned/`.
@@ -267,7 +267,7 @@ newton_onestep()
 newton_onestep()
 newton_onestep()
 add_pin(tag="$name")
-export_all_pinned_states(unitlength=(30,"mm"))
+export_pinned_states(unitlength=(30,"mm"))
 
 
 ## Set parametric mapping (y-direction)
@@ -295,7 +295,7 @@ for i in 1:9
     newton_onestep()
     add_pin(tag="$name-$i")
 end
-export_all_pinned_states(unitlength=(30,"mm"))
+export_pinned_states(unitlength=(30,"mm"))
 ```
 
 ### Helicoid
@@ -329,7 +329,7 @@ newton_onestep()
 newton_onestep()
 newton_onestep()
 add_pin(tag="$name")
-export_all_pinned_states(unitlength=(30,"mm"))
+export_pinned_states(unitlength=(30,"mm"))
 
 
 ## Set parametric mapping (y-direction)
@@ -357,5 +357,5 @@ for i in 1:9
     newton_onestep()
     add_pin(tag="$name-$i")
 end
-export_all_pinned_states(unitlength=(30,"mm"))
+export_pinned_states(unitlength=(30,"mm"))
 ```

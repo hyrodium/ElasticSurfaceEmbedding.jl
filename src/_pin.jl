@@ -25,11 +25,11 @@ function _find_all_pinned_states(allsteps)
 end
 
 """
-    export_all_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
+    export_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
 
 Export all pinned states for final output
 """
-function export_all_pinned_states(allsteps; unitlength::Tuple{<:Real,<:AbstractString}, cutout=(0.1, 5), mesh::Int=60)
+function export_pinned_states(allsteps; unitlength::Tuple{<:Real,<:AbstractString}, cutout=(0.1, 5), mesh::Int=60)
     dir_pinned = joinpath(DIR, "pinned")
     # Delete current pinned directory
     rm(dir_pinned, recursive=true, force=true)
