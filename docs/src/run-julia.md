@@ -4,8 +4,9 @@
 On Julia's package mode, run the following commands.
 ```julia-repl
 pkg> add IntervalSets
-pkg> add BasicBSpline
 pkg> add StaticArrays
+pkg> add BasicBSpline
+pkg> add https://github.com/hyrodium/BasicBSplineExporter.jl
 pkg> add https://github.com/hyrodium/ElasticSurfaceEmbedding.jl
 ```
 
@@ -26,29 +27,6 @@ using IntervalSets
 using BasicBSpline
 using StaticArrays
 using ElasticSurfaceEmbedding
-```
-
-Set the output directory. *(optional)*
-```julia
-config_dir("~/ElasticSurfaceEmbedding-Result")
-```
-
-```@docs
-config_dir
-```
-
-Configure the slack bot. *(optional)*
-```julia
-config_slack(channel="XXXXXXXXXXX",token="xoxb-0000000000000-0000000000000-XXXXXXXXXXXXXXXXXXXXXXXX")
-```
-
-!!! info "Slack bot"
-    If you would like to use this feature, the bot in the channel must have the following permissions.
-    * [`chat.post`](https://api.slack.com/methods/chat.postMessage)
-    * [`files.upload`](https://api.slack.com/methods/files.upload)
-
-```@docs
-config_slack
 ```
 
 ### Define the shape of surface
@@ -73,17 +51,6 @@ D
     In the next step, we'll split the surface into elongated strips.
     The domain of each strip should be a rectangular, and the longer direction is `u¹`, and the shorter direction is `u²`.
     The paraboloid has four‐fold symmetry, so we don't have to take care of it.
-
-### Settings
-Before the computation, we need to set the name of the surface, and output graphics region.
-```julia
-name = "Paraboloid"
-settings(name,canvas=(4,4),mesh=(20,1),unit=200,colorbarsize=0.3)
-```
-
-```@docs
-settings
-```
 
 ### Split the surface into strips
 The domain ``D`` will be split into ``D_i``.
@@ -151,13 +118,14 @@ If you've configured a slack bot, you'll get a message like this:
 
 ```@docs
 initial_state
+initial_state!
 ```
 
 ### Newton-Raphson method iteration
 
 ```julia
-newton_onestep(fixingmethod=:fix3points)
-newton_onestep()
+newton_onestep!(fixingmethod=:fix3points)
+newton_onestep!()
 ```
 
 You can choose the fixing method from below:
@@ -165,7 +133,7 @@ You can choose the fixing method from below:
 * `:fix3points`
 
 ```@docs
-newton_onestep
+newton_onestep!
 ```
 
 ### Refinement of B-spline manifold
@@ -187,29 +155,28 @@ If you finished computing for the strip, it's time to *pin* the state.
 This pin📌 will be used for the next final step.
 
 ```julia
-add_pin(tag="$(name)-$(i)")
+pin(result)
 ```
 
 ```@docs
-add_pin
+pin
 ```
 
 If you add a pin mistakenly, you can remove the pin with `remove_pin` function.
 
 ```julia
-remove_pin(tag="paraboloid-"*string(i))
-remove_pin(10)
+unpin(result, 10)
 ```
 
 ```@docs
-remove_pin
+unpin
 ```
 
 ### Export all pinned shapes
 This is the final step of the computational process.
 
 ```@docs
-export_pinned_states
+export_pinned_steps
 ```
 
 This will create SVG files in `~/ElasticSurfaceEmbedding-Result/Paraboloid/pinned/`.
@@ -223,16 +190,6 @@ If you want to resume the computation, you can just call `settings` like this:
 
 ```julia
 settings("Paraboloid")
-```
-
-To get the list of computed shapes to resume, `computed_shapes` function can be used.
-
-```julia
-computed_shapes()
-```
-
-```@docs
-computed_shapes
 ```
 
 ## Other examples
@@ -251,9 +208,6 @@ ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u²)*cosh(u¹),sin(
 n=9
 Dx(n) = (-π/2..π/2,-π/(4n)..π/(4n))
 
-name = "Catenoid-x"
-settings(name,canvas=(8,8),mesh=(18,1),unit=200,colorbarsize=0.3)
-
 ## Check the maximum strain
 show_strain(Dx(n))
 
@@ -267,16 +221,13 @@ newton_onestep()
 newton_onestep()
 newton_onestep()
 add_pin(tag="$name")
-export_pinned_states(unitlength=(30,"mm"))
+export_pinned_steps(unitlength=(30,"mm"))
 
 
 ## Set parametric mapping (y-direction)
 ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cosh(u²),sin(u¹)*cosh(u²),u²)
 n=9
 Dy(i,n) = (-π..π,(i-1)*π/(2n)..(i)*π/(2n))
-
-name = "Catenoid-y"
-settings(name,canvas=(8,8),mesh=(36,1),unit=200,colorbarsize=0.3)
 
 ## Check the maximum strain
 for i in 1:9
@@ -295,7 +246,7 @@ for i in 1:9
     newton_onestep()
     add_pin(tag="$name-$i")
 end
-export_pinned_states(unitlength=(30,"mm"))
+export_pinned_steps(unitlength=(30,"mm"))
 ```
 
 ### Helicoid
@@ -329,7 +280,7 @@ newton_onestep()
 newton_onestep()
 newton_onestep()
 add_pin(tag="$name")
-export_pinned_states(unitlength=(30,"mm"))
+export_pinned_steps(unitlength=(30,"mm"))
 
 
 ## Set parametric mapping (y-direction)
@@ -357,5 +308,5 @@ for i in 1:9
     newton_onestep()
     add_pin(tag="$name-$i")
 end
-export_pinned_states(unitlength=(30,"mm"))
+export_pinned_steps(unitlength=(30,"mm"))
 ```

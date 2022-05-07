@@ -43,7 +43,7 @@ Split the surface into pieces, and compute the Eucledian embedding.
 For more information, read [numerical computation section](@ref numerical_computation).
 The image below is a result for the domain ``D_1``.
 
-![](img/NurbsStrain.png)
+![](img/bspline_strain.png)
 
 ### step 3 : Edit on vector graphics editor
 The output files are SVG format.
@@ -96,7 +96,7 @@ Cut papers into strips, and weave them into surface.
         Read my upcoming paper. Here's our theoretical framework:
         <ul>
             <li>Mathematical model: <a href="https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity">Nonlinear elasticity</a> on <a href="https://en.m.wikipedia.org/wiki/Riemannian_manifold">Riemannian manifold</a></li>
-            <li>Geometric representation: <a href="https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS (esp. B-spline manifold)</a></li>
+            <li>Geometric representation: <a href="https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">B-spline manifold</a></li>
             <li>Numerical analysis: <a href="https://en.wikipedia.org/wiki/Galerkin_method">Galerkin method</a>, <a href="https://en.wikipedia.org/wiki/Newton%27s_method">Newton-Raphson method</a></li>
         </ul>
     </div>

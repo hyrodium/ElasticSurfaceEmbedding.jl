@@ -3,7 +3,7 @@
 Our theoretical framework is based on the following:
 
 * Mathematical model: Nonlinear elasticity on Riemannian manifold
-* Geometric representation: NURBS (esp. B-spline manifold)
+* Geometric representation: B-spline manifold
 * Numerical analysis: Galerkin method, Newton-Raphson method
 
 For more information, read our paper!

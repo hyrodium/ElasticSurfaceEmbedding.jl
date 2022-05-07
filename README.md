@@ -27,7 +27,7 @@ Split the surface into pieces, and compute the Eucledian embedding.
 For more information, read [this document](/Julia).
 The image below is a result for the domain D_1.
 
-<img src="docs/src/img/NurbsStrain.png" width="800">
+<img src="docs/src/img/bspline_strain.png" width="800">
 
 ### step 3 : Edit on vector graphics editor
 The output files are SVG format.
@@ -52,7 +52,7 @@ Cut papers into strips, and weave them into surface.
 | --- | :-- |
 
 ### ..mathematics or physics:globe_with_meridians:
-| <img src="docs/src/img/math.png" align="top" height="150"> | Read our upcoming paper. Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [NURBS (esp. B-spline manifold)](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
+| <img src="docs/src/img/math.png" align="top" height="150"> | Read our upcoming paper. Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [B-spline manifold](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
 | --- | :-- |
 
 ### ..me!:bowtie:
