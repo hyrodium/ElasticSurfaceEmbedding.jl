@@ -73,7 +73,7 @@ function Base.show(io::IO, allsteps::AllSteps)
     print(io, _tree_as_string(allsteps))
 end
 
-function _realparent(allsteps, index::Int)
+function _validindex(allsteps, index::Int)
     if index==0
         return length(allsteps.steps)
     else

@@ -39,7 +39,7 @@ function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0, nip=NIP
     else
         error("No method for $(fixingmethod). Use :default or :fix3points.")
     end
-    parent = _realparent(allsteps, parent)
+    parent = _validindex(allsteps, parent)
     M = loadM(allsteps, index=parent)
 
     n₁, n₂ = dim.(bsplinespaces(M))
