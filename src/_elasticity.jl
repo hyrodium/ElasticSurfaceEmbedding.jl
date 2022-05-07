@@ -59,11 +59,11 @@ function show_strain(D; index=0)
     msg = "Strain - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...]) * "\n"
     msg *= "Predicted: (min: $(minE), max: $(maxE))\n"
 
-    if isTheShapeComputed()
-        M = loadM(index=index)
-        minE, maxE = _compute_minmax_strain(M)
-        msg *= "Computed: (min: $(minE), max: $(maxE))\n"
-    end
+    # if isTheShapeComputed()
+    #     M = loadM(index=index)
+    #     minE, maxE = _compute_minmax_strain(M)
+    #     msg *= "Computed: (min: $(minE), max: $(maxE))\n"
+    # end
     
     @info msg
 

@@ -43,8 +43,10 @@ function _initialize(D, n₁)
     N = 6n₁
 
     # Solve 𝒄̈(t) = A(t)𝒄̇(t) with Runge-Kutta method
-    A(t) = [ṡ₍₀₎(t, D₂) / s₍₀₎(t, D₂) -𝜅₍₀₎(t, D₂) * s₍₀₎(t, D₂)
-    𝜅₍₀₎(t, D₂) * s₍₀₎(t, D₂) ṡ₍₀₎(t, D₂) / s₍₀₎(t, D₂)]
+    A(t) = @SMatrix[
+        ṡ₍₀₎(t, D₂)/s₍₀₎(t, D₂)  -𝜅₍₀₎(t, D₂)*s₍₀₎(t, D₂)
+        𝜅₍₀₎(t, D₂)*s₍₀₎(t, D₂)  ṡ₍₀₎(t, D₂)/s₍₀₎(t, D₂)
+    ]
 
     # Initial condition
     𝒄̇₀ = SVector(1.0, 0.0) * s₍₀₎(minimum(D₁), D₂)
@@ -89,7 +91,10 @@ function _initialize(D, n₁)
     𝒎[n₁] = 𝒎[n₁-1] + 𝒎̇[n₁-1]*Δk*1/3
 
     # Approximate 𝒄₂ with B-spline curve
-    𝒄₂s = [[g₍₀₎₁₂(ts[i],D₂) -𝝊₍₀₎(ts[i],D₂); 𝝊₍₀₎(ts[i],D₂) g₍₀₎₁₂(ts[i],D₂)] * 𝒄̇s[i] / g₍₀₎₁₁(ts[i],D₂) for i in 1:N+1]
+    𝒄₂s = [
+        (@SMatrix [g₍₀₎₁₂(ts[i],D₂) -𝝊₍₀₎(ts[i],D₂); 𝝊₍₀₎(ts[i],D₂) g₍₀₎₁₂(ts[i],D₂)]) * 𝒄̇s[i] / g₍₀₎₁₁(ts[i],D₂)
+        for i in 1:N+1
+    ]
 
     _B = [bsplinebasis(P₁,i,t) for i in 1:n₁, t in ts]
     _BB = _B * _B'
