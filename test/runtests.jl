@@ -1,7 +1,7 @@
 using Test
 using IntervalSets
 using StaticArrays
-using Images
+# using Images
 using LinearAlgebra
 using BasicBSpline
 using ElasticSurfaceEmbedding
@@ -23,7 +23,7 @@ end
 
 function delta(f, B)
     n = 10
-    𝟙 = 0.99999
+    𝟙 = 1 - 1e-8
     xs = range(-B*𝟙, stop=B*𝟙, length=n+1)
     return maximum(f.(xs))-minimum(f.(xs))
 end
@@ -32,29 +32,26 @@ dir_result_a = joinpath(@__DIR__, "result_a")
 dir_result_b = joinpath(@__DIR__, "result_b")
 
 rm(dir_result_b, recursive=true, force=true)
-config_dir(dir_result_b)
 
 @testset "Rhomboid" begin
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹+u²)
     D = (-1.0..1.0, -1.0..1.0)
-    name = "Rhomboid"
-    settings(name,canvas=(3,5),mesh=(20,1),unit=200,colorbarsize=0.3)
 
-    initial_state(D, n₁=5)
-    M = ElasticSurfaceEmbedding.loadM()
+    result = initial_state(D, n₁=5)
+    M = ElasticSurfaceEmbedding.loadM(result)
     𝒂 = controlpoints(M)
     @test 𝒂[1,1] ≈ [-√(3/2), -3/√(2)]
     @test 𝒂[1,2] ≈ [-√(3/2), -1/√(2)]
     @test 𝒂[1,3] ≈ [-√(3/2), 1/√(2)]
     @test 𝒂[3,1] ≈ [0, -2/√(2)]
-    @test norm(𝒂[3,2]) < 1e-14
+    @test 𝒂[3,2] ≈ [0, 0]  atol=1e-14
     @test 𝒂[3,3] ≈ [0, 2/√(2)]
     @test 𝒂[5,1] ≈ [√(3/2), -1/√(2)]
     @test 𝒂[5,2] ≈ [√(3/2), 1/√(2)]
     @test 𝒂[5,3] ≈ [√(3/2), 3/√(2)]
 
-    newton_onestep()
-    M = ElasticSurfaceEmbedding.loadM()
+    newton_onestep!(result)
+    M = ElasticSurfaceEmbedding.loadM(result)
     𝒂 = controlpoints(M)
     @test 𝒂[1,1] ≈ [-√(3/2), -3/√(2)]
     @test 𝒂[1,2] ≈ [-√(3/2), -1/√(2)]
@@ -71,15 +68,13 @@ end
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(sin(u¹)*u², u²+cos(u¹)-u¹^2/5, 0.0)
     # See https://www.desmos.com/calculator/4usvqpr0iu
     D = (-1.0..2.0, 1.0..1.2)
-    name = "Planar"
-    settings(name,canvas=(4,4),mesh=(20,1),unit=200,colorbarsize=0.3)
 
-    initial_state(D, n₁=35)
-    M = ElasticSurfaceEmbedding.loadM()
+    result = initial_state(D, n₁=35)
+    M = ElasticSurfaceEmbedding.loadM(result)
     @test norm([ElasticSurfaceEmbedding.E(M, u¹, u²) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
 
-    newton_onestep()
-    M = ElasticSurfaceEmbedding.loadM()
+    newton_onestep!(result)
+    M = ElasticSurfaceEmbedding.loadM(result)
     @test norm([ElasticSurfaceEmbedding.E(M, u¹, u²) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
 end
 
@@ -90,18 +85,15 @@ end
 
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cos(u²), sin(u¹)*cos(u²), sin(u²))
     D = (-L..L, -B..B)
-    name = "Sphere-thin"
-    settings(name,canvas=(2L,2),mesh=(L,1),unit=50,colorbarsize=0.05)
 
-    initial_state(D, n₁=5)
+    result = initial_state(D, n₁=5)
+    newton_onestep!(result)
+    newton_onestep!(result)
+    refinement!(result, p₊=(0,1),k₊=(KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0., B/2)))
+    newton_onestep!(result)
+    newton_onestep!(result)
 
-    newton_onestep()
-    newton_onestep()
-    spline_refinement(p₊=(0,1),k₊=(KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0., B/2)))
-    newton_onestep()
-    newton_onestep()
-
-    M = ElasticSurfaceEmbedding.loadM()
+    M = ElasticSurfaceEmbedding.loadM(result)
     𝒂 = controlpoints(M)
 
     # Analytical
@@ -135,18 +127,15 @@ end
 
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cos(u²), sin(u¹)*cos(u²), sin(u²))
     D = (-L..L, -B..B)
-    name = "Sphere-thick"
-    settings(name,canvas=(2L,2),mesh=(L,1),unit=50,colorbarsize=0.05)
 
-    initial_state(D, n₁=5)
+    result = initial_state(D, n₁=5)
+    newton_onestep!(result)
+    newton_onestep!(result)
+    refinement!(result, p₊=(0,1),k₊=(KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0., B/2)))
+    newton_onestep!(result)
+    newton_onestep!(result)
 
-    newton_onestep()
-    newton_onestep()
-    spline_refinement(p₊=(0,1),k₊=(KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0., B/2)))
-    newton_onestep()
-    newton_onestep()
-
-    M = ElasticSurfaceEmbedding.loadM()
+    M = ElasticSurfaceEmbedding.loadM(result)
     𝒂 = controlpoints(M)
 
     # Analytical
@@ -174,7 +163,7 @@ end
     ## Note
     # Try the following script to check the difference between analytical solution and numerical solution.
     # using Plots
-    # 𝟙 = 0.99999
+    # 𝟙 = 1 - 1e-8
     # plot(h′,-B*𝟙,B*𝟙)
     # plot!(h̃′,-B*𝟙,B*𝟙)
     # plot!(ĥ′,-B*𝟙,B*𝟙)
@@ -184,20 +173,19 @@ end
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹^2+u²^2)
     D(i,n) = (-1.0..1.0, (i-1)/n..i/n)
     name = "Paraboloid"
-    settings(name,canvas=(4,4),mesh=(20,1),unit=200,colorbarsize=0.3)
 
     i=3
-    initial_state(D(i,10))
+    result = initial_state(D(i,10))
 
-    newton_onestep(fixingmethod=:fix3points)
-    newton_onestep()
-    spline_refinement(p₊=(0,1),k₊=(KnotVector(),KnotVector([(i-1/2)/10])))
-    newton_onestep()
-    newton_onestep()
-    add_pin(tag="$name-$i")
+    newton_onestep!(result, fixingmethod=:fix3points)
+    newton_onestep!(result)
+    refinement!(result, p₊=(0,1), k₊=(KnotVector(),KnotVector([(i-1/2)/10])))
+    newton_onestep!(result)
+    newton_onestep!(result)
+    pin(result)
 
-    img_a = load(joinpath(dir_result_a,"Paraboloid","append","Paraboloid-5_append.png"))
-    img_b = load(joinpath(dir_result_b,"Paraboloid","append","Paraboloid-5_append.png"))
-    d = Euclidean()
-    @test d(RGB.(img_a), RGB.(img_b)) < 0.0001
+    # img_a = load(joinpath(dir_result_a,"Paraboloid","append","Paraboloid-5_append.png"))
+    # img_b = load(joinpath(dir_result_b,"Paraboloid","append","Paraboloid-5_append.png"))
+    # d = Euclidean()
+    # @test d(RGB.(img_a), RGB.(img_b)) < 0.0001
 end
