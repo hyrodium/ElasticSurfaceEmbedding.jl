@@ -4,7 +4,7 @@
 Add a pin 📌 for the given index
 """
 function pin(allsteps; index::Int=0)
-    index = _realparent(index)
+    index = _realparent(allsteps, index)
     allsteps.steps[index][1].pinned = true
     return allsteps
 end
@@ -15,7 +15,7 @@ end
 Remeve the pin 📌 with the given index
 """
 function unpin(allsteps; index::Int=0)
-    index = _realparent(index)
+    index = _realparent(allsteps, index)
     allsteps.steps[index][1].pinned = false
     return allsteps
 end
@@ -39,7 +39,7 @@ function export_pinned_states(allsteps; unitlength::Tuple{<:Real,<:AbstractStrin
     pinned_states = _find_all_pinned_states(allsteps)
 
     for index in pinned_states
-        M = loadM(index=index)
+        M = loadM(allsteps, index=index)
         filename = joinpath(DIR, "pinned", "$(index).svg")
         save_svg(filename, M, xlims=XLIMS, ylims=YLIMS, mesh=MESH, unitlength=unitlength[1], points=false)
 

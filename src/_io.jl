@@ -30,19 +30,6 @@ function children_ids(allsteps, id)
     findall(step->step[2]==id, allsteps.steps)
 end
 
-function _tmp_allsteps_from_result(result::Dict)
-    allsteps = AllSteps()
-    n = length(result)
-    for i in 1:n
-        manifold = ElasticSurfaceEmbedding.JSONtoBSplineManifold(ElasticSurfaceEmbedding._loadresultdict()["result"][string(i)]["BSplineManifold"])
-        comment = ElasticSurfaceEmbedding._loadresultdict()["result"][string(i)]["comment"]
-        parent = parse(Int,ElasticSurfaceEmbedding._loadresultdict()["result"][string(i)]["parent"])
-        step = Step(manifold, comment)
-        addstep!(allsteps, step, parent)
-    end
-    return allsteps
-end
-
 """
     config_dir(dir)
 
@@ -84,52 +71,6 @@ function settings(
     global UNIT = (unit, "pt")
     global MAXIMUMSTRAIN = maximumstrain
     global COLORBARSIZE = colorbarsize
-    if isTheShapeComputed()
-        dict = _loadresultdict()
-        allsteps = _tmp_allsteps_from_result(dict["result"])
-        println(_tree_as_string(allsteps))
-    end
-end
-
-function toJSON(k::KnotVector)
-    return k.vector
-end
-function toJSON(P::BSplineSpace)
-    return Dict("degree" => degree(P), "knotvector" => toJSON(knotvector(P)))
-end
-function toJSON(P::Array{P,1} where {P<:BSplineSpace})
-    return convert(Vector, toJSON.(P))
-end
-function toJSON(𝒂::Matrix{SVector{2,Float64}})
-    xs = [p.x for p in vec(𝒂)]
-    ys = [p.y for p in vec(𝒂)]
-    return convert(Vector, vcat(xs,ys))
-end
-function toJSON(M::BSplineManifold{2})
-    return Dict("bsplinespaces" => toJSON(collect(bsplinespaces(M))), "controlpoints" => toJSON(controlpoints(M)))
-end
-
-function JSONtoBSplineSpace(jP::Dict)
-    p = jP["degree"]
-    return BSplineSpace{p}(KnotVector(Vector{Float64}(jP["knotvector"])))
-end
-function JSONtoBSplineSpaces(jPs::Array)
-    P1 = JSONtoBSplineSpace(jPs[1])
-    P2 = JSONtoBSplineSpace(jPs[2])
-    return (P1,P2)
-end
-function JSONtoControlPoints(ja, n1, n2)
-    coords = convert(Vector{Float64}, ja)
-    xs = reshape(coords[1:n1*n2], n1, n2)
-    ys = reshape(coords[n1*n2+1:2n1*n2], n1, n2)
-    𝒂 = [SVector(xs[i1,i2],ys[i1,i2]) for i1 in 1:n1, i2 in 1:n2]
-    return 𝒂
-end
-function JSONtoBSplineManifold(dict::Dict)
-    P = JSONtoBSplineSpaces(dict["bsplinespaces"])
-    n1, n2 = dim.(P)
-    𝒂 = JSONtoControlPoints(dict["controlpoints"], n1, n2)
-    return BSplineManifold(𝒂, P)
 end
 
 function nodeseries(allsteps, i)
@@ -139,14 +80,6 @@ function nodeseries(allsteps, i)
         pushfirst!(series, i)
     end
     return series
-end
-
-function NodeSeries(tree::Dict, node)
-    Nodes = [node]
-    while Nodes[end] ≠ "0"
-        push!(Nodes, tree[Nodes[end]]["parent"])
-    end
-    return Nodes
 end
 
 function _tree_as_string(allsteps::AllSteps)
@@ -186,78 +119,16 @@ function _tree_as_string(allsteps::AllSteps)
     return outsting
 end
 
-function _tree_as_string(tree::Dict)
-    serieses = Array{Int,1}[]
-    for key in keys(tree)
-        push!(serieses, (s -> parse(Int, s)).(reverse(NodeSeries(tree, key))))
-    end
-    sort!(serieses)
-    lowstrings = String[]
-    n = length(serieses)
-    for i in 1:n
-        l = length(serieses[i])
-        key = string(serieses[i][end])
-        comment = tree[key]["comment"]
-        if l == 2
-            lowstring = key * ": " * comment
-            push!(lowstrings, lowstring)
-        elseif l ≥ 3
-            lowstring = "  "^(l - 3) * "└─" * key * ": " * comment
-            push!(lowstrings, lowstring)
-            for j in 1:(i-1)
-                chars = collect(lowstrings[end-j])
-                if chars[2(l-3)+1] == ' '
-                    lowstrings[end-j] = join(chars[1:2(l-3)]) * "│" * join(chars[2(l-3)+2:end])
-                elseif chars[2(l-3)+1] == '└'
-                    lowstrings[end-j] = join(chars[1:2(l-3)]) * "├" * join(chars[2(l-3)+2:end])
-                    break
-                else
-                    break
-                end
-            end
-        end
-    end
-    outsting = ""
-    for s in lowstrings
-        outsting = outsting * s * "\n"
-    end
-    return outsting
-end
-
 function Base.show(io::IO, allsteps::AllSteps)
     print(_tree_as_string(allsteps))
 end
 
-function isTheShapeComputed()
-    return isfile(joinpath(DIR,NAME*".json"))
-end
-
-function latest_index()
-    dict = _loadresultdict()
-    latest_index(dict)
-end
-
-function latest_index(dict)
-    result_nums = [parse(Int, i) for i in keys(dict["result"])]
-    return maximum(result_nums)
-end
-
-function _realparent(index::Int)
+function _realparent(allsteps, index::Int)
     if index==0
-        return latest_index()
+        return length(allsteps.steps)
     else
         return index
     end
-end
-
-function loadM(; index=0)
-    if !isTheShapeComputed()
-        error("Result file doesn't exists")
-    end
-    dict = _loadresultdict()
-    index = _realparent(index)
-    M = JSONtoBSplineManifold(dict["result"][string(index)]["BSplineManifold"])
-    return M
 end
 
 function loadM(allsteps; index=0)
@@ -268,55 +139,17 @@ function loadM(allsteps; index=0)
     return M
 end
 
-function _loadresultdict()
-    json = read(joinpath(DIR, "$(NAME).json"), String)
-    dict = JSON.parse(json)
-    v = dict["meta"]["version"]
-    JSON_VERSION = VersionNumber(v["major"], v["minor"], v["patch"])
-
-    if JSON_VERSION.major == ESE_VERSION.major
-        return dict
-    else
-        error("The version of computed shape is not supported.")
-    end
-end
-
-function _export(M::BSplineManifold{2}, parent::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
-    if isTheShapeComputed()
-        dict = _loadresultdict()
-        index = latest_index(dict) + 1
-    else
-        meta = Dict{String,Any}("version" => ESE_VERSION, "generated by" => "ElasticSurfaceEmbedding.jl")
-        dict = Dict{String,Any}("meta" => meta)
-        dict["result"] = Dict{String,Any}()
-        index = 1
-    end
-
-    dict["result"][string(index)] = Dict{String,Any}("parent" => string(parent))
-    dict["result"][string(index)]["BSplineManifold"] = toJSON(M)
-    dict["result"][string(index)]["comment"] = comment
-
-    # Save as json
+function _export(M::BSplineManifold{2}, index::Int; comment="", maximumstrain=MAXIMUMSTRAIN)
     mkpath(DIR)
-    write(joinpath(DIR, NAME*".json"), JSON.json(dict, 4))
 
     # Compute maximum strain for graphics export
-    if maximumstrain == 0.0
+    if iszero(maximumstrain)
         MS = _compute_minmax_strain(M)
-        MaximumStrain = max(-MS[1], MS[2])
-    else
-        MaximumStrain = maximumstrain
+        maximumstrain = max(-MS[1], MS[2])
     end
 
     # Save graphics
-    ExportFiles(M, MaximumStrain, index)
-
-    # Send messages
-    path_png_append = joinpath(DIR, "append", "$(NAME)-$(index)_append.png")
-    allsteps = _tmp_allsteps_from_result(dict["result"])
-    message = _tree_as_string(allsteps)
-    comment = "```\n$(message)```"
-    _send_file_to_slack(path_png_append, comment=comment)
+    ExportFiles(M, maximumstrain, index)
 end
 
 function ExportFiles(
@@ -381,24 +214,6 @@ function ExportFiles(
 
     save(path_png_append, img_append)
 end
-
-
-"""
-    computed_shapes()
-
-Get names of computed shapes in the output directory (default: `~/ElasticSurfaceEmbedding-Result`)
-"""
-function computed_shapes()
-    shapes = String[]
-    for name in readdir(OUT_DIR)
-        dir = joinpath(OUT_DIR, name)
-        !isdir(dir) && continue
-        !isfile(joinpath(dir, name*".json")) && continue
-        push!(shapes, name)
-    end
-    return shapes
-end
-
 
 # TODO
 # export ReDraw

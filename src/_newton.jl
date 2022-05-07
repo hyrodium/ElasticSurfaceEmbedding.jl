@@ -39,7 +39,7 @@ function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0, nip=NIP
     else
         error("No method for $(fixingmethod)")
     end
-    parent = _realparent(parent)
+    parent = _realparent(allsteps, parent)
     M = loadM(allsteps, index=parent)
 
     n₁, n₂ = dim.(bsplinespaces(M))
@@ -56,9 +56,10 @@ function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0, nip=NIP
         (@sprintf("%.4e", norm(Ǧ))) *
         ", computation time: " *
         _seconds2string(Δt)
-    _export(M, parent, comment=comment)
     step = Step(M, comment)
     addstep!(allsteps, step, parent)
+    _export(M, length(allsteps.steps), comment=comment)
+    allsteps
 end
 
 function _newton(M::BSplineManifold{2}, fix_method; nip=NIP)

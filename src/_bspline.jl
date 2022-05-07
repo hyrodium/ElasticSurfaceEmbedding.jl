@@ -57,7 +57,7 @@ end
 Compute a refinement of the B-spline manifold
 """
 function refinement!(allsteps; p₊=(0,0), k₊=(KnotVector(),KnotVector()), parent::Int=0)
-    parent = _realparent(parent)
+    parent = _realparent(allsteps, parent)
     M = loadM(allsteps, index=parent)
 
     P₁, P₂ = bsplinespaces(M)
@@ -77,9 +77,10 @@ function refinement!(allsteps; p₊=(0,0), k₊=(KnotVector(),KnotVector()), par
     comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((k₊₁.vector, k₊₂.vector))"
     comment = replace(comment, "Float64"=>"")
     M = refinement(M, p₊=(p₊₁, p₊₂), k₊=(k₊₁, k₊₂))
-    _export(M, parent, comment=comment)
     step = Step(M, comment)
     addstep!(allsteps, step, parent)
+    _export(M, length(allsteps.steps), comment=comment)
+    allsteps
 end
 
 """
@@ -88,7 +89,7 @@ end
 Show current knotvector and suggestions for knot insertions (with given index).
 """
 function show_knotvector(allsteps; index=0)
-    M = loadM(allsteps, index = index)
+    M = loadM(allsteps, index=index)
 
     P = bsplinespaces(M)
     k₁, k₂ = knotvector.(P)

@@ -20,7 +20,7 @@ using BasicBSpline
 using BasicBSplineExporter
 
 # config
-export config_dir, config_slack
+export config_dir
 export settings
 # Numerical computing
 export initial_state
@@ -30,12 +30,9 @@ export refinement!
 export pin, unpin, export_pinned_states
 # utilities
 export show_strain, show_knotvector
-export computed_shapes
 
 include("_constants.jl")
-include("_integral.jl")
 include("_graphics.jl")
-include("_slack.jl")
 include("_bspline.jl")
 include("_geometry.jl")
 include("_elasticity.jl")

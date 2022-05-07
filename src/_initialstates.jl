@@ -4,16 +4,15 @@
 Compute the initial state, by solving a ODE of center curve.
 """
 function initial_state(D; n₁ = 15)
-    parent = 0
-
     D₁, D₂ = D
     M = _initialize(D, n₁)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
 
-    _export(M, parent, comment = comment)
     step = Step(M,comment)
     allsteps = AllSteps()
     addstep!(allsteps, step, 0)
+    _export(M, length(allsteps.steps), comment = comment)
+    allsteps
 end
 
 function _initialize(D, n₁)
@@ -27,7 +26,6 @@ function _initialize(D, n₁)
     k₂ = KnotVector(repeat(collect(extrema(D₂)), inner = 2))
     P₁ = BSplineSpace{p₁}(k₁)
     P₂ = BSplineSpace{p₂}(k₂)
-
 
     # Number of divisions for ODE
     N = 6n₁
