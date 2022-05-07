@@ -58,8 +58,6 @@ function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0, nip=NIP
         _seconds2string(Δt)
     step = Step(M, comment)
     addstep!(allsteps, step, parent)
-    _export(M, length(allsteps.steps), comment=comment)
-    allsteps
 end
 
 function _newton(M::BSplineManifold{2}, fix_method; nip=NIP)

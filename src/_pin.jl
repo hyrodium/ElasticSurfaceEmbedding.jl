@@ -25,12 +25,12 @@ function _find_all_pinned_states(allsteps)
 end
 
 """
-    export_pinned_states(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
+    export_pinned_steps(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
 
 Export all pinned states for final output
 """
-function export_pinned_states(allsteps; unitlength::Tuple{<:Real,<:AbstractString}, cutout=(0.1, 5), mesh::Int=60)
-    dir_pinned = joinpath(DIR, "pinned")
+function export_pinned_steps(dir::AbstractString, allsteps::AllSteps; unitlength::Tuple{<:Real,<:AbstractString}, cutout=(0.1, 5), xlims=(-5,5), ylims=(-5,5))
+    dir_pinned = joinpath(dir, "pinned")
     # Delete current pinned directory
     rm(dir_pinned, recursive=true, force=true)
     # Make path to pinned directory
@@ -40,8 +40,8 @@ function export_pinned_states(allsteps; unitlength::Tuple{<:Real,<:AbstractStrin
 
     for index in pinned_states
         M = loadM(allsteps, index=index)
-        filename = joinpath(DIR, "pinned", "$(index).svg")
-        save_svg(filename, M, xlims=XLIMS, ylims=YLIMS, mesh=MESH, unitlength=unitlength[1], points=false)
+        filename = joinpath(dir, "pinned", "$(index).svg")
+        save_svg(filename, M, xlims=xlims, ylims=ylims, mesh=MESH, unitlength=unitlength[1], points=false)
 
         # P = bsplinespaces(M)
         # p₁, p₂ = degree.(P)
@@ -55,7 +55,7 @@ function export_pinned_states(allsteps; unitlength::Tuple{<:Real,<:AbstractStrin
         # _svgcurve(
         #     [[t -> 𝒑a(i, t) for i in 0:cutout[2]]..., [t -> 𝒑b(i, t) for i in 0:cutout[2]]...],
         #     D₁,
-        #     filename = joinpath(DIR, "pinned", "$(_get_tag(index))-cutout.svg"),
+        #     filename = joinpath(dir, "pinned", "$(_get_tag(index))-cutout.svg"),
         #     up = UP,
         #     down = DOWN,
         #     right = RIGHT,

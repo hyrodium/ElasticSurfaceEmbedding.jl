@@ -11,8 +11,6 @@ function initial_state(D; n₁ = 15)
     step = Step(M,comment)
     allsteps = AllSteps()
     addstep!(allsteps, step, 0)
-    _export(M, length(allsteps.steps), comment = comment)
-    allsteps
 end
 
 function _initialize(D, n₁)
@@ -58,7 +56,7 @@ function _initialize(D, n₁)
     _p₁ = p₁-1
     _k₁ = KnotVector(range(t₋, t₊, length = n₁-_p₁)) + _p₁ * KnotVector(t₋, t₊)
     _P₁ = BSplineSpace{_p₁}(_k₁)
-    _n₁ =  dim(_P₁)
+    _n₁ = dim(_P₁)
     _B = [bsplinebasis(_P₁,i,t) for i in 1:_n₁, t in ts]
     _BB = _B * _B'
     _b = _B * 𝒄̇s

@@ -21,7 +21,6 @@ function Base.:/(c1::TransparentRGB, c2::AbstractRGB)
     return typeof(c1)(rgb)
 end
 
-
 # Luxor related
 function _changeunit(path_svg, units::Pair{String,String})
     old_unit, new_unit = units

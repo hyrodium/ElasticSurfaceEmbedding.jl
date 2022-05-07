@@ -7,7 +7,6 @@ import Statistics.mean
 
 using IntervalSets
 using StaticArrays
-using JSON
 import FileIO.load
 import FileIO.save
 using OffsetArrays
@@ -19,15 +18,14 @@ using Luxor
 using BasicBSpline
 using BasicBSplineExporter
 
-# config
-export config_dir
-export settings
 # Numerical computing
 export initial_state
 export newton_onestep!
 export refinement!
 # Pin related
-export pin, unpin, export_pinned_states
+export pin, unpin
+# Exports
+export export_all_steps, export_pinned_steps
 # utilities
 export show_strain, show_knotvector
 
