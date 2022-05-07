@@ -8,8 +8,22 @@ function initial_state(D; n₁ = 15)
     M = _initialize(D, n₁)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
 
-    step = Step(M,comment)
+    step = Step(M, comment)
     allsteps = AllSteps()
+    addstep!(allsteps, step, 0)
+end
+
+"""
+    initial_state!(allsteps, D; n₁ = 15)
+
+Compute the initial state, by solving a ODE of center curve.
+"""
+function initial_state!(allsteps, D; n₁ = 15)
+    D₁, D₂ = D
+    M = _initialize(D, n₁)
+    comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
+
+    step = Step(M, comment)
     addstep!(allsteps, step, 0)
 end
 

@@ -19,7 +19,7 @@ using BasicBSpline
 using BasicBSplineExporter
 
 # Numerical computing
-export initial_state
+export initial_state, initial_state!
 export newton_onestep!
 export refinement!
 # Pin related

@@ -35,8 +35,9 @@ function _compute_minmax_strain(M)
     return (minimum(E), maximum(E))
 end
 
-function _predict_minmax_strain(D; mesh = tuple(20 * [MESH...]...))
+function _predict_minmax_strain(D)
     D₁, D₂ = D
+    mesh = (500,50)  # TODO
 
     κ₁ = range(leftendpoint(D₁), stop = rightendpoint(D₁), length = mesh[1] + 1)
     κ₂ = range(leftendpoint(D₂), stop = rightendpoint(D₂), length = mesh[2] + 1)

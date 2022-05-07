@@ -23,13 +23,6 @@ function parent_id(allsteps, id)
     allsteps.steps[id][2]
 end
 
-function _check_filename(name::String)
-    invalidcharacters = [' ', '&', '\\', '/', '.', '<', '>', '|', ':', ';', '*', '?', '=', '%', '$', '"', '~']
-    if length(invalidcharacters ∩ name) ≠ 0
-        error("The name[$(name)] must not consists of following chars: ", invalidcharacters)
-    end
-end
-
 function nodeseries(allsteps, i)
     series = [i]
     while i ≠ 0
@@ -103,16 +96,19 @@ function export_all_steps(
         xlims = (-5,5),
         ylims = (-5,5),
         mesh = (10,1),
-        unit = (100,"mm"),
+        unitlength = (100,"mm"),
         colorbarsize = 0.3,
     )
+    mkpath(dir)
     for (step, i) in allsteps.steps
         M = step.manifold
-        _export_one_step(dir, M, i, maximumstrain=maximumstrain, xlims=xlims, ylims=ylims, mesh=mesh, unit=unit, colorbarsize=colorbarsize)
+        export_one_step(dir, M, i, maximumstrain=maximumstrain, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength, colorbarsize=colorbarsize)
     end
+    export_pinned_steps(dir, allsteps, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength)
+    write(joinpath(dir,"log.txt"), _tree_as_string(allsteps))
 end
 
-function _export_one_step(
+function export_one_step(
         dir,
         M::BSplineManifold{2},
         index::Integer;
@@ -120,32 +116,35 @@ function _export_one_step(
         xlims = (-5,5),
         ylims = (-5,5),
         mesh = (10,1),
-        unit = (100,"mm"),
+        unitlength = (100,"mm"),
         colorbarsize = 0.3,
     )
     if maximumstrain ≤ 0
         MS = _compute_minmax_strain(M)
         maximumstrain = max(-MS[1], MS[2])
     end
-
-    width = (xlims[2] - xlims[1]) * unit[1]
-
+    aa = 5 # magnification parameter for antialias
+    width = (xlims[2] - xlims[1]) * unitlength[1]
     normalized_strain(u¹, u²) = E⁽⁰⁾₁₁(M, u¹, u²) / maximumstrain # bounded in -1 to 1
 
-    aa = 5 # magnification parameter for antialias
+    mkpath(joinpath(dir, "bspline"))
+    mkpath(joinpath(dir, "strain"))
+    mkpath(joinpath(dir, "colorbar"))
+    mkpath(joinpath(dir, "combined"))
 
-    path_svg_bspline = joinpath(dir, "bspline-$(index).svg")
-    path_png_bspline = joinpath(dir, "bspline-$(index).png")
-    path_png_strain = joinpath(dir, "strain-$(index).png")
-    path_png_colorbar = joinpath(dir, "colorbar-$(index).png")
-    path_png_append = joinpath(dir, "append-$(index).png")
+    path_svg_bspline = joinpath(dir, "bspline", "bspline-$(index).svg")
+    path_png_bspline = joinpath(dir, "bspline", "bspline-$(index).png")
+    path_png_strain = joinpath(dir, "strain", "strain-$(index).png")
+    path_png_colorbar = joinpath(dir, "colorbar", "colorbar-$(index).png")
+    path_png_combined = joinpath(dir, "combined", "combined-$(index).png")
 
     colorfunc(u¹,u²) = normalized_strain(u¹,u²) * RGB(0.5, -0.5, -0.5) + RGB(0.5, 0.5, 0.5) # red to cyan
 
-    save_svg(path_svg_bspline, M, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=Int(unit[1]))
-    save_png(path_png_bspline, M, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=Int(unit[1]))
-    save_png(path_png_strain, M, colorfunc, xlims=xlims, ylims=ylims, unitlength=Int(aa*unit[1]))
+    save_svg(path_svg_bspline, M, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=Int(unitlength[1]))
+    save_png(path_png_bspline, M, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=Int(unitlength[1]))
+    save_png(path_png_strain, M, colorfunc, xlims=xlims, ylims=ylims, unitlength=Int(aa*unitlength[1]))
     _colorbar(max=maximumstrain, filename=path_png_colorbar, width=aa*colorbarsize*width)
+    _changeunit(path_svg_bspline, "pt"=>unitlength[2])
 
     img_bspline = load(path_png_bspline)
     img_strain = load(path_png_strain)
@@ -168,7 +167,63 @@ function _export_one_step(
     img_strain_with_colorbar[axes(img_offset_colorbar)...] = img_offset_colorbar ./ img_strain_with_colorbar[axes(img_offset_colorbar)...]
     img_strain_with_colorbar = [RGB(mean(img_strain_with_colorbar[5i-4:5i, 5j-4:5j])) for i in 1:size_bspline[1], j in 1:size_bspline[2]]
     # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but the previous one is better for anti-alias
-    img_append = hcat(img_bspline_white_background, img_strain_with_colorbar)
+    img_combined = hcat(img_bspline_white_background, img_strain_with_colorbar)
 
-    save(path_png_append, img_append)
+    save(path_png_combined, img_combined)
+end
+
+"""
+    export_pinned_steps(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
+
+Export all pinned states for final output
+"""
+function export_pinned_steps(
+        dir::AbstractString,
+        allsteps::AllSteps;
+        xlims=(-5,5),
+        ylims=(-5,5),
+        mesh=(10,1),
+        unitlength::Tuple{<:Real,<:AbstractString},
+        # cutout=(0.1, 5),
+    )
+    dir_pinned = joinpath(dir, "pinned")
+    # Delete current pinned directory
+    rm(dir_pinned, recursive=true, force=true)
+    # Make path to pinned directory
+    mkpath(dir_pinned)
+
+    pinned_states = _find_all_pinned_states(allsteps)
+
+    for index in pinned_states
+        M = loadM(allsteps, index=index)
+        filename = joinpath(dir, "pinned", "pinned-$(index).svg")
+        save_svg(filename, M, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength[1], points=false)
+
+        # P = bsplinespaces(M)
+        # p₁, p₂ = degree.(P)
+        # k₁, k₂ = knotvector.(P)
+        # D₁, D₂ = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
+
+        # 𝒆⁽⁰⁾₁(u¹,u²) = normalize(𝒑₁₍ₜ₎(M,u¹,u²))
+        # 𝒆⁽⁰⁾₂(u¹,u²) = [0.0 -1.0; 1.0 0.0] * 𝒆⁽⁰⁾₁(u¹,u²)
+        # 𝒑a(i, t) = 𝒑₍ₜ₎(M, t, leftendpoint(D₂)) + 𝒆⁽⁰⁾₂(t, leftendpoint(D₂)) * i * cutout[1] / unitlength[1]
+        # 𝒑b(i, t) = 𝒑₍ₜ₎(M, t, rightendpoint(D₂)) - 𝒆⁽⁰⁾₂(t, rightendpoint(D₂)) * i * cutout[1] / unitlength[1]
+        # _svgcurve(
+        #     [[t -> 𝒑a(i, t) for i in 0:cutout[2]]..., [t -> 𝒑b(i, t) for i in 0:cutout[2]]...],
+        #     D₁,
+        #     filename = joinpath(dir, "pinned", "$(_get_tag(index))-cutout.svg"),
+        #     up = UP,
+        #     down = DOWN,
+        #     right = RIGHT,
+        #     left = LEFT,
+        #     thickness = 0.1,
+        #     mesh = mesh,
+        #     unitlength = unitlength[1]
+        # )
+    end
+
+    for name in readdir(dir_pinned)
+        file = joinpath(dir_pinned, name)
+        _changeunit(file, "pt"=>unitlength[2])
+    end
 end

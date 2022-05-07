@@ -37,7 +37,7 @@ function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0, nip=NIP
     elseif fixingmethod == :fix3points
         fixed = _fixthreepoints
     else
-        error("No method for $(fixingmethod)")
+        error("No method for $(fixingmethod). Use :default or :fix3points.")
     end
     parent = _realparent(allsteps, parent)
     M = loadM(allsteps, index=parent)
