@@ -1,26 +1,3 @@
-# The Package ColorBlendModes might work better than the code below, I guess.
-# https://github.com/kimikage/ColorBlendModes.jl
-
-# Images related
-function Base.:/(c1::AbstractRGB, c2::Union{AbstractRGB,TransparentRGB})
-    return c1
-end
-function Base.:/(c1::TransparentRGB, c2::TransparentRGB)
-    rgb1, rgb2 = RGB(c1), RGB(c2)
-    alpha1, alpha2 = c1.alpha, c2.alpha
-    # rgb = (alpha1*rgb1 + (1-alpha1)*alpha2*rgb2) / (alpha1 + alpha2 - alpha1*alpha2)
-    rgb = weighted_color_mean(alpha1 / (alpha1 + alpha2 - alpha1 * alpha2), rgb1, rgb2)
-    alpha = 1 - (1 - alpha1) * (1 - alpha2)
-    return typeof(c1)(RGBA(rgb, alpha))
-end
-function Base.:/(c1::TransparentRGB, c2::AbstractRGB)
-    rgb1, rgb2 = RGB(c1), RGB(c2)
-    alpha1 = c1.alpha
-    # rgb = alpha1*rgb1 + (1-alpha1)*rgb2
-    rgb = weighted_color_mean(alpha1, rgb1, rgb2)
-    return typeof(c1)(rgb)
-end
-
 # Luxor related
 function _changeunit(path_svg, units::Pair{String,String})
     old_unit, new_unit = units
@@ -67,7 +44,7 @@ function _colorbar(; max=1.000, filename="ColorBar.png", width=100)
 
     Drawing(round(width), round((up - down) * unit), filename)
     Luxor.origin(-left * unit, up * unit)
-    setblend(blend(Point(0, -Length * unit), Point(0, Length * unit), "red", "cyan"))
+    setblend(Luxor.blend(Point(0, -Length * unit), Point(0, Length * unit), "red", "cyan"))
     box(BasicBSplineExporter._luxor_pt([-0.9, 0], unit), 1.8 * unit, 7 * unit, :fill)
     sethue("Black")
     fontface("JuliaMono")

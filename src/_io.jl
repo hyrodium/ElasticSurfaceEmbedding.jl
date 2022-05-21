@@ -158,13 +158,13 @@ function export_one_step(
     size_strain = size(img_strain)
     size_colorbar = size(img_colorbar)
 
-    img_bspline_white_background = img_bspline ./ RGB(1, 1, 1)
-    img_strain_white_background = img_strain ./ RGB(1, 1, 1)
-    Δ = collect(size_strain) - collect(size_colorbar)
+    img_bspline_white_background = ColorBlendModes.blend.(RGB(1,1,1), img_bspline, op=ColorBlendModes.CompositeSourceOver)
+    img_strain_white_background = ColorBlendModes.blend.(RGB(1,1,1), img_strain, op=ColorBlendModes.CompositeSourceOver)
+    Δ = size_strain .- size_colorbar
 
     img_offset_colorbar = OffsetArray(img_colorbar, Δ...)
     img_strain_with_colorbar = copy(img_strain_white_background)
-    img_strain_with_colorbar[axes(img_offset_colorbar)...] = img_offset_colorbar ./ img_strain_with_colorbar[axes(img_offset_colorbar)...]
+    img_strain_with_colorbar[axes(img_offset_colorbar)...] = ColorBlendModes.blend.(img_strain_with_colorbar[axes(img_offset_colorbar)...], img_offset_colorbar, op=ColorBlendModes.CompositeSourceOver)
     img_strain_with_colorbar = [RGB(mean(img_strain_with_colorbar[5i-4:5i, 5j-4:5j])) for i in 1:size_bspline[1], j in 1:size_bspline[2]]
     # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but the previous one is better for anti-alias
     img_combined = hcat(img_bspline_white_background, img_strain_with_colorbar)
