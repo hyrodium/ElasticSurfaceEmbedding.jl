@@ -14,6 +14,7 @@ using ForwardDiff
 using FastGaussQuadrature
 using Colors
 using Luxor
+using ColorBlendModes
 
 using BasicBSpline
 using BasicBSplineExporter
