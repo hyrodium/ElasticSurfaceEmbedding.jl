@@ -68,7 +68,7 @@ function _initialize(D, n₁)
         𝒄̇s[i+1] = 𝒄̇ + Δ𝒄̇₀
     end
 
-    # Approximate 𝒄̇=𝒄₁ with B-spline curve
+    # Approximate 𝒄̇=𝒒₁ with B-spline curve
     _p₁ = p₁-1
     _k₁ = KnotVector(range(t₋, t₊, length = n₁-_p₁)) + _p₁ * KnotVector(t₋, t₊)
     _P₁ = BSplineSpace{_p₁}(_k₁)
@@ -76,7 +76,7 @@ function _initialize(D, n₁)
     _B = [bsplinebasis(_P₁,i,t) for i in 1:_n₁, t in ts]
     _BB = _B * _B'
     _b = _B * 𝒄̇s
-    𝒎̇ = inv(_BB)*_b  # control points of 𝒄̃₁
+    𝒎̇ = inv(_BB)*_b  # control points of 𝒒̃₁
 
     # Approximate 𝒄 with B-spline curve
     Δk = (t₊-t₋)/(n₁-p₁)
@@ -90,15 +90,15 @@ function _initialize(D, n₁)
     𝒎[n₁-1] = 𝒎[n₁-2] + 𝒎̇[n₁-2]*Δk*2/3
     𝒎[n₁] = 𝒎[n₁-1] + 𝒎̇[n₁-1]*Δk*1/3
 
-    # Approximate 𝒄₂ with B-spline curve
-    𝒄₂s = [
+    # Approximate 𝒒₂ with B-spline curve
+    𝒒₂s = [
         (@SMatrix [g₍₀₎₁₂(ts[i],D₂) -𝝊₍₀₎(ts[i],D₂); 𝝊₍₀₎(ts[i],D₂) g₍₀₎₁₂(ts[i],D₂)]) * 𝒄̇s[i] / g₍₀₎₁₁(ts[i],D₂)
         for i in 1:N+1
     ]
 
     _B = [bsplinebasis(P₁,i,t) for i in 1:n₁, t in ts]
     _BB = _B * _B'
-    _b = _B * 𝒄₂s
+    _b = _B * 𝒒₂s
     𝒓 = inv(_BB)*_b  # control points of 𝒄̃₂
 
     a1 = 𝒎 - width(D₂) * 𝒓/2
