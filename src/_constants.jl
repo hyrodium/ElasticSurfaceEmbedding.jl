@@ -1,5 +1,4 @@
 const d = 2 # Dimension of surface
-const NIP = 10 # Default number of integration points for Gaussian quadrature
 
 const 𝝂 = 0.25 # Poisson's Ratio
 const Y = 1.0 # Young Modulus

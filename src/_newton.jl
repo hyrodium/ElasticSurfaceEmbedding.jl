@@ -27,11 +27,11 @@ function _seconds2string(Δt::Float64)
 end
 
 """
-    newton_onestep(; fixingmethod=:default, parent::Int=0, nip=NIP)
+    newton_onestep(; fixingmethod=:default, parent::Int=0)
 
 Compute one step of Newton-Raphson method
 """
-function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0, nip=NIP)
+function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0)
     if fixingmethod == :default
         fixed = _defaultorientation
     elseif fixingmethod == :fix3points
@@ -48,7 +48,7 @@ function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0, nip=NIP
     iseven(n₂) && error("n₂ should be odd numbers")
 
     M = _positioning(M)
-    M, F, Ǧ, Δt = _newton(M, fixed, nip=nip)
+    M, F, Ǧ, Δt = _newton(M, fixed)
     comment =
         "Newton onestep - residual norm: " *
         (@sprintf("%.4e", norm(F))) *
@@ -60,7 +60,7 @@ function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0, nip=NIP
     addstep!(allsteps, step, parent)
 end
 
-function _newton(M::BSplineManifold{2, p, <:SVector}, fix_method; nip=NIP) where p
+function _newton(M::BSplineManifold{2, p, <:SVector}, fix_method) where p
     𝒂 = _arrayofvector2array(controlpoints(M))
     P = bsplinespaces(M)
     n₁, n₂ = dim.(P)
