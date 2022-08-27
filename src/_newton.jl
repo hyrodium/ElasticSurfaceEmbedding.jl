@@ -60,7 +60,7 @@ function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0, nip=NIP
     addstep!(allsteps, step, parent)
 end
 
-function _newton(M::BSplineManifold{2}, fix_method; nip=NIP)
+function _newton(M::BSplineManifold{2, p, <:SVector}, fix_method; nip=NIP) where p
     𝒂 = _arrayofvector2array(controlpoints(M))
     P = bsplinespaces(M)
     n₁, n₂ = dim.(P)

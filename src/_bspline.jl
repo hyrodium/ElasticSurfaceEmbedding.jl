@@ -13,22 +13,22 @@ end
 """
 Affine transform of control points.
 """
-function _affine(𝒂, A, b)
+function _affine(𝒂::Matrix{<:SVector}, A::SMatrix{2,2}, b::SVector{2})
     # x'=Ax+b
     n₁, n₂ = size(𝒂)
     return [(A*𝒂[I₁,I₂]+b) for I₁ in 1:n₁, I₂ in 1:n₂]
 end
 
-function _rotate(𝒂)
+function _rotate(𝒂::Matrix{<:SVector})
     n₁, n₂ = size(𝒂)
     ind0 = [(n₁ + 1) ÷ 2, (n₂ + 1) ÷ 2]
     ind1 = ind0 - [0, 1]
     v = 𝒂[ind1...] - 𝒂[ind0...]
-    R = -[v[2] -v[1]; v[1] v[2]] / norm(v)
+    R = - (@SMatrix [v[2] -v[1]; v[1] v[2]]) / norm(v)
     return _affine(𝒂, R, SVector(0.0, 0.0))
 end
 
-function _center(𝒂)
+function _center(𝒂::Matrix{<:SVector})
     xs = [p[1] for p in 𝒂]
     ys = [p[2] for p in 𝒂]
     x_min = minimum(xs)
@@ -37,10 +37,10 @@ function _center(𝒂)
     y_max = maximum(ys)
     x = (x_min+x_max)/2
     y = (y_min+y_max)/2
-    return _affine(𝒂, I(2), -SVector(x,y))
+    return _affine(𝒂, one(SMatrix{2,2}), -SVector(x,y))
 end
 
-function _positioning(𝒂)
+function _positioning(𝒂::Matrix{<:SVector})
     return _center(_rotate(𝒂))
 end
 
