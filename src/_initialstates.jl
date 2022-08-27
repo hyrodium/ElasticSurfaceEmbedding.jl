@@ -106,6 +106,6 @@ function _initialize(D, n₁)
     𝒂 = hcat(a1,a2)
 
     M = BSplineManifold(𝒂, (P₁, P₂))
-    M′ = refinement(M, p₊ = (0, 1))
+    M′ = refinement(M, (Val(0), Val(1)))
     return _positioning(M′)
 end

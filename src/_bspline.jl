@@ -76,7 +76,7 @@ function refinement!(allsteps; p₊=(0,0), k₊=(KnotVector(),KnotVector()), par
 
     comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((k₊₁.vector, k₊₂.vector))"
     comment = replace(comment, "Float64"=>"")
-    M = refinement(M, p₊=(p₊₁, p₊₂), k₊=(k₊₁, k₊₂))
+    M = refinement(M, (Val(p₊₁), Val(p₊₂)), (k₊₁, k₊₂))
     step = Step(M, comment)
     addstep!(allsteps, step, parent)
 end
