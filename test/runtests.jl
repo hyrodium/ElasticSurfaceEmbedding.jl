@@ -89,7 +89,7 @@ end
     result = initial_state(D, n₁=5)
     newton_onestep!(result)
     newton_onestep!(result)
-    refinement!(result, p₊=(0,1),k₊=(KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0., B/2)))
+    refinement!(result, p₊=(0,1),k₊=(KnotVector([-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B]),KnotVector([-B/2, 0., B/2])))
     newton_onestep!(result)
     newton_onestep!(result)
 
@@ -131,7 +131,7 @@ end
     result = initial_state(D, n₁=5)
     newton_onestep!(result)
     newton_onestep!(result)
-    refinement!(result, p₊=(0,1),k₊=(KnotVector(-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B),KnotVector(-B/2, 0., B/2)))
+    refinement!(result, p₊=(0,1),k₊=(KnotVector([-L+B,-L+2B,-L+3B,L-3B,L-2B,L-B]),KnotVector([-B/2, 0., B/2])))
     newton_onestep!(result)
     newton_onestep!(result)
 
