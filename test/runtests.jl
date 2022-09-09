@@ -179,7 +179,7 @@ end
 
     newton_onestep!(result, fixingmethod=:fix3points)
     newton_onestep!(result)
-    refinement!(result, p₊=(0,1), k₊=(KnotVector(),KnotVector([(i-1/2)/10])))
+    refinement!(result, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
     newton_onestep!(result)
     newton_onestep!(result)
     pin(result)

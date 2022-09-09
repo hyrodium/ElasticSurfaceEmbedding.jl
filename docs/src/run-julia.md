@@ -139,7 +139,7 @@ newton_onestep!
 ### Refinement of B-spline manifold
 
 ```julia
-spline_refinement(p₊=(0,1),k₊=(KnotVector(),KnotVector((i-1/2)/10)))
+spline_refinement(p₊=(0,1),k₊=(EmptyKnotVector(),KnotVector((i-1/2)/10)))
 ```
 
 ```@docs
@@ -216,7 +216,7 @@ initial_state(Dx(n), n₁=19)
 newton_onestep(fixingmethod=:fix3points)
 newton_onestep()
 newton_onestep()
-spline_refinement(p₊=(0,1),k₊=(KnotVector(),KnotVector(0)))
+spline_refinement(p₊=(0,1),k₊=(EmptyKnotVector(),KnotVector(0)))
 newton_onestep()
 newton_onestep()
 newton_onestep()
@@ -240,7 +240,7 @@ for i in 1:9
     newton_onestep(fixingmethod=:fix3points)
     newton_onestep()
     newton_onestep()
-    spline_refinement(p₊=(0,1),k₊=(KnotVector(),KnotVector((i-1/2)*π/(2n))))
+    spline_refinement(p₊=(0,1),k₊=(EmptyKnotVector(),KnotVector((i-1/2)*π/(2n))))
     newton_onestep()
     newton_onestep()
     newton_onestep()
@@ -275,7 +275,7 @@ initial_state(Dx(n), n₁=19)
 newton_onestep(fixingmethod=:fix3points)
 newton_onestep()
 newton_onestep()
-spline_refinement(p₊=(0,1),k₊=(KnotVector(),KnotVector(0)))
+spline_refinement(p₊=(0,1),k₊=(EmptyKnotVector(),KnotVector(0)))
 newton_onestep()
 newton_onestep()
 newton_onestep()
@@ -302,7 +302,7 @@ for i in 1:9
     newton_onestep(fixingmethod=:fix3points)
     newton_onestep()
     newton_onestep()
-    spline_refinement(p₊=(0,1),k₊=(KnotVector(),KnotVector((i-1/2)*π/(2n))))
+    spline_refinement(p₊=(0,1),k₊=(EmptyKnotVector(),KnotVector((i-1/2)*π/(2n))))
     newton_onestep()
     newton_onestep()
     newton_onestep()

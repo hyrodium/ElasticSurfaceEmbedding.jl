@@ -52,11 +52,11 @@ function _positioning(M::BSplineManifold{2})
 end
 
 """
-    spline_refinement(; p₊::Tuple{Int,Int}=(0, 0), k₊::Tuple{<:KnotVector,<:KnotVector}=(KnotVector(),KnotVector()), parent::Int=0)
+    spline_refinement(; p₊::Tuple{Int,Int}=(0, 0), k₊::Tuple{AbstractKnotVector,AbstractKnotVector}=(EmptyKnotVector(),EmptyKnotVector()), parent::Int=0)
 
 Compute a refinement of the B-spline manifold
 """
-function refinement!(allsteps; p₊=(0,0), k₊=(KnotVector(),KnotVector()), parent::Int=0)
+function refinement!(allsteps; p₊=(0,0), k₊=(EmptyKnotVector(),EmptyKnotVector()), parent::Int=0)
     parent = _validindex(allsteps, parent)
     M = loadM(allsteps, index=parent)
 
@@ -66,15 +66,15 @@ function refinement!(allsteps; p₊=(0,0), k₊=(KnotVector(),KnotVector()), par
     p₊₁, p₊₂ = p₊
     k₊₁, k₊₂ = k₊
 
-    if (k₊₁ ≠ KnotVector()) && !(k₁[1] < k₊₁[1] && k₊₁[end] < k₁[end])
+    if !iszero(k₊₁) && !(k₁[1] < k₊₁[1] && k₊₁[end] < k₁[end])
         error("given additional knots for refinement are out of range")
     end
 
-    if (k₊₂ ≠ KnotVector()) && !(k₂[1] < k₊₂[1] && k₊₂[end] < k₂[end])
+    if !iszero(k₊₂) && !(k₂[1] < k₊₂[1] && k₊₂[end] < k₂[end])
         error("given additional knots for refinement are out of range")
     end
 
-    comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((k₊₁.vector, k₊₂.vector))"
+    comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((BasicBSpline._vec(k₊₁), BasicBSpline._vec(k₊₂)))"
     comment = replace(comment, "Float64"=>"")
     M = refinement(M, (Val(p₊₁), Val(p₊₂)), (k₊₁, k₊₂))
     step = Step(M, comment)
@@ -95,8 +95,8 @@ function show_knotvector(allsteps; index=0)
     k₂′ = unique(k₂)
     msg = """
     Current knotvectors (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
-    k₁: , $(k₁.vector)
-    k₂: , $(k₂.vector)
+    k₁: , $BasicBSpline._vec((k₁))
+    k₂: , $BasicBSpline._vec((k₂))
     k₁₊: , $([(k₁′[i] + k₁′[i+1]) / 2 for i in 1:(length(k₁′)-1)])
     k₂₊: , $([(k₂′[i] + k₂′[i+1]) / 2 for i in 1:(length(k₂′)-1)])
     """
