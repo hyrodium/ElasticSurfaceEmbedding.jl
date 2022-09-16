@@ -22,7 +22,7 @@ Through this section, we treat a paraboloid ``z=x^2+y^2`` as an example.
 
 ### Load packages, and optional configuration
 Load packages with the following script.
-```julia
+```@example paraboloid
 using IntervalSets
 using BasicBSpline
 using StaticArrays
@@ -30,7 +30,7 @@ using ElasticSurfaceEmbedding
 ```
 
 ### Define the shape of surface
-```julia
+```@example paraboloid
 ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(u¹, u², u¹^2+u²^2)
 ```
 
@@ -48,8 +48,8 @@ D
 ```
 
 !!! info "Direction of the surface"
-    In the next step, we'll split the surface into elongated strips.
-    The domain of each strip should be a rectangular, and the longer direction is `u¹`, and the shorter direction is `u²`.
+    In the next step, we will split the surface into elongated strips.
+    The domain of each strip should be rectangular, and the longer direction is `u¹`, and the shorter direction is `u²`.
     The paraboloid has four‐fold symmetry, so we don't have to take care of it.
 
 ### Split the surface into strips
@@ -66,13 +66,13 @@ D_i
 
 In julia script, just define a domain of the strip with function `D(i,n)`.
 
-```julia
+```@example paraboloid
 n = 10
 D(i,n) = (-1.0..1.0, (i-1)/n..i/n)
 ```
 
 ### Check the strain prediction
-Before numerical computation, we can predict the strain with *Strain Approximation Formula*:
+Before computing the embedding numerically, we can predict the strain with *Strain Approximation Formula*:
 
 ```math
 \begin{aligned}
@@ -80,52 +80,45 @@ E_{11}^{\langle 0\rangle}&\approx\frac{1}{2}K_{[0]}B^2\left(r^2-\frac{1}{3}\righ
 \end{aligned}
 ```
 
-```julia
+```@docs
+show_strain
+```
+
+```@example paraboloid
 for i in 1:n
     show_strain(D(i,n))
 end
 ```
 
-The output information will be like this:
-
-![](img/example_strain-prediction.png)
-
 !!! tip "Allowable strain"
     Positive number means tension, and negative number means compression.
-    Empirically, it is better if the absolute value of strain is smaller than ``0.01``.
-
-```@docs
-show_strain
-```
+    Empirically, it is better if the absolute value of strain is smaller than ``0.01 (=1\%)``.
 
 ### Initial state
-If you finished checking the strain prediction, the next step is determine the initial state.
-
-From this section, the computing is done for each piece of the surface.
-First, let's calculate for ``i=1``.
-```julia
-i=1
-```
-
-As a first step, let's compute the initial state.
-```julia
-initial_state(D(i,n), n₁=19)
-```
-
-If you've configured a slack bot, you'll get a message like this:
-
-![](img/initial_state.png)
+If you finished checking the strain prediction, the next step is determination of the initial state.
 
 ```@docs
 initial_state
 initial_state!
 ```
 
+From this section, the computing is done for each piece of the surface.
+First, let's calculate for ``i=1``.
+```@example paraboloid
+i = 1
+```
+
+As a first step, let's compute the initial state.
+
+```@example paraboloid
+allsteps = initial_state(D(i,n), n₁=19)
+```
+
 ### Newton-Raphson method iteration
 
-```julia
-newton_onestep!(fixingmethod=:fix3points)
-newton_onestep!()
+```@example paraboloid
+newton_onestep!(allsteps, fixingmethod=:fix3points)
+newton_onestep!(allsteps)
 ```
 
 You can choose the fixing method from below:
@@ -138,13 +131,15 @@ newton_onestep!
 
 ### Refinement of B-spline manifold
 
-```julia
-refinement!(p₊=(0,1),k₊=(EmptyKnotVector(),KnotVector((i-1/2)/10)))
-```
-
 ```@docs
 refinement!
 ```
+
+```@example paraboloid
+refinement!(allsteps, p₊=(0,1),k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
+```
+
+The knotvector to be inserted in `refinement!` can be suggested by `show_knotvector` function.
 
 ```@docs
 show_knotvector
@@ -154,7 +149,7 @@ show_knotvector
 If you finished computing for the strip, it's time to *pin* the state.
 This pin📌 will be used for the next final step.
 
-```julia
+```@example paraboloid
 pin(result)
 ```
 
@@ -164,7 +159,7 @@ pin
 
 If you add a pin mistakenly, you can remove the pin with `remove_pin` function.
 
-```julia
+```@example paraboloid
 unpin(result, 10)
 ```
 
