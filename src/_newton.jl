@@ -27,7 +27,7 @@ function _seconds2string(Δt::Float64)
 end
 
 """
-    newton_onestep(; fixingmethod=:default, parent::Int=0)
+    newton_onestep(allsteps; fixingmethod=:default, parent::Int=0)
 
 Compute one step of Newton-Raphson method
 """

@@ -1,5 +1,5 @@
 """
-    pin(; parent::Int = 0)
+    pin(allsteps; parent::Int = 0)
 
 Add a pin 📌 for the given index
 """
@@ -10,7 +10,7 @@ function pin(allsteps; index::Int=0)
 end
 
 """
-    unpin(index::Integer)
+    unpin(allsteps; index::Integer)
 
 Remeve the pin 📌 with the given index
 """
