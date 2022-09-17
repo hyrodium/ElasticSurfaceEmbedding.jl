@@ -149,12 +149,12 @@ show_knotvector
 If you finished computing for the strip, it's time to *pin* the state.
 This pin📌 will be used for the next final step.
 
-```@example paraboloid
-pin(result)
-```
-
 ```@docs
 pin
+```
+
+```@example paraboloid
+pin(allsteps, result)
 ```
 
 If you add a pin mistakenly, you can remove the pin with `remove_pin` function.
