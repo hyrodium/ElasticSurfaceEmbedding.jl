@@ -1,26 +1,29 @@
 mutable struct Step{T<:BSplineManifold{2}}
     manifold::T
     comment::String
-    pinned::Bool
-    function Step(manifold::BSplineManifold{2},comment,pinned=false)
-        new{typeof(manifold)}(manifold,comment,pinned)
+    function Step(manifold::BSplineManifold{2},comment)
+        new{typeof(manifold)}(manifold,comment)
     end
 end
 
 struct AllSteps
-    steps::Vector{Tuple{Step,Int}}
+    steps::Vector{Step}
+    parents::Vector{Int}
+    pinned::Vector{Bool}
     function AllSteps()
-        new(Vector{Tuple{Step,Int}}())
+        new(Vector{Step}(), Vector{Int}(), Vector{Bool}())
     end
 end
 
 function addstep!(allsteps::AllSteps, step::Step, parent::Int)
-    push!(allsteps.steps, (step, parent))
+    push!(allsteps.steps, step)
+    push!(allsteps.parents, parent)
+    push!(allsteps.pinned, false)
     return allsteps
 end
 
 function parent_id(allsteps, id)
-    allsteps.steps[id][2]
+    allsteps.parents[id]
 end
 
 function nodeseries(allsteps, i)
@@ -40,8 +43,8 @@ function _tree_as_string(allsteps::AllSteps)
     for i in 1:n
         l = length(serieses[i])
         key = serieses[i][end]
-        step = allsteps.steps[key][1]
-        pinned = step.pinned
+        step = allsteps.steps[key]
+        pinned = allsteps.pinned[key]
         comment = "📌 "^pinned * step.comment
         if l == 2
             lowstring = "$(key): " * comment
@@ -85,7 +88,7 @@ function loadM(allsteps; index=0)
     if index == 0
         index = length(allsteps.steps)
     end
-    M = allsteps.steps[index][1].manifold
+    M = allsteps.steps[index].manifold
     return M
 end
 
@@ -100,8 +103,8 @@ function export_all_steps(
         colorbarsize = 0.3,
     )
     mkpath(dir)
-    for (step, i) in allsteps.steps
-        M = step.manifold
+    for i in eachindex(allsteps.steps)
+        M = allsteps.steps[i].manifold
         export_one_step(dir, M, i, maximumstrain=maximumstrain, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength, colorbarsize=colorbarsize)
     end
     export_pinned_steps(dir, allsteps, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength)
