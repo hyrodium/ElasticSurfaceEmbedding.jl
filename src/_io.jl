@@ -1,26 +1,29 @@
 mutable struct Step{T<:BSplineManifold{2}}
     manifold::T
     comment::String
-    pinned::Bool
-    function Step(manifold::BSplineManifold{2},comment,pinned=false)
-        new{typeof(manifold)}(manifold,comment,pinned)
+    function Step(manifold::BSplineManifold{2},comment)
+        new{typeof(manifold)}(manifold,comment)
     end
 end
 
 struct AllSteps
-    steps::Vector{Tuple{Step,Int}}
+    steps::Vector{Step}
+    parents::Vector{Int}
+    pinned::Vector{Bool}
     function AllSteps()
-        new(Vector{Tuple{Step,Int}}())
+        new(Vector{Step}(), Vector{Int}(), Vector{Bool}())
     end
 end
 
 function addstep!(allsteps::AllSteps, step::Step, parent::Int)
-    push!(allsteps.steps, (step, parent))
+    push!(allsteps.steps, step)
+    push!(allsteps.parents, parent)
+    push!(allsteps.pinned, false)
     return allsteps
 end
 
 function parent_id(allsteps, id)
-    allsteps.steps[id][2]
+    allsteps.parents[id]
 end
 
 function nodeseries(allsteps, i)
@@ -85,7 +88,7 @@ function loadM(allsteps; index=0)
     if index == 0
         index = length(allsteps.steps)
     end
-    M = allsteps.steps[index][1].manifold
+    M = allsteps.steps[index].manifold
     return M
 end
 
