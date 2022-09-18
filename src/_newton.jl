@@ -56,7 +56,8 @@ function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0)
         (@sprintf("%.4e", norm(Ǧ))) *
         ", computation time: " *
         _seconds2string(Δt)
-    step = Step(M, comment)
+    info = Dict(["type"=>"newton", "fixingmethod"=>string(fixingmethod)])
+    step = Step(M, comment, info)
     addstep!(allsteps, step, parent)
 end
 

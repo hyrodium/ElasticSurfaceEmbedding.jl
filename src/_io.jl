@@ -1,8 +1,9 @@
 mutable struct Step{T<:BSplineManifold{2}}
     manifold::T
     comment::String
-    function Step(manifold::BSplineManifold{2},comment)
-        new{typeof(manifold)}(manifold,comment)
+    info::Dict
+    function Step(manifold::BSplineManifold{2},comment,info)
+        new{typeof(manifold)}(manifold,comment,info)
     end
 end
 

@@ -77,7 +77,8 @@ function refinement!(allsteps; p₊=(0,0), k₊=(EmptyKnotVector(),EmptyKnotVect
     comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((BasicBSpline._vec(k₊₁), BasicBSpline._vec(k₊₂)))"
     comment = replace(comment, "Float64"=>"")
     M = refinement(M, (Val(p₊₁), Val(p₊₂)), (k₊₁, k₊₂))
-    step = Step(M, comment)
+    info = Dict(["type"=>"refinement"])
+    step = Step(M, comment, info)
     addstep!(allsteps, step, parent)
 end
 
