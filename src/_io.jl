@@ -43,8 +43,8 @@ function _tree_as_string(allsteps::AllSteps)
     for i in 1:n
         l = length(serieses[i])
         key = serieses[i][end]
-        step = allsteps.steps[key][1]
-        pinned = step.pinned
+        step = allsteps.steps[key]
+        pinned = allsteps.pinned[key]
         comment = "📌 "^pinned * step.comment
         if l == 2
             lowstring = "$(key): " * comment
@@ -103,8 +103,8 @@ function export_all_steps(
         colorbarsize = 0.3,
     )
     mkpath(dir)
-    for (step, i) in allsteps.steps
-        M = step.manifold
+    for i in eachindex(allsteps.steps)
+        M = allsteps.steps[i].manifold
         export_one_step(dir, M, i, maximumstrain=maximumstrain, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength, colorbarsize=colorbarsize)
     end
     export_pinned_steps(dir, allsteps, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength)
