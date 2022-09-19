@@ -77,7 +77,8 @@ function refinement!(allsteps; p₊=(0,0), k₊=(EmptyKnotVector(),EmptyKnotVect
     comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((BasicBSpline._vec(k₊₁), BasicBSpline._vec(k₊₂)))"
     comment = replace(comment, "Float64"=>"")
     M = refinement(M, (Val(p₊₁), Val(p₊₂)), (k₊₁, k₊₂))
-    step = Step(M, comment)
+    info = Dict(["type"=>"refinement"])
+    step = Step(M, comment, info)
     addstep!(allsteps, step, parent)
 end
 
@@ -95,8 +96,8 @@ function show_knotvector(allsteps; index=0)
     k₂′ = unique(k₂)
     msg = """
     Current knotvectors (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
-    k₁: , $BasicBSpline._vec((k₁))
-    k₂: , $BasicBSpline._vec((k₂))
+    k₁: , $(BasicBSpline._vec((k₁)))
+    k₂: , $(BasicBSpline._vec((k₂)))
     k₁₊: , $([(k₁′[i] + k₁′[i+1]) / 2 for i in 1:(length(k₁′)-1)])
     k₂₊: , $([(k₂′[i] + k₂′[i+1]) / 2 for i in 1:(length(k₂′)-1)])
     """

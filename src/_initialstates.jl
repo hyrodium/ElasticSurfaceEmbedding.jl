@@ -7,8 +7,9 @@ function initial_state(D; n₁ = 15)
     D₁, D₂ = D
     M = _initialize(D, n₁)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
+    info = Dict(["type"=>"initial"])
 
-    step = Step(M, comment)
+    step = Step(M, comment, info)
     allsteps = AllSteps()
     addstep!(allsteps, step, 0)
 end
@@ -22,8 +23,9 @@ function initial_state!(allsteps, D; n₁ = 15)
     D₁, D₂ = D
     M = _initialize(D, n₁)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
+    info = Dict(["type"=>"initial"])
 
-    step = Step(M, comment)
+    step = Step(M, comment, info)
     addstep!(allsteps, step, 0)
 end
 
