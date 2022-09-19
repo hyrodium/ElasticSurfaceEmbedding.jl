@@ -28,11 +28,11 @@ D
 \end{aligned}
 $$
 
-The domain $D$ will be split into $D_i$.
+The domain $D$ will be split into $D^{(i)}$.
 
 $$
 \begin{aligned}
-D_i
+D^{(i)}
 = [-1,1] \times \left[\frac{i-1}{10}, \frac{i}{10}\right] \qquad (i = 1,...,10)
 \end{aligned}
 $$
