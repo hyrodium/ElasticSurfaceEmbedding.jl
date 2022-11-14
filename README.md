@@ -1,6 +1,6 @@
 # Elastic Surface Embedding; Weaving Parer Strips
 
-***[Read my paper on arXiv!!](https://arxiv.org/abs/2211.06372)***
+***👉👉[Read my paper on arXiv!!](https://arxiv.org/abs/2211.06372)👈👈***
 
 ## TL;DR
 You can make a *holdable* smooth surface model with this repository.
@@ -74,7 +74,7 @@ Cut papers into strips, and weave them into the surface.
 | --- | :-- |
 
 ### ..me!:bowtie:
-| <img src="docs/src/img/me.jpg" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/). <br> Read [our paper on arXiv](https://arxiv.org/abs/2211.06372). |
+| <img src="docs/src/img/me.jpg" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/). <br> Read [my paper on arXiv](https://arxiv.org/abs/2211.06372). |
 | --- | :-- |
 
 ## Gallery
