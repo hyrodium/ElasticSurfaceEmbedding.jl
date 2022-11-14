@@ -38,9 +38,9 @@ jobs:
       - run: |
           julia -e '
             using Pkg
-            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))
-            Pkg.add(PackageSpec(url="https://github.com/hyrodium/ElasticSurfaceEmbedding.jl"))'
-      # - uses: julia-actions/julia-buildpkg@v1
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))'
+      - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v1
@@ -57,9 +57,8 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Pkg
-            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))
-            Pkg.add(PackageSpec(url="https://github.com/hyrodium/ElasticSurfaceEmbedding.jl"))
             Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))
             Pkg.instantiate()'
       # - run: |
       #     julia --project=docs -e '
