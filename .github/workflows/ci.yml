@@ -14,7 +14,7 @@ jobs:
       matrix:
         version:
           - '1'
-          - '1.6'
+          # - '1.6' disable this version because currently the BasicBSplineExporter.jl package is not registered and Manifest.toml is added.
         os:
           - ubuntu-latest
         arch:
