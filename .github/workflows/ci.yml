@@ -38,8 +38,8 @@ jobs:
       - run: |
           julia -e '
             using Pkg
-            Pkg.develop(PackageSpec(path=pwd()))
-            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))'
+            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))
+            Pkg.develop(PackageSpec(path=pwd()))'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
@@ -57,8 +57,8 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Pkg
-            Pkg.develop(PackageSpec(path=pwd()))
             Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))
+            Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
       # - run: |
       #     julia --project=docs -e '
