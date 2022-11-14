@@ -66,7 +66,7 @@ Cut papers into strips, and weave them into surface.
         <img src="img/craft_thumbnail.png">
     </div>
     <div style="display:table-cell; vertical-align:middle;">
-        Download the <a href="https://github.com/hyrodium/ElasticSurfaceEmbedding.jl/tree/develop/craft">Paraboloid example</a> and <a href="../craft">make your own surface model</a>.
+        Download and print a paraboloid example or a hyperbolic paraboloid example from <a href="https://arxiv.org/abs/2211.06372">my paper on arXiv</a>, and <a href="../craft">make your own surface model</a>.
         Laser cutting machine is useful, but it's not necessary.
     </div>
 </div>
@@ -93,7 +93,7 @@ Cut papers into strips, and weave them into surface.
         <img src="img/math_thumbnail.png">
     </div>
     <div style="display:table-cell; vertical-align:middle;">
-        Read my upcoming paper. Here's our theoretical framework:
+        Read <a href="https://arxiv.org/abs/2211.06372">my paper on arXiv</a>. Here's our theoretical framework:
         <ul>
             <li>Mathematical model: <a href="https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity">Nonlinear elasticity</a> on <a href="https://en.m.wikipedia.org/wiki/Riemannian_manifold">Riemannian manifold</a></li>
             <li>Geometric representation: <a href="https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">B-spline manifold</a></li>
@@ -113,7 +113,7 @@ Cut papers into strips, and weave them into surface.
         <ul>
             <li>Follow <a href="https://twitter.com/Hyrodium">my twitter account</a>!</li>
             <li>Visit <a href="https://hyrodium.github.io/">my website</a>!</li>
-            <li>Read my upcoming paper!</li>
+            <li>Read <a href="https://arxiv.org/abs/2211.06372">my paper on arXiv</a>!</li>
             <li>Give star to <a href="https://github.com/hyrodium/ElasticSurfaceEmbedding.jl">this repository</a>!</li>
         </ul>
     </div>

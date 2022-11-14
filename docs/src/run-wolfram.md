@@ -8,7 +8,7 @@ So, if you just want to make a surface model, you can skip this part.
 * [Wolfram Engine](https://www.wolfram.com/engine/)
 * [Wolfram Language kernel for Jupyter notebooks](https://github.com/WolframResearch/WolframLanguageForJupyter)
 
-Download my wolfram scripts from [here](https://github.com/hyrodium/ElasticSurfaceEmbedding.jl/tree/develop/wolfram).
+Clone my wolfram scripts from [ElasticSurfaceEmbedding-wolfram](https://github.com/hyrodium/ElasticSurfaceEmbedding-wolfram).
 
 ## Overview
 The main topic of this page is to give a proof of the main theorem of our thesis.

@@ -1,5 +1,7 @@
 # Elastic Surface Embedding; Weaving Parer Strips
 
+***[Read my paper on arXiv!!](https://arxiv.org/abs/2211.06372)***
+
 ## TL;DR
 You can make a *holdable* smooth surface model with this repository.
 
@@ -11,8 +13,8 @@ We determined the embedding by minimizing its elastic strain energy.
 This is the meaning of "Elastic Surface Embedding".
 
 ## Overview: How to make a surface model
-### step 1 : Define a shape of surface (and split into strips)
-The definition must consists of parametric mapping and its domain.
+### step 1: Define a shape of a surface (and split it into strips)
+The definition must consist of parametric mapping and its domain.
 For example, a paraboloid can be parametrized as below.
 
 $$
@@ -37,7 +39,7 @@ D^{(i)}
 \end{aligned}
 $$
 
-### step 2 : Numerical analysis
+### step 2: Numerical analysis
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
 For more information, read [this document](/Julia).
@@ -45,22 +47,22 @@ The image below is a result for the domain $D_1$.
 
 <img src="docs/src/img/bspline_strain.png" width="800">
 
-### step 3 : Edit on vector graphics editor
+### step 3: Edit on your favorite vector graphics editor
 The output files are SVG format.
 After editing the svg files, you can print the graphics or cut papers by laser cutting machine.
 
 <img src="docs/src/img/inkscape.png" width="800">
 
-### step 4 : Craft a paper model
+### step 4: Craft a paper model
 This is the final step.
-Cut papers into strips, and weave them into surface.
+Cut papers into strips, and weave them into the surface.
 
 <img src="docs/src/img/assembling.png" width="800">
 
 
 ## Directions: If you like..
 ### ..making crafts:scissors:
-| <img src="docs/src/img/craft.png" align="top" height="150"> | Download the [Paraboloid example](/Example/Paraboloid.pdf) and [make your own surface model](Craft). <br> Laser cutting machine is useful, but it's not necessary. |
+| <img src="docs/src/img/craft.png" align="top" height="150"> | Download and print a paraboloid example or a hyperbolic paraboloid example from [my paper on arXiv](https://arxiv.org/abs/2211.06372), and <a href="https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/craft/">make your own surface model. <br> Laser cutting machine is useful, but it's not necessary. |
 | --- | :-- |
 
 ### ..computing:octocat:
@@ -68,11 +70,11 @@ Cut papers into strips, and weave them into surface.
 | --- | :-- |
 
 ### ..mathematics or physics:globe_with_meridians:
-| <img src="docs/src/img/math.png" align="top" height="150"> | Read our upcoming paper. Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [B-spline manifold](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
+| <img src="docs/src/img/math.png" align="top" height="150"> | Read [our paper on arXiv](https://arxiv.org/abs/2211.06372). Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [B-spline manifold](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
 | --- | :-- |
 
 ### ..me!:bowtie:
-| <img src="docs/src/img/me.jpg" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/). <br> Read my upcoming paper. |
+| <img src="docs/src/img/me.jpg" align="top" height="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/). <br> Read [our paper on arXiv](https://arxiv.org/abs/2211.06372). |
 | --- | :-- |
 
 ## Gallery
