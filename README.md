@@ -66,7 +66,7 @@ Cut papers into strips, and weave them into the surface.
 
 ## Directions: If you like..
 ### ..making crafts:scissors:
-| <img src="docs/src/img/craft.png" align="top" height="150" width="150"> | Download and print a paraboloid example or a hyperbolic paraboloid example from [my paper on arXiv](https://arxiv.org/abs/2211.06372), and <a href="https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/craft/">make your own surface model. <br> Laser cutting machine is useful, but it's not necessary. |
+| <img src="docs/src/img/craft.png" align="top" height="150" width="150"> | Print Appendix B from [my paper on arXiv](https://arxiv.org/abs/2211.06372), and <a href="https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/craft/">make your own surface model. <br> Laser cutting machine is useful, but it's not necessary. |
 | --- | :-- |
 
 ### ..computing:octocat:
