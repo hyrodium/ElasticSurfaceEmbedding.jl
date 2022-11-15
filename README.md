@@ -28,13 +28,13 @@ $$
 u^1 \\
 u^2 \\
 (u^1)^2+(u^2)^2
-\end{pmatrix} \\
-D
-&= [-1,1] \times [-1,1]
+\end{pmatrix} &
+(u^1, u^2)
+\in [-1,1] \times [-1,1]
 \end{aligned}
 $$
 
-The domain $D$ will be split into $D^{(i)}$.
+The domain will be split into $D^{(i)}$.
 
 $$
 \begin{aligned}
@@ -47,7 +47,7 @@ $$
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
 For more information, read [this document](/Julia).
-The image below is a result for the domain $D_1$.
+The image below is a result for the domain $D^{(1)}$.
 
 <img src="docs/src/img/bspline_strain.png" width="800">
 
