@@ -182,7 +182,7 @@ end
     refinement!(result, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
     newton_onestep!(result)
     newton_onestep!(result)
-    pin(result)
+    pin!(result)
 
     # img_a = load(joinpath(dir_result_a,"Paraboloid","append","Paraboloid-5_append.png"))
     # img_b = load(joinpath(dir_result_b,"Paraboloid","append","Paraboloid-5_append.png"))
