@@ -136,7 +136,7 @@ refinement!
 ```
 
 ```@example paraboloid
-refinement!(allsteps, p₊=(0,1),k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
+refinement!(allsteps, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
 ```
 
 The knotvector to be inserted in `refinement!` can be suggested by `show_knotvector` function.
@@ -147,24 +147,40 @@ show_knotvector
 
 ### Pin the state
 If you finished computing for the strip, it's time to *pin* the state.
-This pin📌 will be used for the next final step.
+This pin📌 will be used for the the final export step.
 
 ```@docs
-pin
+pin!
 ```
 
 ```@example paraboloid
-pin(allsteps, result)
+pin!(allsteps)
 ```
 
-If you add a pin mistakenly, you can remove the pin with `remove_pin` function.
-
-```@example paraboloid
-unpin(result, 10)
-```
+If you add a pin mistakenly, you can remove the pin with `unpin!` function.
 
 ```@docs
-unpin
+unpin!
+```
+
+```@example paraboloid
+unpin!(allsteps, 4)
+```
+
+### Compute more
+```@example paraboloid
+newton_onestep!(allsteps)
+newton_onestep!(allsteps)
+pin!(allsteps)
+
+i = 2
+initial_state!(allsteps, D(i,n), n₁=19)
+newton_onestep!(allsteps, fixingmethod=:fix3points)
+newton_onestep!(allsteps)
+refinement!(allsteps, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
+newton_onestep!(allsteps)
+newton_onestep!(allsteps)
+pin!(allsteps)
 ```
 
 ### Export all pinned shapes
@@ -174,18 +190,22 @@ This is the final step of the computational process.
 export_pinned_steps
 ```
 
-This will create SVG files in `~/ElasticSurfaceEmbedding-Result/Paraboloid/pinned/`.
+```@example paraboloid
+export_pinned_steps(".", allsteps, unitlength=(50, "mm"), mesh=(20,1), xlims=(-2,2), ylims=(-0.3,0.3))
+```
 
-You can edit these files, and craft them into curved surface shape.
+This will create SVG files in `./pinned`.
 
+`pinned/pinned-6.svg`
+![](pinned/pinned-6.svg)
+
+`pinned/pinned-12.svg`
+![](pinned/pinned-12.svg)
+
+The all outputs for `i in 1:10` will be like this:
 ![](img/Paraboloid3.png)
 
-### Utilities
-If you want to resume the computation, you can just call `settings` like this:
-
-```julia
-settings("Paraboloid")
-```
+You can edit these files, and craft them into curved surface shape.
 
 ## Other examples
 ### Catenoid

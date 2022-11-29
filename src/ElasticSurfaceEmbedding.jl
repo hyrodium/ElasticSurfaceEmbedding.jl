@@ -19,12 +19,14 @@ import ColorBlendModes
 using BasicBSpline
 using BasicBSplineExporter
 
+# Tree structure
+export AllSteps
 # Numerical computing
 export initial_state, initial_state!
 export newton_onestep!
 export refinement!
-# Pin related
-export pin, unpin
+# Pin
+export pin!, unpin!
 # Exports
 export export_all_steps, export_pinned_steps
 # utilities

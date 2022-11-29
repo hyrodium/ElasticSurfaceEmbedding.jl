@@ -27,11 +27,11 @@ function _seconds2string(Δt::Float64)
 end
 
 """
-    newton_onestep(allsteps; fixingmethod=:default, parent::Int=0)
+    newton_onestep(allsteps, parent::Int=0; fixingmethod=:default)
 
 Compute one step of Newton-Raphson method
 """
-function newton_onestep!(allsteps; fixingmethod=:default, parent::Int=0)
+function newton_onestep!(allsteps, parent::Int=0; fixingmethod=:default)
     if fixingmethod == :default
         fixed = _defaultorientation
     elseif fixingmethod == :fix3points

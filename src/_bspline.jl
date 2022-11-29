@@ -56,7 +56,7 @@ end
 
 Compute a refinement of the B-spline manifold
 """
-function refinement!(allsteps; p₊=(0,0), k₊=(EmptyKnotVector(),EmptyKnotVector()), parent::Int=0)
+function refinement!(allsteps, parent::Int=0; p₊=(0,0), k₊=(EmptyKnotVector(),EmptyKnotVector()))
     parent = _validindex(allsteps, parent)
     M = loadM(allsteps, index=parent)
 
