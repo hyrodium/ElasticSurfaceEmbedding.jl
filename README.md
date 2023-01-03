@@ -46,7 +46,7 @@ $$
 ### step 2: Numerical analysis
 This is the main part.
 Split the surface into pieces, and compute the Eucledian embedding.
-For more information, read [this document](/Julia).
+For more information, read [this document](https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/run-julia/).
 The image below is a result for the domain $D^{(1)}$.
 
 <img src="docs/src/img/bspline_strain.png" width="800">
@@ -70,7 +70,7 @@ Cut papers into strips, and weave them into the surface.
 | --- | :-- |
 
 ### ..computing:octocat:
-| <img src="docs/src/img/juliawolfram.png" align="top" height="150" width="150"> | Clone this repository, and run the [Julia code](/Julia) or [Wolfram code](/Wolfram)! <br> Any issues and pull requests are welcomed. |
+| <img src="docs/src/img/juliawolfram.png" align="top" height="150" width="150"> | Clone this repository, and run the [Julia code](https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/run-julia/) or [Wolfram code](https://github.com/hyrodium/ElasticSurfaceEmbedding-wolfram)! <br> Any issues and pull requests are welcomed. |
 | --- | :-- |
 
 ### ..mathematics or physics:globe_with_meridians:
