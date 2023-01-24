@@ -85,3 +85,5 @@ Cut papers into strips, and weave them into the surface.
 <img src="docs/src/img/Paraboloid1.png" width="160"> <img src="docs/src/img/Paraboloid2.png" width="160"> <img src="docs/src/img/Paraboloid3.png" width="160"> <img src="docs/src/img/Paraboloid4.jpg" width="160"> <img src="docs/src/img/Paraboloid5.png" width="160">
 
 <img src="docs/src/img/CatenoidHelicoid.gif" width="400">
+
+<img src="docs/src/img/stereographicprojection.png" width="800">
