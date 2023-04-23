@@ -1,7 +1,7 @@
 using Test
 using IntervalSets
 using StaticArrays
-# using Images
+using Images
 using LinearAlgebra
 using BasicBSpline
 using ElasticSurfaceEmbedding
@@ -28,10 +28,9 @@ function delta(f, B)
     return maximum(f.(xs))-minimum(f.(xs))
 end
 
-dir_result_a = joinpath(@__DIR__, "result_a")
-dir_result_b = joinpath(@__DIR__, "result_b")
+dir_result = joinpath(@__DIR__, "result")
 
-rm(dir_result_b, recursive=true, force=true)
+rm(dir_result, recursive=true, force=true)
 
 @testset "Rhomboid" begin
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹+u²)
@@ -184,8 +183,9 @@ end
     newton_onestep!(result)
     pin!(result)
 
-    # img_a = load(joinpath(dir_result_a,"Paraboloid","append","Paraboloid-5_append.png"))
-    # img_b = load(joinpath(dir_result_b,"Paraboloid","append","Paraboloid-5_append.png"))
+    export_all_steps(joinpath(dir_result, "Paraboloid"), result)
+
+    # img_b = load(joinpath(dir_result,"Paraboloid","append","Paraboloid-5_append.png"))
     # d = Euclidean()
     # @test d(RGB.(img_a), RGB.(img_b)) < 0.0001
 end
