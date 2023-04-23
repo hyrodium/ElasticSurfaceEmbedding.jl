@@ -11,7 +11,7 @@ You can make a *holdable* smooth surface model with this repository.
 
 ![](docs/src/img/overview.png)
 
-The main part of this project is how to determine a planer shape from a strip on curved surface.
+The main part of this project is how to determine a planer shape from a strip on the target curved surface.
 In mathematics, this mapping is called "embedding".
 We determined the embedding by minimizing its elastic strain energy.
 This is the meaning of "Elastic Surface Embedding".
@@ -45,15 +45,15 @@ $$
 
 ### step 2: Numerical analysis
 This is the main part.
-Split the surface into pieces, and compute the Eucledian embedding.
+Split the surface into pieces, and compute the Euclidean embedding.
 For more information, read [this document](https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/run-julia/).
 The image below is a result for the domain $D^{(1)}$.
 
 <img src="docs/src/img/bspline_strain.png" width="800">
 
 ### step 3: Edit on your favorite vector graphics editor
-The output files are SVG format.
-After editing the svg files, you can print the graphics or cut papers by laser cutting machine.
+The output files are in SVG format.
+After editing the SVG files, you can print the graphics or cut papers with a laser cutting machine.
 
 <img src="docs/src/img/inkscape.png" width="800">
 
