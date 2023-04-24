@@ -171,20 +171,25 @@ end
 
 @testset "Paraboloid" begin
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(u¹,u²,u¹^2+u²^2)
-    D(i,n) = (-1.0..1.0, (i-1)/n..i/n)
     name = "Paraboloid"
 
-    i=3
-    result = initial_state(D(i,10))
-
-    newton_onestep!(result, fixingmethod=:fix3points)
-    newton_onestep!(result)
-    refinement!(result, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
-    newton_onestep!(result)
-    newton_onestep!(result)
-    pin!(result)
+    N = 10
+    result = AllSteps()
+    for i in 1:N
+        D = (-1.0..1.0, (i-1)/N..i/N)
+        result = initial_state!(result, D(i,10), n₁=25)
+        newton_onestep!(result, fixingmethod=:fix3points)
+        newton_onestep!(result)
+        refinement!(result, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
+        newton_onestep!(result)
+        newton_onestep!(result)
+        pin!(result)
+    end
 
     export_all_steps(joinpath(dir_result, "Paraboloid"), result)
+    files_pinned =  readdir(joinpath(dir_result,"Paraboloid","pinned"))
+
+    @test length(files_pinned) == N
 
     # img_b = load(joinpath(dir_result,"Paraboloid","append","Paraboloid-5_append.png"))
     # d = Euclidean()
