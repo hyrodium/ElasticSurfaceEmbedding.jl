@@ -202,28 +202,6 @@ function export_pinned_steps(
         M = loadM(allsteps, index=index)
         filename = joinpath(dir, "pinned", "pinned-$(index).svg")
         save_svg(filename, M, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength[1], points=false)
-
-        # P = bsplinespaces(M)
-        # p₁, p₂ = degree.(P)
-        # k₁, k₂ = knotvector.(P)
-        # D₁, D₂ = k₁[1+p₁]..k₁[end-p₁], k₂[1+p₂]..k₂[end-p₂]
-
-        # 𝒆⁽⁰⁾₁(u¹,u²) = normalize(𝒑₁₍ₜ₎(M,u¹,u²))
-        # 𝒆⁽⁰⁾₂(u¹,u²) = [0.0 -1.0; 1.0 0.0] * 𝒆⁽⁰⁾₁(u¹,u²)
-        # 𝒑a(i, t) = 𝒑₍ₜ₎(M, t, leftendpoint(D₂)) + 𝒆⁽⁰⁾₂(t, leftendpoint(D₂)) * i * cutout[1] / unitlength[1]
-        # 𝒑b(i, t) = 𝒑₍ₜ₎(M, t, rightendpoint(D₂)) - 𝒆⁽⁰⁾₂(t, rightendpoint(D₂)) * i * cutout[1] / unitlength[1]
-        # _svgcurve(
-        #     [[t -> 𝒑a(i, t) for i in 0:cutout[2]]..., [t -> 𝒑b(i, t) for i in 0:cutout[2]]...],
-        #     D₁,
-        #     filename = joinpath(dir, "pinned", "$(_get_tag(index))-cutout.svg"),
-        #     up = UP,
-        #     down = DOWN,
-        #     right = RIGHT,
-        #     left = LEFT,
-        #     thickness = 0.1,
-        #     mesh = mesh,
-        #     unitlength = unitlength[1]
-        # )
     end
 
     for name in readdir(dir_pinned)

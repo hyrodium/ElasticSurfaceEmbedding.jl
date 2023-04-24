@@ -11,26 +11,6 @@ function _changeunit(path_svg, units::Pair{String,String})
     write(path_svg, join(lines,"\n"))
 end
 
-function _svgcurve(𝒑s::Array{T,1}, I::ClosedInterval; filename, up=5, down=-5, right=5, left=-5, thickness=1, mesh=50, unitlength=100) where {T<:Any}
-    k = collect(range(endpoints(I)..., length = mesh + 1))
-    n = length(k) - 1
-    step = unitlength
-    Drawing((right - left) * step, (up - down) * step, filename)
-
-    Luxor.origin(-left * step, up * step)
-    background("white")
-
-    setline(thickness)
-    sethue("cyan")
-
-    for 𝒑 in 𝒑s
-        BézPth = BezierPath([BezierPathSegment(map(p -> BasicBSplineExporter._luxor_pt(p, step), BasicBSplineExporter._bezier(𝒑, k[i], k[i+1]))...) for i in 1:n])
-        drawbezierpath(BézPth, :stroke)
-    end
-
-    finish()
-end
-
 function _colorbar(; max=1.000, filename="ColorBar.png", width=100)
     up = 4
     down = -4
