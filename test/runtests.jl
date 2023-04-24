@@ -177,7 +177,7 @@ end
     result = AllSteps()
     for i in 1:N
         D = (-1.0..1.0, (i-1)/N..i/N)
-        result = initial_state!(result, D(i,10), n₁=25)
+        result = initial_state!(result, D, n₁=25)
         newton_onestep!(result, fixingmethod=:fix3points)
         newton_onestep!(result)
         refinement!(result, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
