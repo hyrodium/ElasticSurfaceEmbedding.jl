@@ -78,6 +78,12 @@ end
     newton_onestep!(result)
     M = ElasticSurfaceEmbedding.loadM(result)
     @test norm([ElasticSurfaceEmbedding.E(M, u¹, u²) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
+
+    @test result.pinned[2] == false
+    pin!(result, 2)
+    @test result.pinned[2] == true
+    unpin!(result, 2)
+    @test result.pinned[2] == false
 end
 
 @testset "Sphere-thin" begin
