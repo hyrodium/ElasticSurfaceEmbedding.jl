@@ -1,12 +1,12 @@
 function _arrayofvector2array(a::AbstractArray{SVector{2,Float64},2})
-    n1,n2 = size(a)
-    a_2dim = [a[i1,i2][j] for i1 in 1:n1, i2 in 1:n2, j in 1:2]
+    n1, n2 = size(a)
+    a_2dim = [a[i1, i2][j] for i1 in 1:n1, i2 in 1:n2, j in 1:2]
     return a_2dim
 end
 
 function _array2arrayofvector(a::Array{<:Real,3})
-    n1,n2 = size(a)
-    a_vec = [SVector{2}(a[i1,i2,:]) for i1 in 1:n1, i2 in 1:n2]
+    n1, n2 = size(a)
+    a_vec = [SVector{2}(a[i1, i2, :]) for i1 in 1:n1, i2 in 1:n2]
     return a_vec
 end
 
@@ -16,7 +16,7 @@ Affine transform of control points.
 function _affine(𝒂::Matrix{<:SVector}, A::SMatrix{2,2}, b::SVector{2})
     # x'=Ax+b
     n₁, n₂ = size(𝒂)
-    return [(A*𝒂[I₁,I₂]+b) for I₁ in 1:n₁, I₂ in 1:n₂]
+    return [(A * 𝒂[I₁, I₂] + b) for I₁ in 1:n₁, I₂ in 1:n₂]
 end
 
 function _rotate(𝒂::Matrix{<:SVector})
@@ -24,7 +24,7 @@ function _rotate(𝒂::Matrix{<:SVector})
     ind0 = [(n₁ + 1) ÷ 2, (n₂ + 1) ÷ 2]
     ind1 = ind0 - [0, 1]
     v = 𝒂[ind1...] - 𝒂[ind0...]
-    R = - (@SMatrix [v[2] -v[1]; v[1] v[2]]) / norm(v)
+    R = -(@SMatrix [v[2] -v[1]; v[1] v[2]]) / norm(v)
     return _affine(𝒂, R, SVector(0.0, 0.0))
 end
 
@@ -35,9 +35,9 @@ function _center(𝒂::Matrix{<:SVector})
     x_max = maximum(xs)
     y_min = minimum(ys)
     y_max = maximum(ys)
-    x = (x_min+x_max)/2
-    y = (y_min+y_max)/2
-    return _affine(𝒂, one(SMatrix{2,2}), -SVector(x,y))
+    x = (x_min + x_max) / 2
+    y = (y_min + y_max) / 2
+    return _affine(𝒂, one(SMatrix{2,2}), -SVector(x, y))
 end
 
 function _positioning(𝒂::Matrix{<:SVector})
@@ -48,7 +48,7 @@ function _positioning(M::BSplineManifold{2})
     Ps = bsplinespaces(M)
     𝒂 = controlpoints(M)
     𝒂′ = _positioning(𝒂)
-    return BSplineManifold(𝒂′,Ps)
+    return BSplineManifold(𝒂′, Ps)
 end
 
 """
@@ -56,9 +56,9 @@ end
 
 Compute a refinement of the B-spline manifold
 """
-function refinement!(allsteps, parent::Int=0; p₊=(0,0), k₊=(EmptyKnotVector(),EmptyKnotVector()))
+function refinement!(allsteps, parent::Int = 0; p₊ = (0, 0), k₊ = (EmptyKnotVector(), EmptyKnotVector()))
     parent = _validindex(allsteps, parent)
-    M = loadM(allsteps, index=parent)
+    M = loadM(allsteps, index = parent)
 
     P₁, P₂ = bsplinespaces(M)
     k₁, k₂ = knotvector(P₁), knotvector(P₂)
@@ -75,9 +75,9 @@ function refinement!(allsteps, parent::Int=0; p₊=(0,0), k₊=(EmptyKnotVector(
     end
 
     comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((BasicBSpline._vec(k₊₁), BasicBSpline._vec(k₊₂)))"
-    comment = replace(comment, "Float64"=>"")
+    comment = replace(comment, "Float64" => "")
     M = refinement(M, (Val(p₊₁), Val(p₊₂)), (k₊₁, k₊₂))
-    info = Dict(["type"=>"refinement"])
+    info = Dict(["type" => "refinement"])
     step = Step(M, comment, info)
     addstep!(allsteps, step, parent)
 end
@@ -87,8 +87,8 @@ end
 
 Show current knotvector and suggestions for knot insertions (with given index).
 """
-function show_knotvector(allsteps; index=0)
-    M = loadM(allsteps, index=index)
+function show_knotvector(allsteps; index = 0)
+    M = loadM(allsteps, index = index)
 
     P = bsplinespaces(M)
     k₁, k₂ = knotvector.(P)

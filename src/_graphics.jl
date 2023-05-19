@@ -7,11 +7,11 @@ function _changeunit(path_svg, units::Pair{String,String})
     end
     script = read(path_svg, String)
     lines = split(script, "\n")
-    lines[2] = replace(lines[2],"$(old_unit)\""=>"$(new_unit)\"")
-    write(path_svg, join(lines,"\n"))
+    lines[2] = replace(lines[2], "$(old_unit)\"" => "$(new_unit)\"")
+    write(path_svg, join(lines, "\n"))
 end
 
-function _colorbar(; max=1.000, filename="ColorBar.png", width=100)
+function _colorbar(; max = 1.000, filename = "ColorBar.png", width = 100)
     up = 4
     down = -4
     right = 4.6
@@ -35,8 +35,16 @@ function _colorbar(; max=1.000, filename="ColorBar.png", width=100)
     text(" " * @sprintf("%.6f", 0), BasicBSplineExporter._luxor_pt([1.4, -0.28 * FontSize], unit))
     text("-" * @sprintf("%.6f", max), BasicBSplineExporter._luxor_pt([1.4, -Length - 0.28 * FontSize], unit))
     line(BasicBSplineExporter._luxor_pt([0.5, 0], unit), BasicBSplineExporter._luxor_pt([1.2, 0], unit), :stroke)
-    line(BasicBSplineExporter._luxor_pt([0.5, -Length], unit), BasicBSplineExporter._luxor_pt([1.2, -Length], unit), :stroke)
-    line(BasicBSplineExporter._luxor_pt([0.5, Length], unit), BasicBSplineExporter._luxor_pt([1.2, Length], unit), :stroke)
+    line(
+        BasicBSplineExporter._luxor_pt([0.5, -Length], unit),
+        BasicBSplineExporter._luxor_pt([1.2, -Length], unit),
+        :stroke,
+    )
+    line(
+        BasicBSplineExporter._luxor_pt([0.5, Length], unit),
+        BasicBSplineExporter._luxor_pt([1.2, Length], unit),
+        :stroke,
+    )
 
     finish()
 end

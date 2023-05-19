@@ -2,8 +2,8 @@ mutable struct Step{T<:BSplineManifold{2}}
     manifold::T
     comment::String
     info::Dict
-    function Step(manifold::BSplineManifold{2},comment,info)
-        new{typeof(manifold)}(manifold,comment,info)
+    function Step(manifold::BSplineManifold{2}, comment, info)
+        new{typeof(manifold)}(manifold, comment, info)
     end
 end
 
@@ -78,14 +78,14 @@ function Base.show(io::IO, allsteps::AllSteps)
 end
 
 function _validindex(allsteps, index::Int)
-    if index==0
+    if index == 0
         return length(allsteps.steps)
     else
         return index
     end
 end
 
-function loadM(allsteps; index=0)
+function loadM(allsteps; index = 0)
     if index == 0
         index = length(allsteps.steps)
     end
@@ -94,35 +94,45 @@ function loadM(allsteps; index=0)
 end
 
 function export_all_steps(
-        dir,
-        allsteps::AllSteps;
-        maximumstrain = 0,
-        xlims = (-5,5),
-        ylims = (-5,5),
-        mesh = (10,1),
-        unitlength = (100,"mm"),
-        colorbarsize = 0.3,
-    )
+    dir,
+    allsteps::AllSteps;
+    maximumstrain = 0,
+    xlims = (-5, 5),
+    ylims = (-5, 5),
+    mesh = (10, 1),
+    unitlength = (100, "mm"),
+    colorbarsize = 0.3,
+)
     mkpath(dir)
     for i in eachindex(allsteps.steps)
         M = allsteps.steps[i].manifold
-        export_one_step(dir, M, i, maximumstrain=maximumstrain, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength, colorbarsize=colorbarsize)
+        export_one_step(
+            dir,
+            M,
+            i,
+            maximumstrain = maximumstrain,
+            xlims = xlims,
+            ylims = ylims,
+            mesh = mesh,
+            unitlength = unitlength,
+            colorbarsize = colorbarsize,
+        )
     end
-    export_pinned_steps(dir, allsteps, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength)
-    write(joinpath(dir,"log.txt"), _tree_as_string(allsteps))
+    export_pinned_steps(dir, allsteps, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = unitlength)
+    write(joinpath(dir, "log.txt"), _tree_as_string(allsteps))
 end
 
 function export_one_step(
-        dir,
-        M::BSplineManifold{2},
-        index::Integer;
-        maximumstrain = 0,
-        xlims = (-5,5),
-        ylims = (-5,5),
-        mesh = (10,1),
-        unitlength = (100,"mm"),
-        colorbarsize = 0.3,
-    )
+    dir,
+    M::BSplineManifold{2},
+    index::Integer;
+    maximumstrain = 0,
+    xlims = (-5, 5),
+    ylims = (-5, 5),
+    mesh = (10, 1),
+    unitlength = (100, "mm"),
+    colorbarsize = 0.3,
+)
     if maximumstrain ≤ 0
         MS = _compute_minmax_strain(M)
         maximumstrain = max(-MS[1], MS[2])
@@ -142,13 +152,13 @@ function export_one_step(
     path_png_colorbar = joinpath(dir, "colorbar", "colorbar-$(index).png")
     path_png_combined = joinpath(dir, "combined", "combined-$(index).png")
 
-    colorfunc(u¹,u²) = normalized_strain(u¹,u²) * RGB(0.5, -0.5, -0.5) + RGB(0.5, 0.5, 0.5) # red to cyan
+    colorfunc(u¹, u²) = normalized_strain(u¹, u²) * RGB(0.5, -0.5, -0.5) + RGB(0.5, 0.5, 0.5) # red to cyan
 
-    save_svg(path_svg_bspline, M, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=Int(unitlength[1]))
-    save_png(path_png_bspline, M, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=Int(unitlength[1]))
-    save_png(path_png_strain, M, colorfunc, xlims=xlims, ylims=ylims, unitlength=Int(aa*unitlength[1]))
-    _colorbar(max=maximumstrain, filename=path_png_colorbar, width=aa*colorbarsize*width)
-    _changeunit(path_svg_bspline, "pt"=>unitlength[2])
+    save_svg(path_svg_bspline, M, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = Int(unitlength[1]))
+    save_png(path_png_bspline, M, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = Int(unitlength[1]))
+    save_png(path_png_strain, M, colorfunc, xlims = xlims, ylims = ylims, unitlength = Int(aa * unitlength[1]))
+    _colorbar(max = maximumstrain, filename = path_png_colorbar, width = aa * colorbarsize * width)
+    _changeunit(path_svg_bspline, "pt" => unitlength[2])
 
     img_bspline = load(path_png_bspline)
     img_strain = load(path_png_strain)
@@ -162,14 +172,22 @@ function export_one_step(
     size_strain = size(img_strain)
     size_colorbar = size(img_colorbar)
 
-    img_bspline_white_background = ColorBlendModes.blend.(RGB(1,1,1), img_bspline, op=ColorBlendModes.CompositeSourceOver)
-    img_strain_white_background = ColorBlendModes.blend.(RGB(1,1,1), img_strain, op=ColorBlendModes.CompositeSourceOver)
+    img_bspline_white_background =
+        ColorBlendModes.blend.(RGB(1, 1, 1), img_bspline, op = ColorBlendModes.CompositeSourceOver)
+    img_strain_white_background =
+        ColorBlendModes.blend.(RGB(1, 1, 1), img_strain, op = ColorBlendModes.CompositeSourceOver)
     Δ = size_strain .- size_colorbar
 
     img_offset_colorbar = OffsetArray(img_colorbar, Δ...)
     img_strain_with_colorbar = copy(img_strain_white_background)
-    img_strain_with_colorbar[axes(img_offset_colorbar)...] = ColorBlendModes.blend.(img_strain_with_colorbar[axes(img_offset_colorbar)...], img_offset_colorbar, op=ColorBlendModes.CompositeSourceOver)
-    img_strain_with_colorbar = [RGB(mean(img_strain_with_colorbar[5i-4:5i, 5j-4:5j])) for i in 1:size_bspline[1], j in 1:size_bspline[2]]
+    img_strain_with_colorbar[axes(img_offset_colorbar)...] =
+        ColorBlendModes.blend.(
+            img_strain_with_colorbar[axes(img_offset_colorbar)...],
+            img_offset_colorbar,
+            op = ColorBlendModes.CompositeSourceOver,
+        )
+    img_strain_with_colorbar =
+        [RGB(mean(img_strain_with_colorbar[5i-4:5i, 5j-4:5j])) for i in 1:size_bspline[1], j in 1:size_bspline[2]]
     # img_strain_with_colorbar = imresize(img_strain_with_colorbar, (800,800)) # could be coded like this, but the previous one is better for anti-alias
     img_combined = hcat(img_bspline_white_background, img_strain_with_colorbar)
 
@@ -182,30 +200,30 @@ end
 Export all pinned states for final output
 """
 function export_pinned_steps(
-        dir::AbstractString,
-        allsteps::AllSteps;
-        xlims=(-5,5),
-        ylims=(-5,5),
-        mesh=(10,1),
-        unitlength::Tuple{<:Real,<:AbstractString},
-        # cutout=(0.1, 5),
-    )
+    dir::AbstractString,
+    allsteps::AllSteps;
+    xlims = (-5, 5),
+    ylims = (-5, 5),
+    mesh = (10, 1),
+    unitlength::Tuple{<:Real,<:AbstractString},
+    # cutout=(0.1, 5),
+)
     dir_pinned = joinpath(dir, "pinned")
     # Delete current pinned directory
-    rm(dir_pinned, recursive=true, force=true)
+    rm(dir_pinned, recursive = true, force = true)
     # Make path to pinned directory
     mkpath(dir_pinned)
 
     pinned_states = _find_all_pinned_states(allsteps)
 
     for index in pinned_states
-        M = loadM(allsteps, index=index)
+        M = loadM(allsteps, index = index)
         filename = joinpath(dir, "pinned", "pinned-$(index).svg")
-        save_svg(filename, M, xlims=xlims, ylims=ylims, mesh=mesh, unitlength=unitlength[1], points=false)
+        save_svg(filename, M, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = unitlength[1], points = false)
     end
 
     for name in readdir(dir_pinned)
         file = joinpath(dir_pinned, name)
-        _changeunit(file, "pt"=>unitlength[2])
+        _changeunit(file, "pt" => unitlength[2])
     end
 end

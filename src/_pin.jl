@@ -3,7 +3,7 @@
 
 Add a pin 📌 for the given index
 """
-function pin!(allsteps, index::Int=0)
+function pin!(allsteps, index::Int = 0)
     index = _validindex(allsteps, index)
     allsteps.pinned[index] = true
     return allsteps
@@ -14,7 +14,7 @@ end
 
 Remeve the pin 📌 with the given index
 """
-function unpin!(allsteps, index::Int=0)
+function unpin!(allsteps, index::Int = 0)
     index = _validindex(allsteps, index)
     allsteps.pinned[index] = false
     return allsteps
