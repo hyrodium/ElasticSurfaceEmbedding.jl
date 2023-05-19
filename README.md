@@ -3,8 +3,7 @@
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev)
 [![Build Status](https://github.com/hyrodium/ElasticSurfaceEmbedding.jl/workflows/CI/badge.svg)](https://github.com/hyrodium/ElasticSurfaceEmbedding.jl/actions)
 [![Coverage](https://codecov.io/gh/hyrodium/ElasticSurfaceEmbedding.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/hyrodium/ElasticSurfaceEmbedding.jl)
-
-***👉👉[Read my paper on arXiv!!](https://arxiv.org/abs/2211.06372)👈👈***
+[![arXiv](https://img.shields.io/badge/math.DG-arXiv%3A2211.06372-B31B1B.svg)](https://arxiv.org/abs/2211.06372)
 
 ## TL;DR
 You can make a *holdable* smooth surface model with this repository.
