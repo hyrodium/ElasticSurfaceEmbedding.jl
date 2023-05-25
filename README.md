@@ -5,6 +5,10 @@
 [![Coverage](https://codecov.io/gh/hyrodium/ElasticSurfaceEmbedding.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/hyrodium/ElasticSurfaceEmbedding.jl)
 [![arXiv](https://img.shields.io/badge/math.DG-arXiv%3A2211.06372-B31B1B.svg)](https://arxiv.org/abs/2211.06372)
 
+**Notice**
+I will be giving a lightning talk about this repository at JuliaCon 2023.
+[Creating smooth surface models with ElasticSurfaceEmbedding.jl](https://pretalx.com/juliacon2023/talk/RBHAER/)
+
 ## TL;DR
 You can make a *holdable* smooth surface model with this repository.
 
