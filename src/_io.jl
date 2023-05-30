@@ -214,7 +214,7 @@ function export_pinned_steps(
     # Make path to pinned directory
     mkpath(dir_pinned)
 
-    pinned_states = _find_all_pinned_states(allsteps)
+    pinned_states = findall(allsteps.pinned)
 
     for index in pinned_states
         M = loadM(allsteps, index = index)

@@ -19,7 +19,3 @@ function unpin!(allsteps, index::Int = 0)
     allsteps.pinned[index] = false
     return allsteps
 end
-
-function _find_all_pinned_states(allsteps)
-    return findall(allsteps.pinned)
-end
