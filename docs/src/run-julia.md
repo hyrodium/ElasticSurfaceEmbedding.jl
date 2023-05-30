@@ -111,14 +111,14 @@ i = 1
 As a first step, let's compute the initial state.
 
 ```@example paraboloid
-allsteps = initial_state(D(i,n), n₁=19)
+steptree = initial_state(D(i,n), n₁=19)
 ```
 
 ### Newton-Raphson method iteration
 
 ```@example paraboloid
-newton_onestep!(allsteps, fixingmethod=:fix3points)
-newton_onestep!(allsteps)
+newton_onestep!(steptree, fixingmethod=:fix3points)
+newton_onestep!(steptree)
 ```
 
 You can choose the fixing method from below:
@@ -136,7 +136,7 @@ refinement!
 ```
 
 ```@example paraboloid
-refinement!(allsteps, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
+refinement!(steptree, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
 ```
 
 The knotvector to be inserted in `refinement!` can be suggested by `show_knotvector` function.
@@ -154,7 +154,7 @@ pin!
 ```
 
 ```@example paraboloid
-pin!(allsteps)
+pin!(steptree)
 ```
 
 If you add a pin mistakenly, you can remove the pin with `unpin!` function.
@@ -164,23 +164,23 @@ unpin!
 ```
 
 ```@example paraboloid
-unpin!(allsteps, 4)
+unpin!(steptree, 4)
 ```
 
 ### Compute more
 ```@example paraboloid
-newton_onestep!(allsteps)
-newton_onestep!(allsteps)
-pin!(allsteps)
+newton_onestep!(steptree)
+newton_onestep!(steptree)
+pin!(steptree)
 
 i = 2
-initial_state!(allsteps, D(i,n), n₁=19)
-newton_onestep!(allsteps, fixingmethod=:fix3points)
-newton_onestep!(allsteps)
-refinement!(allsteps, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
-newton_onestep!(allsteps)
-newton_onestep!(allsteps)
-pin!(allsteps)
+initial_state!(steptree, D(i,n), n₁=19)
+newton_onestep!(steptree, fixingmethod=:fix3points)
+newton_onestep!(steptree)
+refinement!(steptree, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
+newton_onestep!(steptree)
+newton_onestep!(steptree)
+pin!(steptree)
 ```
 
 ### Export all pinned shapes
@@ -191,7 +191,7 @@ export_pinned_steps
 ```
 
 ```@example paraboloid
-export_pinned_steps(".", allsteps, unitlength=(50, "mm"), mesh=(20,1), xlims=(-2,2), ylims=(-0.3,0.3))
+export_pinned_steps(".", steptree, unitlength=(50, "mm"), mesh=(20,1), xlims=(-2,2), ylims=(-0.3,0.3))
 ```
 
 This will create SVG files in `./pinned`.

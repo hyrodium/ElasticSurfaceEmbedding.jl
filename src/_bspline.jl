@@ -52,13 +52,13 @@ function _positioning(M::BSplineManifold{2})
 end
 
 """
-    refinement!(allsteps; p₊::Tuple{Int,Int}=(0, 0), k₊::Tuple{AbstractKnotVector,AbstractKnotVector}=(EmptyKnotVector(),EmptyKnotVector()), parent::Int=0)
+    refinement!(steptree; p₊::Tuple{Int,Int}=(0, 0), k₊::Tuple{AbstractKnotVector,AbstractKnotVector}=(EmptyKnotVector(),EmptyKnotVector()), parent::Int=0)
 
 Compute a refinement of the B-spline manifold
 """
-function refinement!(allsteps, parent::Int = 0; p₊ = (0, 0), k₊ = (EmptyKnotVector(), EmptyKnotVector()))
-    parent = _validindex(allsteps, parent)
-    M = loadM(allsteps, index = parent)
+function refinement!(steptree, parent::Int = 0; p₊ = (0, 0), k₊ = (EmptyKnotVector(), EmptyKnotVector()))
+    parent = _validindex(steptree, parent)
+    M = loadM(steptree, index = parent)
 
     P₁, P₂ = bsplinespaces(M)
     k₁, k₂ = knotvector(P₁), knotvector(P₂)
@@ -79,7 +79,7 @@ function refinement!(allsteps, parent::Int = 0; p₊ = (0, 0), k₊ = (EmptyKnot
     M = refinement(M, (Val(p₊₁), Val(p₊₂)), (k₊₁, k₊₂))
     info = Dict(["type" => "refinement"])
     step = Step(M, comment, info)
-    addstep!(allsteps, step, parent)
+    addstep!(steptree, step, parent)
 end
 
 """
@@ -87,8 +87,8 @@ end
 
 Show current knotvector and suggestions for knot insertions (with given index).
 """
-function show_knotvector(allsteps; index = 0)
-    M = loadM(allsteps, index = index)
+function show_knotvector(steptree; index = 0)
+    M = loadM(steptree, index = index)
 
     P = bsplinespaces(M)
     k₁, k₂ = knotvector.(P)

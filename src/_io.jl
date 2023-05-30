@@ -16,36 +16,36 @@ struct StepTree
     end
 end
 
-function addstep!(allsteps::StepTree, step::Step, parent::Int)
-    push!(allsteps.steps, step)
-    push!(allsteps.parents, parent)
-    push!(allsteps.pinned, false)
-    return allsteps
+function addstep!(steptree::StepTree, step::Step, parent::Int)
+    push!(steptree.steps, step)
+    push!(steptree.parents, parent)
+    push!(steptree.pinned, false)
+    return steptree
 end
 
-function parent_id(allsteps, id)
-    allsteps.parents[id]
+function parent_id(steptree, id)
+    steptree.parents[id]
 end
 
-function nodeseries(allsteps, i)
+function nodeseries(steptree, i)
     series = [i]
     while i ≠ 0
-        i = parent_id(allsteps, i)
+        i = parent_id(steptree, i)
         pushfirst!(series, i)
     end
     return series
 end
 
-function _tree_as_string(allsteps::StepTree)
-    n = length(allsteps.steps)
-    serieses = [nodeseries(allsteps, i) for i in 1:n]
+function _tree_as_string(steptree::StepTree)
+    n = length(steptree.steps)
+    serieses = [nodeseries(steptree, i) for i in 1:n]
     sort!(serieses)
     lowstrings = String[]
     for i in 1:n
         l = length(serieses[i])
         key = serieses[i][end]
-        step = allsteps.steps[key]
-        pinned = allsteps.pinned[key]
+        step = steptree.steps[key]
+        pinned = steptree.pinned[key]
         comment = "📌 "^pinned * step.comment
         if l == 2
             lowstring = "$(key): " * comment
@@ -73,29 +73,29 @@ function _tree_as_string(allsteps::StepTree)
     return outsting
 end
 
-function Base.show(io::IO, allsteps::StepTree)
-    print(io, _tree_as_string(allsteps))
+function Base.show(io::IO, steptree::StepTree)
+    print(io, _tree_as_string(steptree))
 end
 
-function _validindex(allsteps, index::Int)
+function _validindex(steptree, index::Int)
     if index == 0
-        return length(allsteps.steps)
+        return length(steptree.steps)
     else
         return index
     end
 end
 
-function loadM(allsteps; index = 0)
+function loadM(steptree; index = 0)
     if index == 0
-        index = length(allsteps.steps)
+        index = length(steptree.steps)
     end
-    M = allsteps.steps[index].manifold
+    M = steptree.steps[index].manifold
     return M
 end
 
 function export_all_steps(
     dir,
-    allsteps::StepTree;
+    steptree::StepTree;
     maximumstrain = 0,
     xlims = (-5, 5),
     ylims = (-5, 5),
@@ -104,8 +104,8 @@ function export_all_steps(
     colorbarsize = 0.3,
 )
     mkpath(dir)
-    for i in eachindex(allsteps.steps)
-        M = allsteps.steps[i].manifold
+    for i in eachindex(steptree.steps)
+        M = steptree.steps[i].manifold
         export_one_step(
             dir,
             M,
@@ -118,8 +118,8 @@ function export_all_steps(
             colorbarsize = colorbarsize,
         )
     end
-    export_pinned_steps(dir, allsteps, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = unitlength)
-    write(joinpath(dir, "log.txt"), _tree_as_string(allsteps))
+    export_pinned_steps(dir, steptree, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = unitlength)
+    write(joinpath(dir, "log.txt"), _tree_as_string(steptree))
 end
 
 function export_one_step(
@@ -201,7 +201,7 @@ Export all pinned steps for final output
 """
 function export_pinned_steps(
     dir::AbstractString,
-    allsteps::StepTree;
+    steptree::StepTree;
     xlims = (-5, 5),
     ylims = (-5, 5),
     mesh = (10, 1),
@@ -214,10 +214,10 @@ function export_pinned_steps(
     # Make path to pinned directory
     mkpath(dir_pinned)
 
-    pinned_steps = findall(allsteps.pinned)
+    pinned_steps = findall(steptree.pinned)
 
     for index in pinned_steps
-        M = loadM(allsteps, index = index)
+        M = loadM(steptree, index = index)
         filename = joinpath(dir, "pinned", "pinned-$(index).svg")
         save_svg(filename, M, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = unitlength[1], points = false)
     end

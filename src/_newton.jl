@@ -27,11 +27,11 @@ function _seconds2string(Δt::Float64)
 end
 
 """
-    newton_onestep(allsteps, parent::Int=0; fixingmethod=:default)
+    newton_onestep(steptree, parent::Int=0; fixingmethod=:default)
 
 Compute one step of Newton-Raphson method
 """
-function newton_onestep!(allsteps, parent::Int = 0; fixingmethod = :default)
+function newton_onestep!(steptree, parent::Int = 0; fixingmethod = :default)
     if fixingmethod == :default
         fixed = _defaultorientation
     elseif fixingmethod == :fix3points
@@ -39,8 +39,8 @@ function newton_onestep!(allsteps, parent::Int = 0; fixingmethod = :default)
     else
         error("No method for $(fixingmethod). Use :default or :fix3points.")
     end
-    parent = _validindex(allsteps, parent)
-    M = loadM(allsteps, index = parent)
+    parent = _validindex(steptree, parent)
+    M = loadM(steptree, index = parent)
 
     n₁, n₂ = dim.(bsplinespaces(M))
 
@@ -58,7 +58,7 @@ function newton_onestep!(allsteps, parent::Int = 0; fixingmethod = :default)
         _seconds2string(Δt)
     info = Dict(["type" => "newton", "fixingmethod" => string(fixingmethod)])
     step = Step(M, comment, info)
-    addstep!(allsteps, step, parent)
+    addstep!(steptree, step, parent)
 end
 
 function _newton(M::BSplineManifold{2,p,<:SVector}, fix_method) where {p}

@@ -1,21 +1,21 @@
 """
-    pin(allsteps, parent::Int = 0)
+    pin(steptree, parent::Int = 0)
 
 Add a pin 📌 for the given index
 """
-function pin!(allsteps, index::Int = 0)
-    index = _validindex(allsteps, index)
-    allsteps.pinned[index] = true
-    return allsteps
+function pin!(steptree, index::Int = 0)
+    index = _validindex(steptree, index)
+    steptree.pinned[index] = true
+    return steptree
 end
 
 """
-    unpin(allsteps, index::Integer)
+    unpin(steptree, index::Integer)
 
 Remeve the pin 📌 with the given index
 """
-function unpin!(allsteps, index::Int = 0)
-    index = _validindex(allsteps, index)
-    allsteps.pinned[index] = false
-    return allsteps
+function unpin!(steptree, index::Int = 0)
+    index = _validindex(steptree, index)
+    steptree.pinned[index] = false
+    return steptree
 end
