@@ -197,7 +197,7 @@ end
 """
     export_pinned_steps(; unitlength = (10, "mm"), cutout = (0.1, 5), mesh::Int = 60)
 
-Export all pinned states for final output
+Export all pinned steps for final output
 """
 function export_pinned_steps(
     dir::AbstractString,
@@ -214,9 +214,9 @@ function export_pinned_steps(
     # Make path to pinned directory
     mkpath(dir_pinned)
 
-    pinned_states = findall(allsteps.pinned)
+    pinned_steps = findall(allsteps.pinned)
 
-    for index in pinned_states
+    for index in pinned_steps
         M = loadM(allsteps, index = index)
         filename = joinpath(dir, "pinned", "pinned-$(index).svg")
         save_svg(filename, M, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = unitlength[1], points = false)

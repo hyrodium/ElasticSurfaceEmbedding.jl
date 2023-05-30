@@ -145,8 +145,8 @@ The knotvector to be inserted in `refinement!` can be suggested by `show_knotvec
 show_knotvector
 ```
 
-### Pin the state
-If you finished computing for the strip, it's time to *pin* the state.
+### Pin the step
+If you finished computing for the strip, it's time to *pin* the step.
 This pin📌 will be used for the the final export step.
 
 ```@docs
