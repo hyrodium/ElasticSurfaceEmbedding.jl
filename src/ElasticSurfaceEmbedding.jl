@@ -20,7 +20,7 @@ using BasicBSpline
 using BasicBSplineExporter
 
 # Tree structure
-export AllSteps
+export StepTree
 # Numerical computing
 export initial_state, initial_state!
 export newton_onestep!

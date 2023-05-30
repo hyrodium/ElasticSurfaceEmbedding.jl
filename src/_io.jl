@@ -7,16 +7,16 @@ mutable struct Step{T<:BSplineManifold{2}}
     end
 end
 
-struct AllSteps
+struct StepTree
     steps::Vector{Step}
     parents::Vector{Int}
     pinned::Vector{Bool}
-    function AllSteps()
+    function StepTree()
         new(Vector{Step}(), Vector{Int}(), Vector{Bool}())
     end
 end
 
-function addstep!(allsteps::AllSteps, step::Step, parent::Int)
+function addstep!(allsteps::StepTree, step::Step, parent::Int)
     push!(allsteps.steps, step)
     push!(allsteps.parents, parent)
     push!(allsteps.pinned, false)
@@ -36,7 +36,7 @@ function nodeseries(allsteps, i)
     return series
 end
 
-function _tree_as_string(allsteps::AllSteps)
+function _tree_as_string(allsteps::StepTree)
     n = length(allsteps.steps)
     serieses = [nodeseries(allsteps, i) for i in 1:n]
     sort!(serieses)
@@ -73,7 +73,7 @@ function _tree_as_string(allsteps::AllSteps)
     return outsting
 end
 
-function Base.show(io::IO, allsteps::AllSteps)
+function Base.show(io::IO, allsteps::StepTree)
     print(io, _tree_as_string(allsteps))
 end
 
@@ -95,7 +95,7 @@ end
 
 function export_all_steps(
     dir,
-    allsteps::AllSteps;
+    allsteps::StepTree;
     maximumstrain = 0,
     xlims = (-5, 5),
     ylims = (-5, 5),
@@ -201,7 +201,7 @@ Export all pinned steps for final output
 """
 function export_pinned_steps(
     dir::AbstractString,
-    allsteps::AllSteps;
+    allsteps::StepTree;
     xlims = (-5, 5),
     ylims = (-5, 5),
     mesh = (10, 1),

@@ -10,7 +10,7 @@ function initial_state(D; n₁ = 15)
     info = Dict(["type" => "initial"])
 
     step = Step(M, comment, info)
-    allsteps = AllSteps()
+    allsteps = StepTree()
     addstep!(allsteps, step, 0)
 end
 

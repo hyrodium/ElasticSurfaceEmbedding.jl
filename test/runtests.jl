@@ -192,7 +192,7 @@ end
     name = "Paraboloid"
 
     N = 10
-    result = AllSteps()
+    result = StepTree()
     for i in 1:N
         D = (-1.0 .. 1.0, (i - 1) / N .. i / N)
         show_strain(D)
