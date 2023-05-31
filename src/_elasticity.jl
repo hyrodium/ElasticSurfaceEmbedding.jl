@@ -35,7 +35,7 @@ function _compute_minmax_strain(M)
     return (minimum(E), maximum(E))
 end
 
-function _predict_minmax_strain(D)
+function _predict_minmax_strain(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     D₁, D₂ = D
     mesh = (500, 50)  # TODO
 
@@ -52,7 +52,7 @@ end
 
 Show the predicted maximum strain and, if possible, also the computed strain with the given index.
 """
-function show_strain(D; index = 0)
+function show_strain(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}; index = 0)
     minE, maxE = _predict_minmax_strain(D)
 
     D₁, D₂ = D

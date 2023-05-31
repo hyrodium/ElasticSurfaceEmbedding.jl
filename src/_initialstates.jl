@@ -3,7 +3,7 @@
 
 Compute the initial state, by solving a ODE of center curve.
 """
-function initial_state(D; n₁ = 15)
+function initial_state(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}; n₁ = 15)
     D₁, D₂ = D
     M = _initialize(D, n₁)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
@@ -19,7 +19,7 @@ end
 
 Compute the initial state, by solving a ODE of center curve.
 """
-function initial_state!(steptree, D; n₁ = 15)
+function initial_state!(steptree, D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}; n₁ = 15)
     D₁, D₂ = D
     M = _initialize(D, n₁)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
@@ -29,7 +29,7 @@ function initial_state!(steptree, D; n₁ = 15)
     addstep!(steptree, step, 0)
 end
 
-function _initialize(D, n₁)
+function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n₁)
     D₁, D₂ = D
 
     # Definition for center curve

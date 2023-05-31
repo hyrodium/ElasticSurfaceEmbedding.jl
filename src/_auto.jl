@@ -1,4 +1,4 @@
-function auto_allsteps(D)
+function auto_allsteps(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     auto_allsteps!(StepTree(), D)
 end
 
