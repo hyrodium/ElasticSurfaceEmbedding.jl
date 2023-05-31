@@ -31,6 +31,8 @@ export pin!, unpin!
 export export_all_steps, export_pinned_steps
 # utilities
 export show_strain, show_knotvector
+# auto
+export auto_allsteps, auto_allsteps!
 
 include("_constants.jl")
 include("_graphics.jl")
