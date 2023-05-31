@@ -41,5 +41,6 @@ include("_io.jl")
 include("_initialstates.jl")
 include("_newton.jl")
 include("_pin.jl")
+include("_auto.jl")
 
 end # module
