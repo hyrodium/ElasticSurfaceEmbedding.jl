@@ -2,6 +2,14 @@ function auto_allsteps(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     auto_allsteps!(StepTree(), D)
 end
 
+function auto_allsteps(Ds::Vector{<:Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}})
+    steptree = StepTree()
+    for D in Ds
+        auto_allsteps!(steptree, D)
+    end
+    return steptree
+end
+
 function auto_allsteps!(steptree::StepTree, D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     n₁ = 25
     _, D₂ = D
