@@ -5,9 +5,12 @@ using Images
 using LinearAlgebra
 using BasicBSpline
 using ElasticSurfaceEmbedding
+using Aqua
 import ElasticSurfaceEmbedding.𝝂
 import ElasticSurfaceEmbedding.𝒑₁₍ₜ₎
 import ElasticSurfaceEmbedding.𝒑₂₍ₜ₎
+
+Aqua.test_all(ElasticSurfaceEmbedding; ambiguities=false)
 
 function L²(f, B)
     n = 240

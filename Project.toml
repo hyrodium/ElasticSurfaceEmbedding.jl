@@ -1,7 +1,7 @@
 name = "ElasticSurfaceEmbedding"
 uuid = "bcf6de08-7633-46ab-86e2-ee57f9a67390"
 authors = ["hyrodium <hyrodium@gmail.com>"]
-version = "0.0.1"
+version = "0.0.3-dev"
 
 [deps]
 BasicBSpline = "4c5d9882-2acf-4ea4-9e48-968fd4518195"
@@ -12,7 +12,6 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
-ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Luxor = "ae8d54c2-7ccd-5906-9d76-62fc9837b5bc"
@@ -22,21 +21,23 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
+Aqua = "0.6"
 BasicBSpline = "0.5, 0.6, 0.7, 0.8, 0.9"
+BasicBSplineExporter = "0.0.6"
 ColorBlendModes = "0.2"
 Colors = "0.12"
 FastGaussQuadrature = "0.4, 0.5"
 FileIO = "1.11"
 ForwardDiff = "0.10"
-ImageIO = "0.5, 0.6"
 IntervalSets = "0.5, 0.6, 0.7"
 Luxor = "2.17, 3.0"
 OffsetArrays = "1.10"
 StaticArrays = "1.2"
 
 [extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "Images"]
+test = ["Test", "Images", "Aqua"]
