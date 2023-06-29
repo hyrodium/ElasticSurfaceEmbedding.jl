@@ -1,3 +1,6 @@
 {
-    "theme": "list"
+    "theme": "list",
+    "properties":{
+        "notebook": "true"
+    }
 }
