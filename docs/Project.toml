@@ -1,4 +1,5 @@
 [deps]
+BasicBSpline = "4c5d9882-2acf-4ea4-9e48-968fd4518195"
 BasicBSplineExporter = "769ccd65-a659-4118-b5e3-8f57c631b3e0"
 BasicBSplineFitting = "0b67037f-a240-4a3f-af2e-8325c7d59380"
 DemoCards = "311a05b2-6137-4a5a-b473-18580a3d38b5"
