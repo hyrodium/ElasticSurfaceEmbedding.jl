@@ -119,7 +119,7 @@ for i in 1:10
 end
 
 # The output files will be saved as `embedding-$(i).svg`.
-# By modifying these files, we can place all of the shapes in B4 paper like this:
+# By modifying these files, we can place all of the shapes in yatsugiri-size (八ツ切, approximately 270×390 mm) paper like this:
 
 # ![](../assets/sgp4.svg)
 
