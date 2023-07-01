@@ -2,6 +2,7 @@
     "order": [
         "paraboloid.jl",
         "hyperbolic_paraboloid.jl",
+        "helicatenoid.jl",
         "stereographicprojection.jl"
     ]
 }
