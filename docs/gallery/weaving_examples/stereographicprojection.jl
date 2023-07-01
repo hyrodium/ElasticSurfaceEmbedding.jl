@@ -4,6 +4,8 @@
 # description: A point light illuminates the grid points on the ground.
 # ---
 
+A point light illuminates the grid points on the ground.
+
 # ![](../assets/stereographicprojection.jpg)
 
 # # Load packages

@@ -4,6 +4,8 @@
 # description: Weaving a simple curved surface with positive curvature.
 # ---
 
+Weaving a simple curved surface with positive curvature.
+
 # ![](../assets/paraboloid.jpg)
 
 # ## Load packages

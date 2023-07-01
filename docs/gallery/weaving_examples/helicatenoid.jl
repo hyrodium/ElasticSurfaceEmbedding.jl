@@ -4,6 +4,8 @@
 # description: Weaving a transformable curved surface from catenoid to helicoid.
 # ---
 
+Weaving a transformable curved surface from catenoid to helicoid.
+
 # ![](../assets/helicatenoid.jpg)
 
 # ## Load packages
@@ -15,12 +17,12 @@ using ElasticSurfaceEmbedding
 # ## Define the shape of the surface (non-periodic direction)
 ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u²)*cosh(u¹),sin(u²)*cosh(u¹),u¹)
 n=9
-Dx(n) = (-π/2..π/2,-π/(4n)..π/(4n))
+Da(n) = (-π/2..π/2,-π/(4n)..π/(4n))
 
 # ## Compute the shape of the embeddings
-show_strain(Dx(n))
+show_strain(Da(n))
 
-steptree = initial_state(Dx(n), n₁=33)
+steptree = initial_state(Da(n), n₁=33)
 newton_onestep!(steptree, fixingmethod=:fix3points)
 newton_onestep!(steptree)
 newton_onestep!(steptree)
@@ -38,17 +40,17 @@ export_pinned_steps("helicatenoid-a", steptree, unitlength=(40,"mm"), mesh=(18,1
 
 # ## Define the shape of the surface (periodic direction)
 ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cosh(u²),sin(u¹)*cosh(u²),u²)
-Dy(i,n) = (-π..π,(i-1)*π/(2n)..(i)*π/(2n))
+Db(i,n) = (-π..π,(i-1)*π/(2n)..(i)*π/(2n))
 
 ## Check the maximum strain
 for i in 1:9
-    show_strain(Dy(i,n))
+    show_strain(Db(i,n))
 end
 
 ## Numerical computing
 steptree = StepTree()
 for i in 1:9
-    initial_state!(steptree, Dy(i,n), n₁=33)
+    initial_state!(steptree, Db(i,n), n₁=33)
     newton_onestep!(steptree, fixingmethod=:fix3points)
     newton_onestep!(steptree)
     newton_onestep!(steptree)

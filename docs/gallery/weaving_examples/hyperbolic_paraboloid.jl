@@ -4,6 +4,8 @@
 # description: Weaving a simple curved surface with negative curvature.
 # ---
 
+Weaving a simple curved surface with negative curvature.
+
 # ![](../assets/hyperbolic_paraboloid.jpg)
 
 # ## Load packages
