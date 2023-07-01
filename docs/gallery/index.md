@@ -1,2 +1,3 @@
+# [Gallery](@id gallery)
 
 {{{democards}}}
