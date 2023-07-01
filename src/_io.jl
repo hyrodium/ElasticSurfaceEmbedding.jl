@@ -215,15 +215,14 @@ function export_pinned_steps(
     mkpath(dir_pinned)
 
     pinned_steps = findall(steptree.pinned)
+    paths_output = Vector{String}(undef, length(pinned_steps))
 
-    for index in pinned_steps
+    for (i, index) in enumerate(pinned_steps)
         M = loadM(steptree, index = index)
-        filename = joinpath(dir, "pinned", "pinned-$(index).svg")
-        save_svg(filename, M, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = unitlength[1], points = false)
+        path_svg = joinpath(dir_pinned, "pinned-$(index).svg")
+        save_svg(path_svg, M, xlims = xlims, ylims = ylims, mesh = mesh, unitlength = unitlength[1], points = false)
+        _changeunit(path_svg, "pt" => unitlength[2])
+        paths_output[i] = path_svg
     end
-
-    for name in readdir(dir_pinned)
-        file = joinpath(dir_pinned, name)
-        _changeunit(file, "pt" => unitlength[2])
-    end
+    return paths_output
 end
