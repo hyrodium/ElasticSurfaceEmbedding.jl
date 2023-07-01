@@ -34,7 +34,7 @@ for i in 1:10
     pin!(steptree)
 end
 
-# ## Export the shape in SVG format
+# ## Export the shapes in SVG format
 export_pinned_steps("paraboloid", steptree, xlims=(-2,2), ylims=(-2,2), unitlength=(100,"mm"), mesh=(20,1))
 
 # ![](paraboloid/pinned/pinned-9.svg)
