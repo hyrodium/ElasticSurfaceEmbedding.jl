@@ -14,7 +14,7 @@ jobs:
       matrix:
         version:
           - '1'
-          # - '1.6' disable this version because currently the BasicBSplineExporter.jl package is not registered and Manifest.toml is added.
+          - '1.6'
         os:
           - ubuntu-latest
         arch:
@@ -35,6 +35,10 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
+      - run: |
+          julia --project=. -e '
+            using Pkg
+            Pkg.add(PackageSpec(url="https://github.com/hyrodium/BasicBSplineExporter.jl"))'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
