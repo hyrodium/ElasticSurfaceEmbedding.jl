@@ -65,7 +65,7 @@ unitlength = (200, "mm")
 r = 0.025
 
 # ## Export all embedded shapes with arcs
-mkdir("stereographicprojection")
+mkpath("stereographicprojection")
 for i in 1:10
     M = svector2point(steptree.steps[6i].manifold, unitlength)
     D¹ = domain(bsplinespaces(M)[1])
