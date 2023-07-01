@@ -34,6 +34,8 @@ pin!(steptree)
 # ## Export the shape in SVG format
 export_pinned_steps("helicatenoid-a", steptree, unitlength=(40,"mm"), mesh=(18,1))
 
+# ![](helicatenoid-a/pinned/pinned-9.svg)
+
 # ## Define the shape of the surface (periodic direction)
 ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cosh(u²),sin(u¹)*cosh(u²),u²)
 Dy(i,n) = (-π..π,(i-1)*π/(2n)..(i)*π/(2n))
@@ -48,8 +50,10 @@ steptree = StepTree()
 for i in 1:9
     initial_state!(steptree, Dy(i,n), n₁=33)
     newton_onestep!(steptree, fixingmethod=:fix3points)
-    newton_onestep!(steptree, )
-    newton_onestep!(steptree, )
+    newton_onestep!(steptree)
+    newton_onestep!(steptree)
+    newton_onestep!(steptree)
+    newton_onestep!(steptree)
     refinement!(steptree, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)*π/(2n)])))
     newton_onestep!(steptree)
     newton_onestep!(steptree)
@@ -58,3 +62,7 @@ end
 
 # ## Export the shapes in SVG format
 export_pinned_steps("helicatenoid-b", steptree, unitlength=(40,"mm"), mesh=(36,1))
+
+# ![](helicatenoid-b/pinned/pinned-9.svg) ![](helicatenoid-b/pinned/pinned-18.svg) ![](helicatenoid-b/pinned/pinned-27.svg)
+# ![](helicatenoid-b/pinned/pinned-36.svg) ![](helicatenoid-b/pinned/pinned-45.svg) ![](helicatenoid-b/pinned/pinned-54.svg)
+# ![](helicatenoid-b/pinned/pinned-63.svg) ![](helicatenoid-b/pinned/pinned-72.svg) ![](helicatenoid-b/pinned/pinned-81.svg)

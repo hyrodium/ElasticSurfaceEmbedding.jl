@@ -33,4 +33,15 @@ for i in 1:10
 end
 
 # ## Export the shape in SVG format
-export_pinned_steps("paraboloid", steptree, xlims=(-2,2), ylims=(-2,2), unitlength=(100,"mm"), mesh=(20,1))
+export_pinned_steps("hyperbolic_paraboloid", steptree, xlims=(-2,2), ylims=(-2,2), unitlength=(100,"mm"), mesh=(20,1))
+
+# ![](hyperbolic_paraboloid/pinned/pinned-9.svg)
+# ![](hyperbolic_paraboloid/pinned/pinned-18.svg)
+# ![](hyperbolic_paraboloid/pinned/pinned-27.svg)
+# ![](hyperbolic_paraboloid/pinned/pinned-36.svg)
+# ![](hyperbolic_paraboloid/pinned/pinned-45.svg)
+# ![](hyperbolic_paraboloid/pinned/pinned-54.svg)
+# ![](hyperbolic_paraboloid/pinned/pinned-63.svg)
+# ![](hyperbolic_paraboloid/pinned/pinned-72.svg)
+# ![](hyperbolic_paraboloid/pinned/pinned-81.svg)
+# ![](hyperbolic_paraboloid/pinned/pinned-90.svg)
