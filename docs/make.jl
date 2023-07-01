@@ -22,7 +22,6 @@ makedocs(;
         "Craft" => "craft.md",
         "Numerical computation" => "run-julia.md",
         "Symbolic computation" => "run-wolfram.md",
-        "Theoretical Framework" => "theory.md",
         "Gallery" => gallery_demopage,
         # "Function Reference" => "functionreference.md",
     ],

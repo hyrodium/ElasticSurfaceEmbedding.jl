@@ -11,9 +11,17 @@ pkg> add https://github.com/hyrodium/ElasticSurfaceEmbedding.jl
 ```
 
 ## Overview of our method
+Our theoretical framework is based on:
+
+* Mathematical model: Nonlinear elasticity on Riemannian manifold
+* Geometric representation: B-spline manifold
+* Numerical analysis: Galerkin method, Newton-Raphson method
+
 The computation process proceeds as shown in the following flowchart (from our paper):
 
 ![](img/flowchart.png)
+
+For more information, read [our paper](https://arxiv.org/abs/2211.06372) or contact [me](https://twitter.com/Hyrodium)!
 
 ## Example: Paraboloid
 Through this section, we treat a paraboloid ``z=x^2+y^2`` as an example.
