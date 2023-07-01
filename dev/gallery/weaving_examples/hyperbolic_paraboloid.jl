@@ -21,7 +21,7 @@ for i in 1:10
     pin!(steptree)
 end
 
-export_pinned_steps("paraboloid", steptree, xlims=(-2,2), ylims=(-2,2), unitlength=(100,"mm"), mesh=(20,1))
+export_pinned_steps("hyperbolic_paraboloid", steptree, xlims=(-2,2), ylims=(-2,2), unitlength=(100,"mm"), mesh=(20,1))
 
 # This file was generated using Literate.jl, https://github.com/fredrikekre/Literate.jl
 

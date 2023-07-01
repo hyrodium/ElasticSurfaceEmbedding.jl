@@ -47,6 +47,7 @@ ylims=(-1,1)
 unitlength = (200, "mm")
 r = 0.025
 
+mkdir("stereographicprojection")
 for i in 1:10
     M = svector2point(steptree.steps[6i].manifold, unitlength)
     D¹ = domain(bsplinespaces(M)[1])
@@ -58,7 +59,7 @@ for i in 1:10
     width = (xlims[2] - xlims[1]) * unitlength[1]
     height = (ylims[2] - ylims[1]) * unitlength[1]
 
-    filepath = "embedding-$(i).svg"
+    filepath = joinpath("stereographicprojection", "embedding-$(i).svg")
     Drawing(width, height, filepath)
     origin()
     background("white")
