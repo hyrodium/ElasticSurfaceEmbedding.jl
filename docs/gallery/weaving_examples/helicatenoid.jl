@@ -6,7 +6,12 @@
 
 # Weaving a transformable curved surface from catenoid to helicoid.
 
-# ![](../assets/helicatenoid.jpg)
+# ```@raw html
+# <div class="videoWrapper">
+#   <!-- Copy & Pasted from YouTube -->
+#   <iframe width="560" height="315" src="https://www.youtube.com/embed/Gp6XkPLCw7s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+# </div>
+# ```
 
 # ## Load packages
 using IntervalSets
