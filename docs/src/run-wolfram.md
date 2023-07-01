@@ -23,11 +23,15 @@ There are two theorems in [our paper](https://arxiv.org/abs/2211.06372).
     ```
     where ``K_{[0]}`` is the Gaussian curvature along the center curve ``C_{[0]}`` of the reference state ``M_{[0]}``, ``r`` is a normalized breadth-directional coordinate (``−1 \le r \le 1``). 
 
+![](img/approx_strain.png)
+
 !!! info "Theorem.  Approximation of Embedding"
     Let ``C_{[0]}`` be the center curve of ``M_{[0]}``, ``\kappa_{[0]}`` be its geodesic curvature, ``B`` be the breadth from center curve of ``M_{[0]}``. Similarly, let ``C_{[t]}`` be the center curve of ``M_{[t]}`` , ``\kappa_{[t]}`` be its planer curvature. If the breadth ``B`` is sufficiently small, then the following approximation is satisfied.
     ```math
     g_{[t]}|_C \approx g_{[0]}|_C, \quad \kappa_{[t]} \approx \kappa_{[0]}.
     ```
+
+![](img/approx_embedding.png)
 
 The proof is too hard to calculate by hand, so we wrote code to solve this problem by Wolfram language.
 
