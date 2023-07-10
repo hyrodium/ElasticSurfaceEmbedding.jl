@@ -97,10 +97,10 @@ function export_all_steps(
     dir,
     steptree::StepTree;
     maximumstrain = 0,
-    xlims = (-5, 5),
-    ylims = (-5, 5),
+    xlims = (-2, 2),
+    ylims = (-2, 2),
     mesh = (10, 1),
-    unitlength = (100, "mm"),
+    unitlength::Tuple{<:Real,<:AbstractString} = (50, "mm"),
     colorbarsize = 0.3,
 )
     mkpath(dir)
@@ -127,10 +127,10 @@ function export_one_step(
     M::BSplineManifold{2},
     index::Integer;
     maximumstrain = 0,
-    xlims = (-5, 5),
-    ylims = (-5, 5),
+    xlims = (-2, 2),
+    ylims = (-2, 2),
     mesh = (10, 1),
-    unitlength = (100, "mm"),
+    unitlength::Tuple{<:Real,<:AbstractString} = (50, "mm"),
     colorbarsize = 0.3,
 )
     if maximumstrain ≤ 0
@@ -202,10 +202,10 @@ Export all pinned steps for final output
 function export_pinned_steps(
     dir::AbstractString,
     steptree::StepTree;
-    xlims = (-5, 5),
-    ylims = (-5, 5),
+    xlims = (-2, 2),
+    ylims = (-2, 2),
     mesh = (10, 1),
-    unitlength::Tuple{<:Real,<:AbstractString},
+    unitlength::Tuple{<:Real,<:AbstractString} = (50, "mm"),
     # cutout=(0.1, 5),
 )
     dir_pinned = joinpath(dir, "pinned")
