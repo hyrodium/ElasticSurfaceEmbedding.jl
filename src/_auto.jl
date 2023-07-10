@@ -11,9 +11,8 @@ function auto_allsteps(Ds::Vector{<:Tuple{ClosedInterval{<:Real}, ClosedInterval
 end
 
 function auto_allsteps!(steptree::StepTree, D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
-    n₁ = 25
     _, D₂ = D
-    steptree = initial_state!(steptree, D, n₁=n₁)
+    steptree = initial_state!(steptree, D)
     newton_onestep!(steptree, fixingmethod=:fix3points)
     newton_onestep!(steptree)
     refinement!(steptree, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([mean(D₂)])))
