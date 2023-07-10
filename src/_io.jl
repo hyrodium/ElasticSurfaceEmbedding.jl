@@ -99,7 +99,7 @@ function export_all_steps(
     maximumstrain = 0,
     xlims = (-2, 2),
     ylims = (-2, 2),
-    mesh = (10, 1),
+    mesh = (20, 1),
     unitlength::Tuple{<:Real,<:AbstractString} = (50, "mm"),
     colorbarsize = 0.3,
 )
@@ -129,7 +129,7 @@ function export_one_step(
     maximumstrain = 0,
     xlims = (-2, 2),
     ylims = (-2, 2),
-    mesh = (10, 1),
+    mesh = (20, 1),
     unitlength::Tuple{<:Real,<:AbstractString} = (50, "mm"),
     colorbarsize = 0.3,
 )
@@ -204,7 +204,7 @@ function export_pinned_steps(
     steptree::StepTree;
     xlims = (-2, 2),
     ylims = (-2, 2),
-    mesh = (10, 1),
+    mesh = (20, 1),
     unitlength::Tuple{<:Real,<:AbstractString} = (50, "mm"),
     # cutout=(0.1, 5),
 )
