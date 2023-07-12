@@ -70,6 +70,31 @@ function show_strain(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}; i
     return
 end
 
+"""
+    show_strain(domains; index=0)
+
+Show the predicted maximum strain and, if possible, also the computed strain with the given index.
+"""
+function show_strain(domains::Vector{<:Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}}; index = 0)
+    msg = ""
+    for domain in domains
+        minE, maxE = _predict_minmax_strain(domain)
+
+        D₁, D₂ = domain
+        msg *= "Strain - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...]) * "\n"
+        msg *= "  Predicted: (min: $(minE), max: $(maxE))\n"
+    end
+
+    # if isTheShapeComputed()
+    #     M = loadM(index=index)
+    #     minE, maxE = _compute_minmax_strain(M)
+    #     msg *= "Computed: (min: $(minE), max: $(maxE))\n"
+    # end
+
+    @info msg
+
+    return
+end
 
 # Elastic Modulus
 function C(i, j, k, l, g⁻)
