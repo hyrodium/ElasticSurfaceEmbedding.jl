@@ -2,6 +2,7 @@
 
 # Parametric mapping of Reference state
 𝒑₍₀₎(u¹, u²) = SVector(u¹, u², 0)
+const surface = 𝒑₍₀₎
 
 # Tangent vector
 𝒑₁₍₀₎(u¹, u²) = ForwardDiff.derivative(u¹ -> 𝒑₍₀₎(u¹, u²), u¹)
