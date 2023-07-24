@@ -82,6 +82,18 @@ function refinement!(steptree, parent::Int = 0; p₊ = (0, 0), k₊ = (EmptyKnot
     addstep!(steptree, step, parent)
 end
 
+function suggested_knotvector(steptree; index=0)
+    M = loadM(steptree, index = index)
+
+    P = bsplinespaces(M)
+    k₁, k₂ = knotvector.(P)
+    k₁′ = unique(k₁)
+    k₂′ = unique(k₂)
+    k₁₊ = KnotVector([(k₁′[i] + k₁′[i+1]) / 2 for i in 1:(length(k₁′)-1)])
+    k₂₊ = KnotVector([(k₂′[i] + k₂′[i+1]) / 2 for i in 1:(length(k₂′)-1)])
+    return k₁₊, k₂₊
+end
+
 """
     show_knotvector(; index=0)
 
@@ -92,14 +104,13 @@ function show_knotvector(steptree; index = 0)
 
     P = bsplinespaces(M)
     k₁, k₂ = knotvector.(P)
-    k₁′ = unique(k₁)
-    k₂′ = unique(k₂)
+    k₁₊, k₂₊ = suggested_knotvector(steptree, index=index)
     msg = """
     Current knotvectors (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
     k₁: , $(BasicBSpline._vec((k₁)))
     k₂: , $(BasicBSpline._vec((k₂)))
-    k₁₊: , $([(k₁′[i] + k₁′[i+1]) / 2 for i in 1:(length(k₁′)-1)])
-    k₂₊: , $([(k₂′[i] + k₂′[i+1]) / 2 for i in 1:(length(k₂′)-1)])
+    k₁₊: , $(BasicBSpline._vec(k₁₊))
+    k₂₊: , $(BasicBSpline._vec(k₂₊))
     """
     @info msg
     return
