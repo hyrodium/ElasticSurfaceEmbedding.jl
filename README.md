@@ -49,7 +49,21 @@ $$
 
 ### step 2: Numerical analysis
 This is the main part.
-Split the surface into pieces, and compute the Euclidean embedding.
+Split the surface into strips, and compute the embeddings.
+
+```julia
+using ElasticSurfaceEmbedding
+using IntervalSets
+using StaticArrays
+# Overload the shape definition
+ElasticSurfaceEmbedding.surface(x,y) = SVector(x, y, x^2+y^2)
+# (1) split the surface into strips
+dom = [(-1..1, (i-1)/10..i/10) for i in 1:10]
+# (2) Embed the strips onto a plane
+res = auto_allsteps(dom)
+export_pinned_steps("paraboloid", res)
+```
+
 For more information, read [this document](https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/run-julia/).
 The image below is a result for the domain $D^{(1)}$.
 
