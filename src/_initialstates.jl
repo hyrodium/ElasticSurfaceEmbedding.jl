@@ -45,13 +45,13 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n
     N = 6n₁
 
     # Solve 𝒄̈(t) = A(t)𝒄̇(t) with Runge-Kutta method
-    A(t) = @SMatrix[
+    A(t) = @SMatrix [
         ṡ₍₀₎(t, D₂)/s₍₀₎(t, D₂) -𝜅₍₀₎(t, D₂)*s₍₀₎(t, D₂)
         𝜅₍₀₎(t, D₂)*s₍₀₎(t, D₂) ṡ₍₀₎(t, D₂)/s₍₀₎(t, D₂)
     ]
 
     # Initial condition
-    𝒄̇₀ = SVector(1.0, 0.0) * s₍₀₎(minimum(D₁), D₂)
+    𝒄̇₀ = SVector(s₍₀₎(t₋, D₂), 0.0)
 
     Δt = (t₊ - t₋) / N
     ts = range(t₋, stop = t₊, length = N + 1)
@@ -82,11 +82,11 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n
 
     # Approximate 𝒄 with B-spline curve
     Δk = (t₊ - t₋) / (n₁ - p₁)
-    𝒎 = zeros(SVector{2,Float64}, dim(P₁))  # control points of 𝒄̃
+    𝒎 = zeros(SVector{2,Float64}, n₁)  # control points of 𝒄̃
     𝒎[1] = zero(SVector{2,Float64})
     𝒎[2] = 𝒎[1] + 𝒎̇[1] * Δk * 1 / 3
     𝒎[3] = 𝒎[2] + 𝒎̇[2] * Δk * 2 / 3
-    for i in 3:dim(P₁)-1
+    for i in 3:n₁-1
         𝒎[i+1] = 𝒎[i] + 𝒎̇[i] * Δk
     end
     𝒎[n₁-1] = 𝒎[n₁-2] + 𝒎̇[n₁-2] * Δk * 2 / 3
