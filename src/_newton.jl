@@ -13,6 +13,24 @@ function _fixthreepoints(n₁, n₂)
     )
 end
 
+function _fixfivepoints(n₁, n₂)
+    mid1 = (n₁ + 1) ÷ 2
+    mid2 = (n₂ + 1) ÷ 2
+    Δ4 = (n₁ + 1) ÷ 4
+    return (
+        [1, mid2, 1],
+        [1, mid2, 2],
+        [mid1-Δ4, mid2, 1],
+        [mid1-Δ4, mid2, 2],
+        [mid1, mid2, 1],
+        [mid1, mid2, 2],
+        [mid1+Δ4, mid2, 1],
+        [mid1+Δ4, mid2, 2],
+        [n₁, mid2, 1],
+        [n₁, mid2, 2],
+    )
+end
+
 _abbstr(t::Week) = string(t.value) * "w "
 _abbstr(t::Day) = string(t.value) * "d "
 _abbstr(t::Hour) = string(t.value) * "h "
@@ -36,6 +54,8 @@ function newton_onestep!(steptree, parent::Int = 0; fixingmethod = :default)
         fixed = _defaultorientation
     elseif fixingmethod == :fix3points
         fixed = _fixthreepoints
+    elseif fixingmethod == :fix5points
+        fixed = _fixfivepoints
     else
         error("No method for $(fixingmethod). Use :default or :fix3points.")
     end
