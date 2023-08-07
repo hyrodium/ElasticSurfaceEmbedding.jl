@@ -107,8 +107,8 @@ function show_knotvector(steptree; index = 0)
     k₁₊, k₂₊ = suggest_knotvector(steptree, index=index)
     msg = """
     Current knotvectors (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
-    k₁: , $(BasicBSpline._vec((k₁)))
-    k₂: , $(BasicBSpline._vec((k₂)))
+    k₁: , $(BasicBSpline._vec(k₁))
+    k₂: , $(BasicBSpline._vec(k₂))
     k₁₊: , $(BasicBSpline._vec(k₁₊))
     k₂₊: , $(BasicBSpline._vec(k₂₊))
     """
