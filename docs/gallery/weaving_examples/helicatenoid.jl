@@ -21,7 +21,7 @@ using ElasticSurfaceEmbedding
 
 # ## Define the shape of the surface (non-periodic direction)
 ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u²)*cosh(u¹),sin(u²)*cosh(u¹),u¹)
-n=9
+n = 9
 Da(n) = (-π/2..π/2,-π/(4n)..π/(4n))
 
 # ## Compute the shape of the embeddings
@@ -48,13 +48,13 @@ ElasticSurfaceEmbedding.𝒑₍₀₎(u¹,u²) = SVector(cos(u¹)*cosh(u²),sin(
 Db(i,n) = (-π..π,(i-1)*π/(2n)..(i)*π/(2n))
 
 ## Check the maximum strain
-for i in 1:9
+for i in 1:n
     show_strain(Db(i,n))
 end
 
 ## Numerical computing
 steptree = StepTree()
-for i in 1:9
+for i in 1:n
     initial_state!(steptree, Db(i,n), n₁=33)
     newton_onestep!(steptree, fixingmethod=:fix3points)
     newton_onestep!(steptree)
