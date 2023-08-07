@@ -2,6 +2,8 @@
 
 # Parametric mapping of Reference state
 𝒑₍₀₎(u¹, u²) = SVector(u¹, u², 0)
+
+# alias to avoid non-standard unicode characters
 const surface = 𝒑₍₀₎
 
 # Tangent vector
