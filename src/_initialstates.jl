@@ -32,8 +32,10 @@ end
 function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n₁)
     D₁, D₂ = D
 
-    # Definition for center curve
-    t₋, t₊ = extrema(D₁)
+    # Definitions for the center curve
+    # 1e-14 is ad-hoc number to avoid non-smooth singularity on the boundary.
+    t₋ = minimum(D₁) + 1e-14
+    t₊ = maximum(D₁) - 1e-14
     p₁ = 3
     p₂ = 1
     k₁ = KnotVector(range(t₋, t₊, length = n₁ - p₁ + 1)) + p₁ * KnotVector([t₋, t₊])
@@ -106,6 +108,10 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n
     a2 = 𝒎 + width(D₂) * 𝒓 / 2
     𝒂 = hcat(a1, a2)
 
+    # Revert the ad-hoc boundary
+    k₁.vector[1:p₁] .= minimum(D₁)
+    k₁.vector[1+p₁:end-p₁] .= range(minimum(D₁), maximum(D₁), length = n₁ - p₁ + 1)
+    k₁.vector[end-p₁+1:end] .= maximum(D₁)
     M = BSplineManifold(𝒂, (P₁, P₂))
     M′ = refinement(M, (Val(0), Val(1)))
     return _positioning(M′)
