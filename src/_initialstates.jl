@@ -72,7 +72,7 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n
         𝒄̇s[i+1] = 𝒄̇ + Δ𝒄̇₀
     end
 
-    # Approximate 𝒄̇=𝒒₁ with B-spline curve
+    # Approximate 𝒄̇ = 𝒒₁ with B-spline curve
     _p₁ = p₁ - 1
     _k₁ = KnotVector(range(t₋, t₊, length = n₁ - _p₁)) + _p₁ * KnotVector([t₋, t₊])
     _P₁ = BSplineSpace{_p₁}(_k₁)
