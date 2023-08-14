@@ -5,7 +5,7 @@ Compute the initial state, by solving a ODE of center curve.
 """
 function initial_state(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     D₁, D₂ = D
-    M = _initialize(D₁, D₂)
+    M = _positioning(_initialize(D₁, D₂))
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
     info = Dict(["type" => "initial"])
 
@@ -21,7 +21,7 @@ Compute the initial state, by solving a ODE of center curve.
 """
 function initial_state!(steptree, D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     D₁, D₂ = D
-    M = _initialize(D₁, D₂)
+    M = _positioning(_initialize(D₁, D₂))
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
     info = Dict(["type" => "initial"])
 
@@ -153,5 +153,5 @@ function _initialize(D₁, D₂)
 
     M = BSplineManifold(𝒂, (P₁, P₂))
     M′ = refinement(M, (Val(0), Val(1)))
-    return _positioning(M′)
+    return M′
 end
