@@ -45,7 +45,7 @@ function _divide_D₁(D₁::ClosedInterval{<:Real}, D₂::ClosedInterval{<:Real}
     ts = [t2]
     Ls = Float64[]
 
-    for _ in 1:100
+    while true
         t1 = t2
         t2 = t1+1/ω(t1, D₂)
         for _ in 1:10
