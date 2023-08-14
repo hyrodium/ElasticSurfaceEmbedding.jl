@@ -5,7 +5,7 @@ Compute the initial state, by solving a ODE of center curve.
 """
 function initial_state(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     D₁, D₂ = D
-    M = _initialize(D)
+    M = _initialize(D₁, D₂)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
     info = Dict(["type" => "initial"])
 
@@ -21,7 +21,7 @@ Compute the initial state, by solving a ODE of center curve.
 """
 function initial_state!(steptree, D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     D₁, D₂ = D
-    M = _initialize(D)
+    M = _initialize(D₁, D₂)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
     info = Dict(["type" => "initial"])
 
@@ -96,9 +96,7 @@ function _divide_D₁(D₁::ClosedInterval{<:Real}, D₂::ClosedInterval{<:Real}
     return ts
 end
 
-function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
-    D₁, D₂ = D
-
+function _initialize(D₁, D₂)
     # Definitions for the center curve
     # 1e-14 is ad-hoc number to avoid non-smooth singularity on the boundary.
     t₋ = minimum(D₁) + 1e-14
@@ -135,8 +133,6 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     # Construct initial state M₍ₛ₎
     𝒒₍ₛ₎₁(t) = unbounded_mapping(𝒄̇₍ₛ₎, t)
     𝒒₍ₛ₎₂(t) = (@SMatrix [g₍₀₎₁₂(t, D₂) -𝝊₍₀₎(t, D₂); 𝝊₍₀₎(t, D₂) g₍₀₎₁₂(t, D₂)]) * 𝒒₍ₛ₎₁(t) / g₍₀₎₁₁(t, D₂)
-    c = (t₋+t₊)/2
-    𝒑₍ₛ₎(u¹, u²) = 𝒄₍ₛ₎(u¹) + (u²-c)*𝒒₍ₛ₎₂(u¹)
 
     p₁ = 3
     p₂ = 1
@@ -145,7 +141,16 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     P₁ = BSplineSpace{p₁}(k₁)
     P₂ = BSplineSpace{p₂}(k₂)
 
-    𝒂 = fittingcontrolpoints(𝒑₍ₛ₎, P₁, P₂)
+    # Approximate 𝒄 with B-spline curve
+    𝒓 = fittingcontrolpoints(𝒒₍ₛ₎₂, P₁)
+    𝒎 = fittingcontrolpoints(𝒄₍ₛ₎, P₁)
+    b = width(D₂) / 2
+    𝒂 = hcat(𝒎 - b * 𝒓,  𝒎 + b * 𝒓)
+
+    # c = (t₋+t₊)/2
+    # 𝒑₍ₛ₎(u¹, u²) = 𝒄₍ₛ₎(u¹) + (u²-c)*𝒒₍ₛ₎₂(u¹)
+    # 𝒂 = fittingcontrolpoints(𝒑₍ₛ₎, P₁, P₂)
+
     M = BSplineManifold(𝒂, (P₁, P₂))
     M′ = refinement(M, (Val(0), Val(1)))
     return _positioning(M′)
