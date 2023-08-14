@@ -32,7 +32,7 @@ export pin!, unpin!
 # Exports
 export export_all_steps, export_pinned_steps
 # utilities
-export show_strain, show_knotvector
+export show_strain, show_knotvector, suggest_knotvector
 # auto
 export auto_allsteps, auto_allsteps!
 
