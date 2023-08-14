@@ -152,7 +152,6 @@ end
 function _merge(manifolds::Vector{<:BSplineManifold{2, p}}) where p
     # Assume all B-spline manifolds have open knot vectors.
     p₁, p₂ = p
-    println(p)
 
     k₁ = copy(knotvector(bsplinespaces(manifolds[1])[1]))
     k₂ = knotvector(bsplinespaces(manifolds[1])[2])
