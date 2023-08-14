@@ -148,3 +148,36 @@ function _interpolate2(ts::AbstractVector{<:Real}, fs::AbstractVector{T}, f′0:
     y = vcat([f′0], fs)
     return BSplineManifold(inv(M)*y, P)
 end
+
+function _merge(manifolds::Vector{<:BSplineManifold{2, p}}) where p
+    # Assume all B-spline manifolds have open knot vectors.
+    p₁, p₂ = p
+    println(p)
+
+    k₁ = copy(knotvector(bsplinespaces(manifolds[1])[1]))
+    k₂ = knotvector(bsplinespaces(manifolds[1])[2])
+    for i in 2:length(manifolds)
+        pop!(k₁.vector)
+        k₁ += knotvector(bsplinespaces(manifolds[i])[1])[p₁+2:end]
+    end
+    P₁ = BSplineSpace{p₁}(k₁)
+    P₂ = BSplineSpace{p₂}(k₂)
+
+    𝒂 = controlpoints(manifolds[1])
+    for i in 2:length(manifolds)
+        _𝒂 = controlpoints(manifolds[i])
+        v = 𝒂[end,:]
+        _v = _𝒂[1,:]
+        Δ = v[end] - v[1]
+        _Δ = _v[end] - _v[1]
+        a = dot(Δ, _Δ)
+        b = cross(Δ, _Δ)
+        r = (@SMatrix [a b;-b a]) / norm([a,b])
+        _w = [r*p for p in _v]
+        c = sum(v)/length(v)
+        _c = sum(_w)/length(_w)
+        _𝒂 = [r*p-_c+c for p in _𝒂]
+        𝒂 = vcat(𝒂[1:end-1, :], (𝒂[end:end, :]+_𝒂[1:1, :])/2, _𝒂[2:end, :])
+    end
+    return BSplineManifold(𝒂, P₁, P₂)
+end
