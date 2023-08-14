@@ -3,9 +3,9 @@
 
 Compute the initial state, by solving a ODE of center curve.
 """
-function initial_state(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
+function initial_state(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, splitat=Float64[])
     D₁, D₂ = D
-    M = _positioning(_initialize(D₁, D₂))
+    M = _positioning(_initialize(D₁, D₂, splitat))
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
     info = Dict(["type" => "initial"])
 
@@ -19,9 +19,9 @@ end
 
 Compute the initial state, by solving a ODE of center curve.
 """
-function initial_state!(steptree, D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
+function initial_state!(steptree, D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, splitat=Float64[])
     D₁, D₂ = D
-    M = _positioning(_initialize(D₁, D₂))
+    M = _positioning(_initialize(D₁, D₂, splitat))
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
     info = Dict(["type" => "initial"])
 
@@ -154,4 +154,12 @@ function _initialize(D₁, D₂)
     M = BSplineManifold(𝒂, (P₁, P₂))
     M′ = refinement(M, (Val(0), Val(1)))
     return M′
+end
+
+function _initialize(D₁, D₂, splitat)
+    _splitat = unique!(sort!(vcat([u¹ for u¹ in splitat if u¹ in OpenInterval(D₁)], extrema(D₁)...)))
+    intervals = [_splitat[i].._splitat[i+1] for i in 1:length(_splitat)-1]
+    manifolds = [_initialize(interval, D₂) for interval in intervals]
+    M = _merge(manifolds)
+    return M
 end
