@@ -115,3 +115,15 @@ function show_knotvector(steptree; index = 0)
     @info msg
     return
 end
+
+function integrate(C::BSplineManifold{1})
+    a = controlpoints(C)
+    P = bsplinespaces(C)[1]
+    p = degree(P)
+    k = knotvector(P)
+    k′ = k + k[[begin, end]]
+    p′ = p+1
+    P′ = BSplineSpace{p′}(k′)
+    A = [ifelse(i≤j, 0.0, (k′[p′+j+1]-k′[j+1])/(p′)) for i in 1:dim(P′), j in 1:dim(P)]
+    return BSplineManifold(A*a, P′)
+end
