@@ -29,6 +29,12 @@ function initial_state!(steptree, D::Tuple{ClosedInterval{<:Real}, ClosedInterva
     addstep!(steptree, step, 0)
 end
 
+# Coefficient matrix of the center-curve ODE
+A(t, D₂) = @SMatrix [
+    ṡ₍₀₎(t, D₂)/s₍₀₎(t, D₂) -𝜅₍₀₎(t, D₂)*s₍₀₎(t, D₂)
+    𝜅₍₀₎(t, D₂)*s₍₀₎(t, D₂) ṡ₍₀₎(t, D₂)/s₍₀₎(t, D₂)
+]
+
 function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n₁)
     D₁, D₂ = D
 
@@ -38,80 +44,46 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n
     t₊ = maximum(D₁) - 1e-14
     p₁ = 3
     p₂ = 1
-    k₁ = KnotVector(range(t₋, t₊, length = n₁ - p₁ + 1)) + p₁ * KnotVector([t₋, t₊])
+    k₁ = KnotVector(range(extrema(D₁)..., length = n₁ - p₁ + 1)) + p₁ * KnotVector([extrema(D₁)...])
     k₂ = KnotVector(repeat(collect(extrema(D₂)), inner = 2))
     P₁ = BSplineSpace{p₁}(k₁)
     P₂ = BSplineSpace{p₂}(k₂)
 
     # Number of divisions for ODE
-    N = 6n₁
+    N = 100
 
-    # Solve 𝒄̈(t) = A(t)𝒄̇(t) with Runge-Kutta method
-    A(t) = @SMatrix [
-        ṡ₍₀₎(t, D₂)/s₍₀₎(t, D₂) -𝜅₍₀₎(t, D₂)*s₍₀₎(t, D₂)
-        𝜅₍₀₎(t, D₂)*s₍₀₎(t, D₂) ṡ₍₀₎(t, D₂)/s₍₀₎(t, D₂)
-    ]
-
-    # Initial condition
+    # Initial condition for ODE
     𝒄̇₀ = SVector(s₍₀₎(t₋, D₂), 0.0)
 
+    # Solve ODE 𝒄̈₍ₛ₎(t) = A(t)𝒄̇₍ₛ₎(t) with Runge-Kutta method (and interpolation)
     Δt = (t₊ - t₋) / N
     ts = range(t₋, stop = t₊, length = N + 1)
-    𝒄̇s = zeros(SVector{2,Float64}, N + 1)
-    𝒄̇s[1] = 𝒄̇₀
+    𝒄̇₍ₛ₎s = zeros(SVector{2,Float64}, N + 1)
+    𝒄̇₍ₛ₎s[1] = 𝒄̇₀
     for i in 1:N
         t = ts[i]
-        𝒄̇ = 𝒄̇s[i]
+        𝒄̇ = 𝒄̇₍ₛ₎s[i]
 
-        k1 = A(t) * 𝒄̇
-        k2 = A(t + Δt / 2) * (𝒄̇ + k1 * Δt / 2)
-        k3 = A(t + Δt / 2) * (𝒄̇ + k2 * Δt / 2)
-        k4 = A(t + Δt) * (𝒄̇ + k3 * Δt)
+        k1 = A(t, D₂) * 𝒄̇
+        k2 = A(t + Δt / 2, D₂) * (𝒄̇ + k1 * Δt / 2)
+        k3 = A(t + Δt / 2, D₂) * (𝒄̇ + k2 * Δt / 2)
+        k4 = A(t + Δt, D₂) * (𝒄̇ + k3 * Δt)
 
         Δ𝒄̇₀ = Δt * (k1 + 2k2 + 2k3 + k4) / 6
-        𝒄̇s[i+1] = 𝒄̇ + Δ𝒄̇₀
+        𝒄̇₍ₛ₎s[i+1] = 𝒄̇ + Δ𝒄̇₀
     end
+    𝒄̇₍ₛ₎ = _interpolate2(ts, 𝒄̇₍ₛ₎s, A(D₂, t₋)*𝒄̇₀)
 
-    # Approximate 𝒄̇ = 𝒒₁ with B-spline curve
-    _p₁ = p₁ - 1
-    _k₁ = KnotVector(range(t₋, t₊, length = n₁ - _p₁)) + _p₁ * KnotVector([t₋, t₊])
-    _P₁ = BSplineSpace{_p₁}(_k₁)
-    _n₁ = dim(_P₁)
-    _B = [bsplinebasis(_P₁, i, t) for i in 1:_n₁, t in ts]
-    _BB = _B * _B'
-    _b = _B * 𝒄̇s
-    𝒎̇ = inv(_BB) * _b  # control points of 𝒒̃₁
+    # Integrate 𝒄̇₍ₛ₎ and obtain the center-curve 𝒄₍ₛ₎
+    𝒄₍ₛ₎(t) = unbounded_mapping(integrate(𝒄̇₍ₛ₎), t)
 
-    # Approximate 𝒄 with B-spline curve
-    Δk = (t₊ - t₋) / (n₁ - p₁)
-    𝒎 = zeros(SVector{2,Float64}, n₁)  # control points of 𝒄̃
-    𝒎[1] = zero(SVector{2,Float64})
-    𝒎[2] = 𝒎[1] + 𝒎̇[1] * Δk * 1 / 3
-    𝒎[3] = 𝒎[2] + 𝒎̇[2] * Δk * 2 / 3
-    for i in 3:n₁-1
-        𝒎[i+1] = 𝒎[i] + 𝒎̇[i] * Δk
-    end
-    𝒎[n₁-1] = 𝒎[n₁-2] + 𝒎̇[n₁-2] * Δk * 2 / 3
-    𝒎[n₁] = 𝒎[n₁-1] + 𝒎̇[n₁-1] * Δk * 1 / 3
+    # Construct initial state M₍ₛ₎
+    𝒒₍ₛ₎₁(t) = unbounded_mapping(𝒄̇₍ₛ₎, t)
+    𝒒₍ₛ₎₂(t) = (@SMatrix [g₍₀₎₁₂(t, D₂) -𝝊₍₀₎(t, D₂); 𝝊₍₀₎(t, D₂) g₍₀₎₁₂(t, D₂)]) * 𝒒₍ₛ₎₁(t) / g₍₀₎₁₁(t, D₂)
+    c = (t₋+t₊)/2
+    𝒑₍ₛ₎(u¹, u²) = 𝒄₍ₛ₎(u¹) + (u²-c)*𝒒₍ₛ₎₂(u¹)
 
-    # Approximate 𝒒₂ with B-spline curve
-    𝒒₂s = [
-        (@SMatrix [g₍₀₎₁₂(ts[i], D₂) -𝝊₍₀₎(ts[i], D₂); 𝝊₍₀₎(ts[i], D₂) g₍₀₎₁₂(ts[i], D₂)]) * 𝒄̇s[i] / g₍₀₎₁₁(ts[i], D₂) for i in 1:N+1
-    ]
-
-    _B = [bsplinebasis(P₁, i, t) for i in 1:n₁, t in ts]
-    _BB = _B * _B'
-    _b = _B * 𝒒₂s
-    𝒓 = inv(_BB) * _b  # control points of 𝒄̃₂
-
-    a1 = 𝒎 - width(D₂) * 𝒓 / 2
-    a2 = 𝒎 + width(D₂) * 𝒓 / 2
-    𝒂 = hcat(a1, a2)
-
-    # Revert the ad-hoc boundary
-    k₁.vector[1:p₁] .= minimum(D₁)
-    k₁.vector[1+p₁:end-p₁] .= range(minimum(D₁), maximum(D₁), length = n₁ - p₁ + 1)
-    k₁.vector[end-p₁+1:end] .= maximum(D₁)
+    𝒂 = fittingcontrolpoints(𝒑₍ₛ₎, P₁, P₂)
     M = BSplineManifold(𝒂, (P₁, P₂))
     M′ = refinement(M, (Val(0), Val(1)))
     return _positioning(M′)
