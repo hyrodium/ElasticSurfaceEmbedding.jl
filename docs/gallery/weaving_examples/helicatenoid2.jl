@@ -13,8 +13,9 @@ using BasicBSpline
 using BasicBSplineFitting
 using StaticArrays
 using ElasticSurfaceEmbedding
+using LinearAlgebra
 
-# ## Define the shape of the surface (non-periodic direction)
+# ## Define the shape of the surface
 const N = 8
 const J = 1
 f0(s) = max(-abs(s+1/2N-1)-(1/2N-1), 0)
@@ -69,6 +70,8 @@ unitlength = (100, "mm")
 width = (xlims[2] - xlims[1]) * unitlength[1]
 height = (ylims[2] - ylims[1]) * unitlength[1]
 
+# ## Export embeddings
+mkpath("helicatenoid2")
 for i in 1:(N+1)÷2
     filepath = joinpath("helicatenoid2", "embedding-$(i).svg")
     M = svector2point(steptree.steps[10i].manifold)

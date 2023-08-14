@@ -74,7 +74,7 @@ end
     D = (-1.0 .. 2.0, 1.0 .. 1.2)
 
     show_strain(D)
-    result = initial_state(D, n₁ = 35)
+    result = initial_state(D)
     M = ElasticSurfaceEmbedding.loadM(result)
     @test norm([ElasticSurfaceEmbedding.E(M, u¹, u²) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
 
@@ -98,7 +98,7 @@ end
     D = (-L .. L, -B .. B)
 
     show_strain(D)
-    result = initial_state(D, n₁ = 5)
+    result = initial_state(D)
     newton_onestep!(result)
     newton_onestep!(result)
     refinement!(
@@ -145,7 +145,7 @@ end
     D = (-L .. L, -B .. B)
 
     show_strain(D)
-    result = initial_state(D, n₁ = 5)
+    result = initial_state(D)
     newton_onestep!(result)
     newton_onestep!(result)
     refinement!(
@@ -199,7 +199,7 @@ end
     for i in 1:N
         D = (-1.0 .. 1.0, (i - 1) / N .. i / N)
         show_strain(D)
-        result = initial_state!(result, D, n₁ = 25)
+        result = initial_state!(result, D)
         newton_onestep!(result, fixingmethod = :fix3points)
         newton_onestep!(result)
         refinement!(result, p₊ = (0, 1), k₊ = (EmptyKnotVector(), KnotVector([(i - 1 / 2) / 10])))
