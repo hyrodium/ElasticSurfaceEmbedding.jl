@@ -1,11 +1,11 @@
 """
-    initial_state(D; n₁ = 15)
+    initial_state(D)
 
 Compute the initial state, by solving a ODE of center curve.
 """
-function initial_state(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}; n₁ = 15)
+function initial_state(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     D₁, D₂ = D
-    M = _initialize(D, n₁)
+    M = _initialize(D)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
     info = Dict(["type" => "initial"])
 
@@ -15,13 +15,13 @@ function initial_state(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}};
 end
 
 """
-    initial_state!(steptree, D; n₁ = 15)
+    initial_state!(steptree, D)
 
 Compute the initial state, by solving a ODE of center curve.
 """
-function initial_state!(steptree, D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}; n₁ = 15)
+function initial_state!(steptree, D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     D₁, D₂ = D
-    M = _initialize(D, n₁)
+    M = _initialize(D)
     comment = "Initial state - domain: " * repr([endpoints(D₁)...]) * "×" * repr([endpoints(D₂)...])
     info = Dict(["type" => "initial"])
 
@@ -35,7 +35,68 @@ A(t, D₂) = @SMatrix [
     𝜅₍₀₎(t, D₂)*s₍₀₎(t, D₂) ṡ₍₀₎(t, D₂)/s₍₀₎(t, D₂)
 ]
 
-function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n₁)
+ω(t, D₂) = abs(s₍₀₎(t, D₂))/2B̃(t, D₂)
+
+function _divide_D₁(D₁::ClosedInterval{<:Real}, D₂::ClosedInterval{<:Real})
+    t₋ = minimum(D₁)
+    t₊ = maximum(D₁)
+    nodes, weights = gausslegendre(10)
+    t2 = Float64(t₋)
+    ts = [t2]
+    Ls = Float64[]
+
+    for _ in 1:100
+        t1 = t2
+        t2 = t1+1/ω(t1, D₂)
+        for _ in 1:10
+            nodes_shifted = t1 .+ (nodes .+ 1) ./ 2 .* (t2-t1)
+            L12 = dot(ω.(nodes_shifted, Ref(D₂)), weights)*(t2-t1)/2
+            t2 += (1-L12)/ω(t2, D₂)
+        end
+        if t2 < t₊
+            push!(ts, t2)
+            push!(Ls, L12)
+        elseif iseven(length(ts))
+            t2 = t₊
+            nodes_shifted = t1 .+ (nodes .+ 1) ./ 2 .* (t2-t1)
+            L12 = dot(ω.(nodes_shifted, Ref(D₂)), weights)*(t2-t1)/2
+            push!(ts, t2)
+            push!(Ls, L12)
+            break
+        else
+            t2 = (t2+t₊)/2
+            nodes_shifted = t1 .+ (nodes .+ 1) ./ 2 .* (t2-t1)
+            L12 = dot(ω.(nodes_shifted, Ref(D₂)), weights)*(t2-t1)/2
+            push!(ts, t2)
+            push!(Ls, L12)
+            t2 = t₊
+            nodes_shifted = t1 .+ (nodes .+ 1) ./ 2 .* (t2-t1)
+            L12 = dot(ω.(nodes_shifted, Ref(D₂)), weights)*(t2-t1)/2
+            push!(ts, t2)
+            push!(Ls, L12)
+            break
+        end
+    end
+
+    l = length(ts)
+    for _ in 1:10
+        L̄ = mean(Ls)
+        for i in 2:l-1
+            ΔL = sum(Ls[1:i-1]) - L̄*(i-1)
+            ts[i] -= ΔL / ω(ts[i], D₂)
+        end
+        for i in 1:l-1
+            t1 = ts[i]
+            t2 = ts[i+1]
+            nodes_shifted = t1 .+ (nodes .+ 1) ./ 2 .* (t2-t1)
+            L12 = dot(ω.(nodes_shifted, Ref(D₂)), weights)*(t2-t1)/2
+            Ls[i] = L12
+        end
+    end
+    return ts
+end
+
+function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}})
     D₁, D₂ = D
 
     # Definitions for the center curve
@@ -79,7 +140,7 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n
 
     p₁ = 3
     p₂ = 1
-    k₁ = KnotVector(range(extrema(D₁)..., length = n₁ - p₁ + 1)) + p₁ * KnotVector([extrema(D₁)...])
+    k₁ = KnotVector(_divide_D₁(D₁, D₂)) + p₁ * KnotVector([extrema(D₁)...])
     k₂ = KnotVector(repeat(collect(extrema(D₂)), inner = 2))
     P₁ = BSplineSpace{p₁}(k₁)
     P₂ = BSplineSpace{p₂}(k₂)
