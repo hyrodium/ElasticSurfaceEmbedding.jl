@@ -234,3 +234,14 @@ function export_pinned_steps(
     end
     return paths_output
 end
+
+function Base.show(io::IO, mime::MIME"image/png", steptree::StepTree)
+    dir = mktempdir()
+    index = length(steptree.steps)
+    M = steptree.steps[index].manifold
+    export_one_step(dir, M, index)
+    img = RGB.(load(joinpath(dir, "combined", "combined-$(index).png")))
+    Base.show(io, mime, img)
+end
+
+Base.showable(::MIME"image/png", steptree::StepTree) = !iszero(length(steptree.steps))
