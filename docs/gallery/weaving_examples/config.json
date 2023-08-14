@@ -3,6 +3,7 @@
         "paraboloid.jl",
         "hyperbolic_paraboloid.jl",
         "helicatenoid.jl",
-        "stereographicprojection.jl"
+        "stereographicprojection.jl",
+        "helicatenoid2.jl"
     ]
 }
