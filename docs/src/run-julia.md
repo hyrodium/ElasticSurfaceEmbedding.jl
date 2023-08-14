@@ -119,7 +119,7 @@ i = 1
 As a first step, let's compute the initial state.
 
 ```@example paraboloid
-steptree = initial_state(D(i,n), n₁=19)
+steptree = initial_state(D(i,n))
 ```
 
 ### Newton-Raphson method iteration
@@ -182,7 +182,7 @@ newton_onestep!(steptree)
 pin!(steptree)
 
 i = 2
-initial_state!(steptree, D(i,n), n₁=19)
+initial_state!(steptree, D(i,n))
 newton_onestep!(steptree, fixingmethod=:fix3points)
 newton_onestep!(steptree)
 refinement!(steptree, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
