@@ -17,6 +17,7 @@ using Luxor
 import ColorBlendModes
 
 using BasicBSpline
+using BasicBSplineFitting
 using BasicBSplineExporter
 
 # Tree structure
