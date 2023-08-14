@@ -127,12 +127,20 @@ function export_one_step(
     M::BSplineManifold{2},
     index::Integer;
     maximumstrain = 0,
-    xlims = (-2, 2),
-    ylims = (-2, 2),
+    xlims = nothing,
+    ylims = nothing,
     mesh = (20, 1),
-    unitlength::Tuple{<:Real,<:AbstractString} = (50, "mm"),
+    unitlength::Tuple{<:Real,<:AbstractString} = (100, "mm"),
     colorbarsize = 0.3,
 )
+    if isnothing(xlims)
+        xs = [p[1] for p in controlpoints(M)]
+        xlims = floor(Int, minimum(xs))-1, ceil(Int, maximum(xs))+1
+    end
+    if isnothing(ylims)
+        ys = [p[1] for p in controlpoints(M)]
+        ylims = floor(Int, minimum(ys))-1, ceil(Int, maximum(ys))+1
+    end
     if maximumstrain ≤ 0
         MS = _compute_minmax_strain(M)
         maximumstrain = max(-MS[1], MS[2])
