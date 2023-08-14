@@ -127,3 +127,24 @@ function integrate(C::BSplineManifold{1})
     A = [ifelse(i≤j, 0.0, (k′[p′+j+1]-k′[j+1])/(p′)) for i in 1:dim(P′), j in 1:dim(P)]
     return BSplineManifold(A*a, P′)
 end
+
+function _interpolate2(ts::AbstractVector{<:Real}, fs::AbstractVector{T}, f′0::T) where T
+    # Quadric open B-spline space
+    p = 2
+    k = KnotVector(ts) + KnotVector([ts[1],ts[end]]) * p
+    P = BSplineSpace{p}(k)
+
+    # dimensions
+    m = length(ts)
+    n = dim(P)
+
+    # The interpolant function has a f''=0 property at bounds.
+    dP = BSplineDerivativeSpace{1}(P)
+    d0 = [bsplinebasis(dP,j,ts[1]) for j in 1:n]
+
+    # Compute the interpolant function (1-dim B-spline manifold)
+    M = [bsplinebasis(P,j,ts[i]) for i in 1:m, j in 1:n]
+    M = vcat(d0', M)
+    y = vcat([f′0], fs)
+    return BSplineManifold(inv(M)*y, P)
+end
