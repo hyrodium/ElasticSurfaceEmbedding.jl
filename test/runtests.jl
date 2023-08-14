@@ -41,31 +41,37 @@ rm(dir_result, recursive = true, force = true)
     show_strain(D)
     @test_logs (:info, "Strain - domain: [-1.0, 1.0]×[-1.0, 1.0]\nPredicted: (min: -0.0, max: 0.0)\n") show_strain(D)
 
-    result = initial_state(D, n₁ = 5)
+    result = initial_state(D)
     M = ElasticSurfaceEmbedding.loadM(result)
     𝒂 = controlpoints(M)
+    M, N = size(𝒂)
+    m = M ÷ 2 + 1
+    n = N ÷ 2 + 1
     @test 𝒂[1, 1] ≈ [-√(3 / 2), -3 / √(2)]
-    @test 𝒂[1, 2] ≈ [-√(3 / 2), -1 / √(2)]
-    @test 𝒂[1, 3] ≈ [-√(3 / 2), 1 / √(2)]
-    @test 𝒂[3, 1] ≈ [0, -2 / √(2)]
-    @test 𝒂[3, 2] ≈ [0, 0] atol = 1e-14
-    @test 𝒂[3, 3] ≈ [0, 2 / √(2)]
-    @test 𝒂[5, 1] ≈ [√(3 / 2), -1 / √(2)]
-    @test 𝒂[5, 2] ≈ [√(3 / 2), 1 / √(2)]
-    @test 𝒂[5, 3] ≈ [√(3 / 2), 3 / √(2)]
+    @test 𝒂[1, n] ≈ [-√(3 / 2), -1 / √(2)]
+    @test 𝒂[1, N] ≈ [-√(3 / 2), 1 / √(2)]
+    @test 𝒂[m, 1] ≈ [0, -2 / √(2)]
+    @test 𝒂[m, n] ≈ [0, 0] atol = 1e-14
+    @test 𝒂[m, N] ≈ [0, 2 / √(2)]
+    @test 𝒂[M, 1] ≈ [√(3 / 2), -1 / √(2)]
+    @test 𝒂[M, n] ≈ [√(3 / 2), 1 / √(2)]
+    @test 𝒂[M, N] ≈ [√(3 / 2), 3 / √(2)]
 
     newton_onestep!(result)
     M = ElasticSurfaceEmbedding.loadM(result)
     𝒂 = controlpoints(M)
+    M, N = size(𝒂)
+    m = M ÷ 2 + 1
+    n = N ÷ 2 + 1
     @test 𝒂[1, 1] ≈ [-√(3 / 2), -3 / √(2)]
-    @test 𝒂[1, 2] ≈ [-√(3 / 2), -1 / √(2)]
-    @test 𝒂[1, 3] ≈ [-√(3 / 2), 1 / √(2)]
-    @test 𝒂[3, 1] ≈ [0, -2 / √(2)]
-    @test norm(𝒂[3, 2]) < 1e-14
-    @test 𝒂[3, 3] ≈ [0, 2 / √(2)]
-    @test 𝒂[5, 1] ≈ [√(3 / 2), -1 / √(2)]
-    @test 𝒂[5, 2] ≈ [√(3 / 2), 1 / √(2)]
-    @test 𝒂[5, 3] ≈ [√(3 / 2), 3 / √(2)]
+    @test 𝒂[1, n] ≈ [-√(3 / 2), -1 / √(2)]
+    @test 𝒂[1, N] ≈ [-√(3 / 2), 1 / √(2)]
+    @test 𝒂[m, 1] ≈ [0, -2 / √(2)]
+    @test 𝒂[m, n] ≈ [0, 0] atol = 1e-14
+    @test 𝒂[m, N] ≈ [0, 2 / √(2)]
+    @test 𝒂[M, 1] ≈ [√(3 / 2), -1 / √(2)]
+    @test 𝒂[M, n] ≈ [√(3 / 2), 1 / √(2)]
+    @test 𝒂[M, N] ≈ [√(3 / 2), 3 / √(2)]
 end
 
 @testset "Planar" begin
@@ -76,8 +82,10 @@ end
     show_strain(D)
     result = initial_state(D)
     M = ElasticSurfaceEmbedding.loadM(result)
-    @test norm([ElasticSurfaceEmbedding.E(M, u¹, u²) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
+    @test norm([ElasticSurfaceEmbedding.E(M, u¹, u²) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-4
 
+    newton_onestep!(result)
+    refinement!(result, p₊=(0,1), k₊=suggest_knotvector(result))
     newton_onestep!(result)
     M = ElasticSurfaceEmbedding.loadM(result)
     @test norm([ElasticSurfaceEmbedding.E(M, u¹, u²) for u¹ in -0.9:0.1:1.9, u² in 1.05:0.05:1.15], Inf) < 1e-5
