@@ -42,12 +42,6 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n
     # 1e-14 is ad-hoc number to avoid non-smooth singularity on the boundary.
     t₋ = minimum(D₁) + 1e-14
     t₊ = maximum(D₁) - 1e-14
-    p₁ = 3
-    p₂ = 1
-    k₁ = KnotVector(range(extrema(D₁)..., length = n₁ - p₁ + 1)) + p₁ * KnotVector([extrema(D₁)...])
-    k₂ = KnotVector(repeat(collect(extrema(D₂)), inner = 2))
-    P₁ = BSplineSpace{p₁}(k₁)
-    P₂ = BSplineSpace{p₂}(k₂)
 
     # Number of divisions for ODE
     N = 100
@@ -72,7 +66,7 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n
         Δ𝒄̇₀ = Δt * (k1 + 2k2 + 2k3 + k4) / 6
         𝒄̇₍ₛ₎s[i+1] = 𝒄̇ + Δ𝒄̇₀
     end
-    𝒄̇₍ₛ₎ = _interpolate2(ts, 𝒄̇₍ₛ₎s, A(D₂, t₋)*𝒄̇₀)
+    𝒄̇₍ₛ₎ = _interpolate2(ts, 𝒄̇₍ₛ₎s, A(t₋, D₂)*𝒄̇₀)
 
     # Integrate 𝒄̇₍ₛ₎ and obtain the center-curve 𝒄₍ₛ₎
     𝒄₍ₛ₎(t) = unbounded_mapping(integrate(𝒄̇₍ₛ₎), t)
@@ -82,6 +76,13 @@ function _initialize(D::Tuple{ClosedInterval{<:Real}, ClosedInterval{<:Real}}, n
     𝒒₍ₛ₎₂(t) = (@SMatrix [g₍₀₎₁₂(t, D₂) -𝝊₍₀₎(t, D₂); 𝝊₍₀₎(t, D₂) g₍₀₎₁₂(t, D₂)]) * 𝒒₍ₛ₎₁(t) / g₍₀₎₁₁(t, D₂)
     c = (t₋+t₊)/2
     𝒑₍ₛ₎(u¹, u²) = 𝒄₍ₛ₎(u¹) + (u²-c)*𝒒₍ₛ₎₂(u¹)
+
+    p₁ = 3
+    p₂ = 1
+    k₁ = KnotVector(range(extrema(D₁)..., length = n₁ - p₁ + 1)) + p₁ * KnotVector([extrema(D₁)...])
+    k₂ = KnotVector(repeat(collect(extrema(D₂)), inner = 2))
+    P₁ = BSplineSpace{p₁}(k₁)
+    P₂ = BSplineSpace{p₂}(k₂)
 
     𝒂 = fittingcontrolpoints(𝒑₍ₛ₎, P₁, P₂)
     M = BSplineManifold(𝒂, (P₁, P₂))
