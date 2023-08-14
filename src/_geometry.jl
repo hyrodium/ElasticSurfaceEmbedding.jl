@@ -56,7 +56,7 @@ g₍₀₎₂₂(u¹, D₂::ClosedInterval) = g₍₀₎₂₂(u¹, c(D₂))
 𝝊₍₀₎(u¹, D₂::ClosedInterval) = 𝝊₍₀₎(u¹, c(D₂))
 
 # Current State
-𝒑₍ₜ₎(M, u¹, u²) = M(u¹, u²)
+𝒑₍ₜ₎(M, u¹, u²) = unbounded_mapping(M, u¹, u²)
 # This can be faster with BSplineDerivativeSpace, but we don't need speed here.
 𝒑₁₍ₜ₎(M, u¹, u²) = ForwardDiff.derivative(u¹ -> 𝒑₍ₜ₎(M, u¹, u²), u¹)
 𝒑₂₍ₜ₎(M, u¹, u²) = ForwardDiff.derivative(u² -> 𝒑₍ₜ₎(M, u¹, u²), u²)
