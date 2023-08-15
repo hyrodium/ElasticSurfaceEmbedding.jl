@@ -1,7 +1,6 @@
 # ---
 # title: Helicatenoid2
-# cover: ../assets/helicatenoid.jpg
-# description: Weaving a transformable curved surface from catenoid to helicoid.
+# description: Weaving a transformable curved surface from catenoid to helicoid (2).
 # ---
 
 # Weaving a transformable curved surface from catenoid to helicoid.
@@ -123,3 +122,8 @@ for i in 1:(N+1)÷2
 end
 
 # The output files will be saved as `embedding-$(i).svg`.
+
+# ![](helicatenoid2/embedding-1.svg)
+# ![](helicatenoid2/embedding-2.svg)
+# ![](helicatenoid2/embedding-3.svg)
+# ![](helicatenoid2/embedding-4.svg)
