@@ -13,10 +13,10 @@ show_strain(D(1,n))
 
 steptree = StepTree()
 for i in 1:10
-    initial_state!(steptree, D(i,n), n₁=25)
+    initial_state!(steptree, D(i,n))
     newton_onestep!(steptree, fixingmethod=:fix3points)
     newton_onestep!(steptree)
-    refinement!(steptree, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/5])))
+    refinement!(steptree, p₊=(0,1), k₊=suggest_knotvector(steptree))
     newton_onestep!(steptree)
     newton_onestep!(steptree)
     pin!(steptree)
