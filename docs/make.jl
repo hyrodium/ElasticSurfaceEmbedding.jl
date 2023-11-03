@@ -2,6 +2,8 @@ using ElasticSurfaceEmbedding
 using Documenter
 using DemoCards
 
+
+
 # Create demo with DemoCards.jl
 gallery_demopage, gallery_cb, gallery_assets = makedemos(joinpath("gallery"))
 

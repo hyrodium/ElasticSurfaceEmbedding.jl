@@ -104,7 +104,7 @@ function _newton(M::BSplineManifold{2,p,<:SVector}, fix_method) where {p}
     F̌ = F[_unfixed]
     Ǧ = Ȟ \ F̌
     𝒂̌ = 𝒂̌ - Ǧ
-    for i in _fixed
+    for i = _fixed
         insert!(𝒂̌, i, 𝒂ₒ[i])
     end
     𝒂 = reshape(𝒂̌, n₁, n₂, 2)
