@@ -1,10 +1,8 @@
 name: Format suggestions
-
 on:
   pull_request:
-
 jobs:
   code-style:
     runs-on: ubuntu-latest
     steps:
-      - uses: hyrodium/julia-format@renew
+      - uses: julia-actions/julia-format@v2
