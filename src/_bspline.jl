@@ -76,7 +76,7 @@ function refinement!(steptree, parent::Int = 0; p₊ = (0, 0), k₊ = (EmptyKnot
 
     comment = "Refinement - p₊:$((p₊₁, p₊₂)), k₊:$((BasicBSpline._vec(k₊₁), BasicBSpline._vec(k₊₂)))"
     comment = replace(comment, "Float64" => "")
-    M = refinement(M, (Val(p₊₁), Val(p₊₂)), (k₊₁, k₊₂))
+    M = refinement_I(M, (Val(p₊₁), Val(p₊₂)), (k₊₁, k₊₂))
     info = Dict(["type" => "refinement"])
     step = Step(M, comment, info)
     addstep!(steptree, step, parent)
