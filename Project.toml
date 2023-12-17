@@ -1,7 +1,7 @@
 name = "ElasticSurfaceEmbedding"
 uuid = "bcf6de08-7633-46ab-86e2-ee57f9a67390"
 authors = ["hyrodium <hyrodium@gmail.com>"]
-version = "0.0.3-dev"
+version = "0.0.4-dev"
 
 [deps]
 BasicBSpline = "4c5d9882-2acf-4ea4-9e48-968fd4518195"
