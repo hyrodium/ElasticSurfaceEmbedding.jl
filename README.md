@@ -6,9 +6,13 @@
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![arXiv](https://img.shields.io/badge/math.DG-arXiv%3A2211.06372-B31B1B.svg)](https://arxiv.org/abs/2211.06372)
 
-📣**Notice**🕙\
-I will be giving a lightning talk about this repository at JuliaCon 2023!\
-[Creating smooth surface models with ElasticSurfaceEmbedding.jl](https://pretalx.com/juliacon2023/talk/RBHAER/)
+## JuliaCon2023 Talk! 📣🕙
+I gave a lightning talk about this repository at JuliaCon2023!
+
+[![JuliaCon2023 Talk](https://img.youtube.com/vi/0gRVPLfZl7w/0.jpg)](https://www.youtube.com/watch?v=0gRVPLfZl7w)
+
+* [Pretalx page](https://pretalx.com/juliacon2023/talk/RBHAER/)
+* [Slides](https://www.docswell.com/s/hyrodium/5JL8EQ-JuliaCon2023)
 
 ## TL;DR
 You can make a *holdable* smooth surface model with this repository.
