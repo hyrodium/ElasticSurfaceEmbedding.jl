@@ -18,6 +18,7 @@ makedocs(;
         prettyurls = true,
         canonical = "https://hyrodium.github.io/ElasticSurfaceEmbedding.jl",
         assets = ["assets/custom.css", gallery_assets],
+        repolink = "https://github.com/hyrodium/ElasticSurfaceEmbedding.jl"
     ),
     pages = [
         "Home" => "index.md",
@@ -25,7 +26,7 @@ makedocs(;
         "Numerical computation" => "run-julia.md",
         "Symbolic computation" => "run-wolfram.md",
         "Gallery" => gallery_demopage,
-        # "Function Reference" => "functionreference.md",
+        "API" => "api.md",
     ],
 )
 

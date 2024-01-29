@@ -88,9 +88,7 @@ E_{11}^{\langle 0\rangle}&\approx\frac{1}{2}K_{[0]}B^2\left(r^2-\frac{1}{3}\righ
 \end{aligned}
 ```
 
-```@docs
-show_strain
-```
+[`show_strain`](@ref)
 
 ```@example paraboloid
 for i in 1:n
@@ -103,12 +101,7 @@ end
     Empirically, it is better if the absolute value of strain is smaller than ``0.01 (=1\%)``.
 
 ### Initial state
-If you finished checking the strain prediction, the next step is determination of the initial state.
-
-```@docs
-initial_state
-initial_state!
-```
+If you finished checking the strain prediction, the next step is determination of the initial state with [`initial_state`](@ref) (or [`initial_state!`](@ref) from the second time).
 
 From this section, the computing is done for each piece of the surface.
 First, let's calculate for ``i=1``.
@@ -124,6 +117,8 @@ steptree = initial_state(D(i,n))
 
 ### Newton-Raphson method iteration
 
+[`newton_onestep!`](@ref) function calculates one step of Newton-Raphson method iteration.
+
 ```@example paraboloid
 newton_onestep!(steptree, fixingmethod=:fix3points)
 newton_onestep!(steptree)
@@ -133,43 +128,23 @@ You can choose the fixing method from below:
 * `:default` (default)
 * `:fix3points`
 
-```@docs
-newton_onestep!
-```
-
 ### Refinement of B-spline manifold
-
-```@docs
-refinement!
-```
 
 ```@example paraboloid
 refinement!(steptree, p₊=(0,1), k₊=(EmptyKnotVector(),KnotVector([(i-1/2)/10])))
 ```
 
-The knotvector to be inserted in `refinement!` can be suggested by `show_knotvector` function.
-
-```@docs
-show_knotvector
-```
+The knotvector to be inserted in [`refinement!`](@ref) can be suggested by [`show_knotvector`](@ref) function.
 
 ### Pin the step
 If you finished computing for the strip, it's time to *pin* the step.
-This pin📌 will be used for the the final export step.
-
-```@docs
-pin!
-```
+This [`pin!`](@ref) function will be used for the the final export step.
 
 ```@example paraboloid
 pin!(steptree)
 ```
 
-If you add a pin mistakenly, you can remove the pin with `unpin!` function.
-
-```@docs
-unpin!
-```
+If you add a pin mistakenly, you can remove the pin with [`unpin!`](@ref) function.
 
 ```@example paraboloid
 unpin!(steptree, 4)
@@ -192,11 +167,7 @@ pin!(steptree)
 ```
 
 ### Export all pinned shapes
-This is the final step of the computational process.
-
-```@docs
-export_pinned_steps
-```
+This is the final step of the computational process with [`export_pinned_steps`](@ref).
 
 ```@example paraboloid
 export_pinned_steps(".", steptree, unitlength=(50, "mm"), mesh=(20,1), xlims=(-2,2), ylims=(-0.3,0.3))
