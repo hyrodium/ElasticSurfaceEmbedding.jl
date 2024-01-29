@@ -87,19 +87,19 @@ Cut papers into strips, and weave them into the surface.
 
 
 ## Directions: If you like..
-### ..making crafts:scissors:
+### ..making crafts :scissors:
 | <img src="docs/src/img/craft.png" align="top" height="150" width="150"> | Print Appendix B from [my paper on arXiv](https://arxiv.org/abs/2211.06372), and <a href="https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/craft/">make your own surface model. <br> Laser cutting machine is useful, but it's not necessary. |
 | --- | :-- |
 
-### ..computing:octocat:
+### ..computing :octocat:
 | <img src="docs/src/img/juliawolfram.png" align="top" height="150" width="150"> | Clone this repository, and run the [Julia code](https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/run-julia/) or [Wolfram code](https://github.com/hyrodium/ElasticSurfaceEmbedding-wolfram)! <br> Any issues and pull requests are welcomed. |
 | --- | :-- |
 
-### ..mathematics or physics:globe_with_meridians:
+### ..mathematics or physics :globe_with_meridians:
 | <img src="docs/src/img/math.png" align="top" height="150" width="150"> | Read [our paper on arXiv](https://arxiv.org/abs/2211.06372). Here's our theoretical framework: <br> ・Mathematical model: [Nonlinear elasticity](https://www.sciencedirect.com/topics/engineering/geometric-nonlinearity) on [Riemannian manifold](https://en.m.wikipedia.org/wiki/Riemannian_manifold) <br> ・Geometric representation: [B-spline manifold](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline) <br> ・Numerical analysis: [Galerkin method](https://en.wikipedia.org/wiki/Galerkin_method), [Newton-Raphson method](https://en.wikipedia.org/wiki/Newton%27s_method) |
 | --- | :-- |
 
-### ..me!:bowtie:
+### ..me! :bowtie:
 | <img src="docs/src/img/me.jpg" align="top" height="150" width="150"> | Follow [my twitter account](https://twitter.com/Hyrodium). <br> Visit [my website](https://hyrodium.github.io/). <br> Read [my paper on arXiv](https://arxiv.org/abs/2211.06372). |
 | --- | :-- |
 
