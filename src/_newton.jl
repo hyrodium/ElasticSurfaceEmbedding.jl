@@ -40,8 +40,12 @@ _abbstr(t::Millisecond) = string(t.value) * "ms "
 _abbstr(t::Vector{Period}) = *(_abbstr.(t)...)[1:end-1]
 
 function _seconds2string(Δt::Float64)
-    prds = Dates.canonicalize(Dates.CompoundPeriod(Dates.Millisecond(floor(1000Δt)))).periods
-    return _abbstr(prds)
+    periods = Dates.canonicalize(Dates.CompoundPeriod(Dates.Millisecond(floor(1000Δt)))).periods
+    if isempty(periods)
+        return "0ms"
+    else
+        return _abbstr(periods)
+    end
 end
 
 """
