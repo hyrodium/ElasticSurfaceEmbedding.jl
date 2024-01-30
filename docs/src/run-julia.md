@@ -88,7 +88,7 @@ E_{11}^{\langle 0\rangle}&\approx\frac{1}{2}K_{[0]}B^2\left(r^2-\frac{1}{3}\righ
 \end{aligned}
 ```
 
-[`show_strain`](@ref)
+You can check this strain estimation using the [`show_strain`](@ref) function.
 
 ```@example paraboloid
 for i in 1:n
