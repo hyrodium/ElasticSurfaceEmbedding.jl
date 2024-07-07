@@ -31,9 +31,9 @@ function delta(f, B)
     return maximum(f.(xs)) - minimum(f.(xs))
 end
 
-dir_result = joinpath(@__DIR__, "result")
+DIR_RESULT = joinpath(@__DIR__, "result")
 
-rm(dir_result, recursive = true, force = true)
+rm(DIR_RESULT, recursive = true, force = true)
 
 @testset "Rhomboid" begin
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹, u²) = SVector(u¹, u², u¹ + u²)
@@ -216,12 +216,12 @@ end
         pin!(result)
     end
 
-    export_all_steps(joinpath(dir_result, "Paraboloid"), result)
-    files_pinned = readdir(joinpath(dir_result, "Paraboloid", "pinned"))
+    export_all_steps(joinpath(DIR_RESULT, "Paraboloid"), result)
+    files_pinned = readdir(joinpath(DIR_RESULT, "Paraboloid", "pinned"))
 
     @test length(files_pinned) == N
 
-    # img_b = load(joinpath(dir_result,"Paraboloid","append","Paraboloid-5_append.png"))
+    # img_b = load(joinpath(DIR_RESULT,"Paraboloid","append","Paraboloid-5_append.png"))
     # d = Euclidean()
     # @test d(RGB.(img_a), RGB.(img_b)) < 0.0001
 end
