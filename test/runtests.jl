@@ -61,6 +61,8 @@ end
     D = (-1.0 .. 1.0, -1.0 .. 1.0)
     show_strain(D)
     @test_logs (:info, "Strain - domain: [-1.0, 1.0]×[-1.0, 1.0]\nPredicted: (min: -0.0, max: 0.0)\n") show_strain(D)
+    @test_logs (:info, "Strain - domain: [-1.0, 1.0]×[-1.0, 1.0]\n  Predicted: (min: -0.0, max: 0.0)\n") show_strain([D])
+    @test_logs (:info, "Strain - domain: [-1.0, 1.0]×[-1.0, 1.0]\n  Predicted: (min: -0.0, max: 0.0)\nStrain - domain: [-1.0, 1.0]×[-1.0, 1.0]\n  Predicted: (min: -0.0, max: 0.0)\n") show_strain([D,D])
 
     result = initial_state(D)
     M = ElasticSurfaceEmbedding.loadM(result)
@@ -77,6 +79,19 @@ end
     @test 𝒂[M, 1] ≈ [√(3 / 2), -1 / √(2)]
     @test 𝒂[M, n] ≈ [√(3 / 2), 1 / √(2)]
     @test 𝒂[M, N] ≈ [√(3 / 2), 3 / √(2)]
+
+    P₁, _ = result.steps[end].manifold.bsplinespaces
+    k₁ = knotvector(P₁)
+    k₁.vector ≈ [-1,-1,-1,-1,0,1,1,1,1]
+    k₁₊, _ = suggest_knotvector(result, index=1)
+    msg = """
+    Current knotvectors (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
+    k₁: $(BasicBSpline._vec(k₁))
+    k₂: $([-1.0, -1.0, -1.0, 1.0, 1.0, 1.0])
+    k₁₊: $(BasicBSpline._vec(k₁₊))
+    k₂₊: $([0.0])
+    """
+    @test_logs (:info, msg) show_knotvector(result)
 
     newton_onestep!(result)
     M = ElasticSurfaceEmbedding.loadM(result)
