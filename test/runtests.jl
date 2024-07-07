@@ -31,15 +31,38 @@ function delta(f, B)
     return maximum(f.(xs)) - minimum(f.(xs))
 end
 
-dir_result = joinpath(@__DIR__, "result")
+DIR_RESULT = joinpath(@__DIR__, "result")
 
-rm(dir_result, recursive = true, force = true)
+rm(DIR_RESULT, recursive = true, force = true)
+
+@testset "README example" begin
+    # Overload the shape definition
+    ElasticSurfaceEmbedding.surface(x,y) = SVector(x, y, x^2+y^2)
+    # (1) split the surface into strips
+    dom = [(-1..1, (i-1)/10..i/10) for i in 1:10]
+    # (2) Embed the strips onto a plane
+    res = auto_allsteps(dom)
+    export_pinned_steps(joinpath(DIR_RESULT, "paraboloid"), res)
+
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-7.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-14.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-21.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-28.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-35.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-42.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-49.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-56.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-63.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-70.svg"))
+end
 
 @testset "Rhomboid" begin
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹, u²) = SVector(u¹, u², u¹ + u²)
     D = (-1.0 .. 1.0, -1.0 .. 1.0)
     show_strain(D)
     @test_logs (:info, "Strain - domain: [-1.0, 1.0]×[-1.0, 1.0]\nPredicted: (min: -0.0, max: 0.0)\n") show_strain(D)
+    @test_logs (:info, "Strain - domain: [-1.0, 1.0]×[-1.0, 1.0]\n  Predicted: (min: -0.0, max: 0.0)\n") show_strain([D])
+    @test_logs (:info, "Strain - domain: [-1.0, 1.0]×[-1.0, 1.0]\n  Predicted: (min: -0.0, max: 0.0)\nStrain - domain: [-1.0, 1.0]×[-1.0, 1.0]\n  Predicted: (min: -0.0, max: 0.0)\n") show_strain([D,D])
 
     result = initial_state(D)
     M = ElasticSurfaceEmbedding.loadM(result)
@@ -56,6 +79,19 @@ rm(dir_result, recursive = true, force = true)
     @test 𝒂[M, 1] ≈ [√(3 / 2), -1 / √(2)]
     @test 𝒂[M, n] ≈ [√(3 / 2), 1 / √(2)]
     @test 𝒂[M, N] ≈ [√(3 / 2), 3 / √(2)]
+
+    P₁, _ = result.steps[end].manifold.bsplinespaces
+    k₁ = knotvector(P₁)
+    @test k₁.vector ≈ [-1,-1,-1,-1,0,1,1,1,1]
+    k₁₊, _ = suggest_knotvector(result, index=1)
+    msg = """
+    Current knotvectors (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
+    k₁: $(BasicBSpline._vec(k₁))
+    k₂: $([-1.0, -1.0, -1.0, 1.0, 1.0, 1.0])
+    k₁₊: $(BasicBSpline._vec(k₁₊))
+    k₂₊: $([0.0])
+    """
+    @test_logs (:info, msg) show_knotvector(result)
 
     newton_onestep!(result)
     M = ElasticSurfaceEmbedding.loadM(result)
@@ -216,12 +252,12 @@ end
         pin!(result)
     end
 
-    export_all_steps(joinpath(dir_result, "Paraboloid"), result)
-    files_pinned = readdir(joinpath(dir_result, "Paraboloid", "pinned"))
+    export_all_steps(joinpath(DIR_RESULT, "Paraboloid"), result)
+    files_pinned = readdir(joinpath(DIR_RESULT, "Paraboloid", "pinned"))
 
     @test length(files_pinned) == N
 
-    # img_b = load(joinpath(dir_result,"Paraboloid","append","Paraboloid-5_append.png"))
+    # img_b = load(joinpath(DIR_RESULT,"Paraboloid","append","Paraboloid-5_append.png"))
     # d = Euclidean()
     # @test d(RGB.(img_a), RGB.(img_b)) < 0.0001
 end

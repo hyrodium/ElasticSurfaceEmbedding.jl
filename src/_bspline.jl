@@ -95,7 +95,7 @@ function suggest_knotvector(steptree; index=0)
 end
 
 """
-    show_knotvector(; index=0)
+    show_knotvector(::StepTree; index=0)
 
 Show current knotvector and suggestions for knot insertions (with given index).
 """
@@ -107,10 +107,10 @@ function show_knotvector(steptree; index = 0)
     k₁₊, k₂₊ = suggest_knotvector(steptree, index=index)
     msg = """
     Current knotvectors (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
-    k₁: , $(BasicBSpline._vec(k₁))
-    k₂: , $(BasicBSpline._vec(k₂))
-    k₁₊: , $(BasicBSpline._vec(k₁₊))
-    k₂₊: , $(BasicBSpline._vec(k₂₊))
+    k₁: $(BasicBSpline._vec(k₁))
+    k₂: $(BasicBSpline._vec(k₂))
+    k₁₊: $(BasicBSpline._vec(k₁₊))
+    k₂₊: $(BasicBSpline._vec(k₂₊))
     """
     @info msg
     return
