@@ -82,7 +82,7 @@ end
 
     P₁, _ = result.steps[end].manifold.bsplinespaces
     k₁ = knotvector(P₁)
-    k₁.vector ≈ [-1,-1,-1,-1,0,1,1,1,1]
+    @test k₁.vector ≈ [-1,-1,-1,-1,0,1,1,1,1]
     k₁₊, _ = suggest_knotvector(result, index=1)
     msg = """
     Current knotvectors (k₁, k₂) and suggestions for knot insertions (k₁₊, k₂₊)
