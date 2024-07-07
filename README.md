@@ -1,5 +1,6 @@
 # Elastic Surface Embedding; Weaving Parer Strips
 
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev)
 [![Build Status](https://github.com/hyrodium/ElasticSurfaceEmbedding.jl/workflows/CI/badge.svg)](https://github.com/hyrodium/ElasticSurfaceEmbedding.jl/actions)
 [![Coverage](https://codecov.io/gh/hyrodium/ElasticSurfaceEmbedding.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/hyrodium/ElasticSurfaceEmbedding.jl)
