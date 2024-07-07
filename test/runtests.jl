@@ -35,6 +35,27 @@ DIR_RESULT = joinpath(@__DIR__, "result")
 
 rm(DIR_RESULT, recursive = true, force = true)
 
+@testset "README example" begin
+    # Overload the shape definition
+    ElasticSurfaceEmbedding.surface(x,y) = SVector(x, y, x^2+y^2)
+    # (1) split the surface into strips
+    dom = [(-1..1, (i-1)/10..i/10) for i in 1:10]
+    # (2) Embed the strips onto a plane
+    res = auto_allsteps(dom)
+    export_pinned_steps(joinpath(DIR_RESULT, "paraboloid"), res)
+
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-7.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-14.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-21.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-28.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-35.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-42.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-49.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-56.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-63.svg"))
+    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-70.svg"))
+end
+
 @testset "Rhomboid" begin
     ElasticSurfaceEmbedding.𝒑₍₀₎(u¹, u²) = SVector(u¹, u², u¹ + u²)
     D = (-1.0 .. 1.0, -1.0 .. 1.0)
