@@ -17,7 +17,7 @@ makedocs(;
     format = Documenter.HTML(;
         prettyurls = true,
         canonical = "https://hyrodium.github.io/ElasticSurfaceEmbedding.jl",
-        assets = ["assets/custom.css", gallery_assets],
+        assets = ["assets/favicon.ico", "assets/custom.css", gallery_assets],
         repolink = "https://github.com/hyrodium/ElasticSurfaceEmbedding.jl"
     ),
     pages = [
