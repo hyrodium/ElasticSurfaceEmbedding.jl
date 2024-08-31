@@ -1,9 +1,13 @@
 # ---
 # title: Helicatenoid2
+# cover: ../assets/helicatenoid2.jpg
 # description: Weaving a transformable curved surface from catenoid to helicoid (2).
 # ---
 
 # Weaving a transformable curved surface from catenoid to helicoid.
+# You can buy the kit [via my Booth site](https://hyrodium.booth.pm/items/5046306)!
+
+# ![](../assets/helicatenoid2.jpg)
 
 # ## Load packages
 using Luxor
@@ -127,3 +131,6 @@ end
 # ![](helicatenoid2/embedding-2.svg)
 # ![](helicatenoid2/embedding-3.svg)
 # ![](helicatenoid2/embedding-4.svg)
+
+# # References
+# - [懸垂面螺旋面製作キット](https://hackmd.io/@hyrodium/Hy4D5r633)
