@@ -8,10 +8,17 @@ You can:
     * I'm using [Beambox by FLUX.inc](https://flux3dp.com/beambox/).
 * [Compute the shape of paper strip](@ref numerical_computation), instead of downloading the paraboloid.
     * This needs setup for Julia environment.
-* Buy already cut pieces of paper at [Booth](https://hyrodium.booth.pm/) (In preparation).
-    * Ships from Japan.
+* Buy already cut pieces of paper from [my Booth page](https://hyrodium.booth.pm/).
+    * [懸垂面↔螺旋面 変形模型製作キット](https://hyrodium.booth.pm/items/5046306)
+    * [立体射影製作キット](https://hyrodium.booth.pm/items/5046218)
 
 ## Images during the making process
 
 ![](img/assembling.png)
 ![](img/craft.png)
+
+See also
+
+- [立体射影製作キット](https://hackmd.io/@hyrodium/HJsIPNKqo)
+- [Stereographic projection weaving kit](https://hackmd.io/@hyrodium/H1epn1rRj)
+- [懸垂面螺旋面製作キット](https://hackmd.io/@hyrodium/Hy4D5r633)
