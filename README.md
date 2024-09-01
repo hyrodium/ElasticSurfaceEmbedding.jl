@@ -30,7 +30,7 @@ This is the meaning of "Elastic Surface Embedding".
 The definition must consist of parametric mapping and its domain.
 For example, a paraboloid can be parametrized as below.
 
-$$
+```math
 \begin{aligned}
 \boldsymbol{p}_{[0]}(u^1,u^2)
 &= \begin{pmatrix}
@@ -41,16 +41,16 @@ u^2 \\
 (u^1, u^2)
 \in [-1,1] \times [-1,1]
 \end{aligned}
-$$
+```
 
 The domain will be split into $D^{(i)}$.
 
-$$
+```math
 \begin{aligned}
 D^{(i)}
 = [-1,1] \times \left[\frac{i-1}{10}, \frac{i}{10}\right] \qquad (i = 1,...,10)
 \end{aligned}
-$$
+```
 
 ### step 2: Numerical analysis
 This is the main part.

@@ -5,6 +5,7 @@
 # ---
 
 # A point light illuminates the grid points on the ground.
+# You can buy the kit [via my Booth site](https://hyrodium.booth.pm/items/5046218)!
 
 # ![](../assets/stereographicprojection.jpg)
 
@@ -130,7 +131,7 @@ end
 # Please check the following references for more information.
 
 # # References
-# * [紙工作で立体射影をつくった話](https://note.com/hyrodium/n/n7b7cf03a7d91)
-# * [立体射影製作キット](https://hackmd.io/@hyrodium/HJsIPNKqo)
-# * [Stereographic projection weaving kit](https://hackmd.io/@hyrodium/H1epn1rRj)
-# * [Further adventures in stereographic projection](https://www.youtube.com/watch?v=lbUOScpu0ws)
+# - [紙工作で立体射影をつくった話](https://note.com/hyrodium/n/n7b7cf03a7d91)
+# - [立体射影製作キット](https://hackmd.io/@hyrodium/HJsIPNKqo)
+# - [Stereographic projection weaving kit](https://hackmd.io/@hyrodium/H1epn1rRj)
+# - [Further adventures in stereographic projection](https://www.youtube.com/watch?v=lbUOScpu0ws)

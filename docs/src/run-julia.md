@@ -6,8 +6,8 @@ On Julia's package mode, run the following commands.
 pkg> add IntervalSets
 pkg> add StaticArrays
 pkg> add BasicBSpline
-pkg> add https://github.com/hyrodium/BasicBSplineExporter.jl
-pkg> add https://github.com/hyrodium/ElasticSurfaceEmbedding.jl
+pkg> add BasicBSplineExporter.jl
+pkg> add ElasticSurfaceEmbedding.jl
 ```
 
 ## Overview of our method

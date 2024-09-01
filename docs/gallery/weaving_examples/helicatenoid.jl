@@ -73,3 +73,7 @@ export_pinned_steps("helicatenoid-b", steptree, unitlength=(40,"mm"), mesh=(36,1
 # ![](helicatenoid-b/pinned/pinned-9.svg) ![](helicatenoid-b/pinned/pinned-18.svg) ![](helicatenoid-b/pinned/pinned-27.svg)
 # ![](helicatenoid-b/pinned/pinned-36.svg) ![](helicatenoid-b/pinned/pinned-45.svg) ![](helicatenoid-b/pinned/pinned-54.svg)
 # ![](helicatenoid-b/pinned/pinned-63.svg) ![](helicatenoid-b/pinned/pinned-72.svg) ![](helicatenoid-b/pinned/pinned-81.svg)
+
+# # References
+# - [Isometric transformation between a Catenoid and a Helicoid](https://www.youtube.com/watch?v=Gp6XkPLCw7s)
+# - [2019 Joint Mathematics Meetings - Yuto Horikawa](https://gallery.bridgesmathart.org/exhibitions/2019-joint-mathematics-meetings/yuto-horikawa)
