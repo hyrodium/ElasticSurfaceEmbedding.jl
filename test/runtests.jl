@@ -42,18 +42,18 @@ rm(DIR_RESULT, recursive = true, force = true)
     dom = [(-1..1, (i-1)/10..i/10) for i in 1:10]
     # (2) Embed the strips onto a plane
     res = auto_allsteps(dom)
-    export_pinned_steps(joinpath(DIR_RESULT, "paraboloid"), res)
+    export_pinned_steps(joinpath(DIR_RESULT, "README_Paraboloid"), res)
 
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-7.svg"))
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-14.svg"))
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-21.svg"))
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-28.svg"))
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-35.svg"))
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-42.svg"))
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-49.svg"))
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-56.svg"))
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-63.svg"))
-    @test isfile(joinpath(DIR_RESULT, "paraboloid", "pinned", "pinned-70.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-7.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-14.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-21.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-28.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-35.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-42.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-49.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-56.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-63.svg"))
+    @test isfile(joinpath(DIR_RESULT, "README_Paraboloid", "pinned", "pinned-70.svg"))
 end
 
 @testset "Rhomboid" begin
