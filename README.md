@@ -66,7 +66,7 @@ ElasticSurfaceEmbedding.surface(x,y) = SVector(x, y, x^2+y^2)
 dom = [(-1..1, (i-1)/10..i/10) for i in 1:10]
 # (2) Embed the strips onto a plane
 res = auto_allsteps(dom)
-export_pinned_steps("paraboloid", res)
+export_pinned_steps("README_Paraboloid", res)
 ```
 
 For more information, read [this document](https://hyrodium.github.io/ElasticSurfaceEmbedding.jl/dev/run-julia/).

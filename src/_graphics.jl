@@ -8,6 +8,14 @@ function _changeunit(path_svg, units::Pair{String,String})
     script = read(path_svg, String)
     lines = split(script, "\n")
     lines[2] = replace(lines[2], "$(old_unit)\"" => "$(new_unit)\"")
+    widthequal = match(r"(width=\"\d+)\"", lines[2])
+    if !isnothing(widthequal)
+        lines[2] = replace(lines[2], widthequal.captures[1] => widthequal.captures[1]*"mm")
+    end
+    heightequal = match(r"(height=\"\d+)\"", lines[2])
+    if !isnothing(heightequal)
+        lines[2] = replace(lines[2], heightequal.captures[1] => heightequal.captures[1]*"mm")
+    end
     write(path_svg, join(lines, "\n"))
 end
 
